@@ -35,8 +35,9 @@ int main(int argc, char *argv[])
     CryptoService crypto;
     AppIdService appIdService(&settings);
     TokenService tokenService(&settings);
-    User authorizedUser;
-    Auth auth(&appIdService, &tokenService, &api, &crypto, &authorizedUser);
+    User user;
+    context->setContextProperty("user", &user);
+    Auth auth(&appIdService, &tokenService, &api, &crypto, &user);
     context->setContextProperty("auth", &auth);
 
     // Start the application.

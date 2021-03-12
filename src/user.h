@@ -12,9 +12,11 @@
 class User : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString email READ getEmail NOTIFY emailChanged)
 public:
     explicit User(QObject *parent = nullptr);
     void setInformation(QString userId, QString email, KdfType kdf, int kdfIterations);
+    QString getEmail();
 
 private:
     QString userId;
@@ -23,6 +25,7 @@ private:
     int kdfIterations;
 
 signals:
+    void emailChanged();
 
 };
 

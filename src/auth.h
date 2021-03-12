@@ -23,6 +23,7 @@ class Auth : public QObject
     Q_PROPERTY(bool loginProcessing READ isLoginProcessing NOTIFY loginProcessingChanged);
     Q_PROPERTY(QString loginMessage READ getLoginMessage NOTIFY loginMessageChanged);
     Q_PROPERTY(QString loginMessageType READ getLoginMessageType NOTIFY loginMessageTypeChanged);
+    Q_PROPERTY(bool authorized READ isAuthorized NOTIFY authorizedChanged);
 public:
     Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, CryptoService *crypto, User *user);
     Q_INVOKABLE void login(QString password);
@@ -30,12 +31,14 @@ public:
     bool isLoginProcessing();
     QString getLoginMessage();
     QString getLoginMessageType();
+    bool isAuthorized();
 
 signals:
     void emailChanged();
     void loginProcessingChanged();
     void loginMessageChanged();
     void loginMessageTypeChanged();
+    void authorizedChanged();
 
 private:
     AppIdService *appIdService;
@@ -45,6 +48,7 @@ private:
     User *user;
 
     bool loginProcessing = false;
+    bool authorized = false;
     QString loginMessage;
     QString loginMessageType;
     void setLoginMessage(QString message, QString type = "info");

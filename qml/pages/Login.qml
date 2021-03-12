@@ -75,6 +75,16 @@ Page {
 
     }
 
+    Connections {
+        target: auth
+        onAuthorizedChanged: {
+            console.log("received authorized changed signal");
+            if(auth.authorized){
+                pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"));
+            }
+        }
+    }
+
     DockedPanel {
         id: progressPanel
 

@@ -25,6 +25,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
 DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/cover/CoverPage.qml \
     qml/pages/Login.qml \
+    qml/pages/Home.qml \
     rpm/harbour-bitwarden-manager.changes.in \
     rpm/harbour-bitwarden-manager.changes.run.in \
     rpm/harbour-bitwarden-manager.spec \

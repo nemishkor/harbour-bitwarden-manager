@@ -31,6 +31,11 @@ QString Auth::getLoginMessageType()
     return loginMessageType;
 }
 
+bool Auth::isAuthorized()
+{
+    return authorized;
+}
+
 void Auth::setLoginMessage(QString message, QString type)
 {
     if(this->loginMessage != message){
@@ -142,4 +147,6 @@ void Auth::identityReplyFinished()
 
     tokenService->setTokens(root["access_token"].toString(), root["refresh_token"].toString());
     user->setInformation(tokenService->getUserIdFromToken(), tokenService->getEmailFromToken(), static_cast<KdfType>(root["Kdf"].toInt()), root["KdfIterations"].toInt());
+    authorized = true;
+    emit authorizedChanged();
 }

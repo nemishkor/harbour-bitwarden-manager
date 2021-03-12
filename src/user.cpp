@@ -12,4 +12,10 @@ void User::setInformation(QString userId, QString email, KdfType kdf, int kdfIte
     this->email = email;
     this->kdf = kdf;
     this->kdfIterations = kdfIterations;
+    emit emailChanged();
+}
+
+QString User::getEmail()
+{
+    return email;
 }
