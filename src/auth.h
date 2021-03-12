@@ -25,6 +25,7 @@ class Auth : public QObject
     Q_PROPERTY(QString loginMessageType READ getLoginMessageType NOTIFY loginMessageTypeChanged);
 public:
     Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, CryptoService *crypto, User *user);
+    Q_INVOKABLE void reset();
     Q_INVOKABLE void preLogin(QString email);
     Q_INVOKABLE void login(QString password);
     int getLoginStage();
@@ -68,7 +69,6 @@ private:
     void saveKDFParameters();
     QByteArray makeIdentityTokenRequestBody();
     void postAuthenticate();
-    void abortAuthentication();
 
 };
 

@@ -2,12 +2,10 @@
 
 Authentication::Authentication(QObject *parent) : QObject(parent)
 {
-    qDebug() << this << "authentication constructor";
 }
 
 Authentication::~Authentication()
 {
-    qDebug() << this << "authentication destructor";
 }
 
 void Authentication::clear()

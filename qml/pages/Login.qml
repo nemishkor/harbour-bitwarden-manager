@@ -51,11 +51,18 @@ Page {
             }
 
             ButtonLayout {
+                visible: auth.loginStage === 0 || auth.loginStage === 2
+                preferredWidth: auth.loginStage === 0 ? Theme.buttonWidthMedium : Theme.buttonWidthExtraSmall
                 Button {
                     visible: auth.loginStage === 0
                     enabled: emailField.acceptableInput
                     text: qsTr("Next")
                     onClicked: auth.preLogin(emailField.text)
+                }
+                Button {
+                    visible: auth.loginStage === 2
+                    text: qsTr("Edit email")
+                    onClicked: auth.reset()
                 }
             }
 
@@ -73,8 +80,9 @@ Page {
             }
 
             ButtonLayout {
+                visible: auth.loginStage === 2
                 Button {
-                    visible: auth.loginStage === 2
+                    preferredWidth: Theme.buttonWidthMedium
                     enabled: passwordField.acceptableInput
                     text: qsTr("Login")
                     onClicked: auth.login(passwordField.text)
@@ -90,13 +98,16 @@ Page {
     Connections {
         target: auth
         onLoginStageChanged: {
-            console.log("received authorized changed signal");
+            if(auth.loginStage === 0){
+                emailField.forceActiveFocus()
+                passwordField.text = ""
+            }
             if(auth.loginStage === 2){
-                passwordField.forceActiveFocus();
+                passwordField.forceActiveFocus()
             }
 
             if(auth.loginStage === 4){
-                pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"));
+                pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"))
             }
         }
     }
@@ -128,9 +139,8 @@ Page {
             anchors {
                 left: circle.visible ? circle.right : parent.left
                 leftMargin: circle.visible ? Theme.paddingMedium : Theme.horizontalPageMargin
-                right: parent.theme
-                rightMargin: Theme.horizontalPageMargin
             }
+            width: parent.width - 2 * Theme.horizontalPageMargin - (circle.visible ? circle.width : 0)
             padding: Theme.paddingMedium
             text: auth.loginMessage
             color: auth.loginMessageType === "error" ? Theme.errorColor : Theme.primaryColor

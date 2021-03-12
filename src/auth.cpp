@@ -8,6 +8,8 @@ Auth::Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, Cry
     user(user)
 {
     authentication = new Authentication();
+    preloginReply = nullptr;
+    authenticateReply = nullptr;
     if(tokenService->exists()){
         qDebug() << "tokens is exist";
     }
@@ -54,6 +56,18 @@ void Auth::setLoginMessage(QString message, QString type)
     }
 }
 
+void Auth::reset()
+{
+    authentication->clear();
+    setLoginStage(0);
+    if(preloginReply && preloginReply->isRunning()){
+        preloginReply->abort();
+    }
+    if(authenticateReply && authenticateReply->isRunning()){
+        authenticateReply->abort();
+    }
+}
+
 void Auth::preLogin(QString email)
 {
     setLoginStage(1);
@@ -68,23 +82,27 @@ void Auth::preLogin(QString email)
 void Auth::saveKDFParameters()
 {
     if(preloginReply->error() != QNetworkReply::NoError){
-        setLoginStage(0);
-        setLoginMessage(preloginReply->errorString(), "error");
+        setLoginMessage("[" + QString::number(preloginReply->error()) + "]" + preloginReply->errorString(), "error");
+        reset();
         return;
     }
 
     QJsonDocument json = QJsonDocument::fromJson(preloginReply->readAll());
+    qDebug() << json.toJson();
     if(!json.isObject()){
         setLoginMessage("Invalid prelogin API response #1", "error");
+        reset();
         return;
     }
     QJsonObject root = json.object();
     if(!root.contains("Kdf")){
         setLoginMessage("Invalid prelogin API response #2", "error");
+        reset();
         return;
     }
     if(!root.contains("KdfIterations")){
         setLoginMessage("Invalid prelogin API response #3", "error");
+        reset();
         return;
     }
     authentication->setKdfType(static_cast<KdfType>(root["Kdf"].toInt()));
@@ -125,9 +143,9 @@ QByteArray Auth::makeIdentityTokenRequestBody()
 
 void Auth::postAuthenticate()
 {
-    if(authenticateReply->error() != QNetworkReply::NoError){
-        setLoginStage(0);
-        setLoginMessage(authenticateReply->errorString(), "error");
+    if(authenticateReply->error() != QNetworkReply::NoError && authenticateReply->error() != QNetworkReply::ProtocolInvalidOperationError){
+        setLoginMessage("[" + QString::number(authenticateReply->error()) + "]" + authenticateReply->errorString(), "error");
+        reset();
         return;
     }
 
@@ -136,29 +154,40 @@ void Auth::postAuthenticate()
 
     if(!json.isObject()){
         setLoginMessage("Invalid API response", "error");
+        reset();
         return;
     }
 
     QJsonObject root = json.object();
     if(root.contains("ErrorModel")){
         setLoginMessage(root["ErrorModel"].toObject()["Message"].toString(), "error");
+        reset();
         return;
     }
     if(root.contains("error_description")) {
         setLoginMessage(root["error_description"].toString(), "error");
+        reset();
         return;
     }
     if(root.contains("error")) {
         setLoginMessage(root["error"].toString(), "error");
+        reset();
         return;
     }
-
     if(!root.contains("access_token")){
         setLoginMessage("Invalid API response #2", "error");
+        reset();
         return;
     }
     if(!root.contains("refresh_token")){
         setLoginMessage("Invalid API response #3", "error");
+        reset();
+        return;
+    }
+
+    if(authenticateReply->error() == QNetworkReply::ProtocolInvalidOperationError){
+        setLoginMessage("[" + QString::number(authenticateReply->error()) + "]" + authenticateReply->errorString(), "error");
+        reset();
         return;
     }
 
@@ -167,16 +196,4 @@ void Auth::postAuthenticate()
 
     setLoginStage(4);
     setLoginMessage("");
-}
-
-void Auth::abortAuthentication()
-{
-    authentication->clear();
-    loginStage = 0;
-    if(preloginReply->isRunning()){
-        preloginReply->abort();
-    }
-    if(authenticateReply->isRunning()){
-        authenticateReply->abort();
-    }
 }

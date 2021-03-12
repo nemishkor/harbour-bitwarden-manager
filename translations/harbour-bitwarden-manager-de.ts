@@ -30,5 +30,9 @@
         <source>Next</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Edit email</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
