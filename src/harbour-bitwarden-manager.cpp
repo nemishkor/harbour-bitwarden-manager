@@ -2,11 +2,14 @@
 #include <QtQuick>
 #endif
 
+#include <QSettings>
 #include <sailfishapp.h>
 #include "api.h"
 #include "cryptoservice.h"
 #include "auth.h"
 #include "appidservice.h"
+#include "tokenservice.h"
+#include "user.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,9 +31,12 @@ int main(int argc, char *argv[])
 
     Api api(QString("https://api.bitwarden.com"), QString("https://identity.bitwarden.com"));
     context->setContextProperty("api", &api);
+    QSettings settings("harbour-bitwarden-manager");
     CryptoService crypto;
-    AppIdService appIdService;
-    Auth auth(&appIdService, &api, &crypto);
+    AppIdService appIdService(&settings);
+    TokenService tokenService(&settings);
+    User authorizedUser;
+    Auth auth(&appIdService, &tokenService, &api, &crypto, &authorizedUser);
     context->setContextProperty("auth", &auth);
 
     // Start the application.

@@ -1,8 +1,7 @@
 #include "appidservice.h"
 
-AppIdService::AppIdService(QObject *parent) : QObject(parent)
+AppIdService::AppIdService(QSettings *settings) : QObject(nullptr), settings(settings)
 {
-    settings = new QSettings("harbour-bitwarden-manager");
 }
 
 QString AppIdService::getAppId()

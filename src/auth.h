@@ -13,6 +13,8 @@
 #include "cryptoservice.h"
 #include "appidservice.h"
 #include "devicetype.h"
+#include "tokenservice.h"
+#include "user.h"
 
 class Auth : public QObject
 {
@@ -22,7 +24,7 @@ class Auth : public QObject
     Q_PROPERTY(QString loginMessage READ getLoginMessage NOTIFY loginMessageChanged);
     Q_PROPERTY(QString loginMessageType READ getLoginMessageType NOTIFY loginMessageTypeChanged);
 public:
-    Auth(AppIdService *appIdService, Api *api, CryptoService *crypto);
+    Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, CryptoService *crypto, User *user);
     Q_INVOKABLE void login(QString password);
     QString getEmail();
     bool isLoginProcessing();
@@ -37,12 +39,15 @@ signals:
 
 private:
     AppIdService *appIdService;
+    TokenService *tokenService;
     Api *api;
     CryptoService *crypto;
+    User *user;
 
     bool loginProcessing = false;
     QString loginMessage;
     QString loginMessageType;
+    void setLoginMessage(QString message, QString type = "info");
 
     QString email;
     QString password;

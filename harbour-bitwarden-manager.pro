@@ -18,7 +18,9 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/api.cpp \
     src/appidservice.cpp \
     src/auth.cpp \
-    src/cryptoservice.cpp
+    src/cryptoservice.cpp \
+    src/tokenservice.cpp \
+    src/user.cpp
 
 DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/cover/CoverPage.qml \
@@ -49,7 +51,9 @@ HEADERS += \
     src/auth.h \
     src/cryptoservice.h \
     src/devicetype.h \
-    src/kdftype.h
+    src/kdftype.h \
+    src/tokenservice.h \
+    src/user.h
 
 QT += network
 

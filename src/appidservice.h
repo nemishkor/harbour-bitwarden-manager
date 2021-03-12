@@ -9,7 +9,7 @@ class AppIdService : public QObject
 {
     Q_OBJECT
 public:
-    explicit AppIdService(QObject *parent = nullptr);
+    AppIdService(QSettings *settings);
     QString getAppId();
 
 signals:

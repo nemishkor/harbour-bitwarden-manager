@@ -1,10 +1,12 @@
 #include "auth.h"
 
-Auth::Auth(AppIdService *appIdService, Api *api, CryptoService *crypto) :
+Auth::Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, CryptoService *crypto, User *user) :
     appIdService(appIdService),
+    tokenService(tokenService),
     api(api),
     crypto(crypto),
-    email("")
+    user(user),
+    email("nemish94@gmail.com")
 {
 
 }
@@ -29,6 +31,18 @@ QString Auth::getLoginMessageType()
     return loginMessageType;
 }
 
+void Auth::setLoginMessage(QString message, QString type)
+{
+    if(this->loginMessage != message){
+        this->loginMessage = message;
+        emit loginMessageChanged();
+    }
+    if(this->loginMessageType != type){
+        this->loginMessageType = type;
+        emit loginMessageTypeChanged();
+    }
+}
+
 void Auth::login(QString password)
 {
     loginProcessing = true;
@@ -44,8 +58,7 @@ void Auth::login(QString password)
 
 void Auth::prelogin()
 {
-    loginMessage = "Checking encoding settings";
-    emit loginMessageChanged();
+    setLoginMessage("Checking encoding settings");
     QJsonObject jsonBody{ {"email", email} };
     preloginReply = api->postPrelogin(QUrl(api->getApiUrl() + "/accounts/prelogin"), QJsonDocument(jsonBody).toJson(QJsonDocument::Compact));
     connect(preloginReply, &QNetworkReply::finished, this, &Auth::makePreloginKey);
@@ -53,9 +66,7 @@ void Auth::prelogin()
 
 void Auth::makePreloginKey()
 {
-
-    loginMessage = "Credentials encoding";
-    emit loginMessageChanged();
+    setLoginMessage("Credentials encoding");
 
     QJsonDocument json = QJsonDocument::fromJson(preloginReply->readAll());
 //    qDebug() << "json response:" << json.toJson(QJsonDocument::Compact);
@@ -64,8 +75,7 @@ void Auth::makePreloginKey()
     hashedPassword = crypto->hashPassword(key, password);
     password = ""; // we don't need raw password anymore
 
-    loginMessage = "Logging in";
-    emit loginMessageChanged();
+    setLoginMessage("Logging in");
 
     // postIdentityToken
     identityReply = api->postIdentityToken(api->getIdentityUrl() + "/connect/token", makeIdentityTokenRequestBody());
@@ -93,35 +103,43 @@ QByteArray Auth::makeIdentityTokenRequestBody()
 void Auth::identityReplyFinished()
 {
     qDebug() << "Auth::identityReplyFinished";
-    QJsonDocument json = QJsonDocument::fromJson(identityReply->readAll());
-    qDebug() << "json response:" << json.toJson(QJsonDocument::Compact);
-    if(json.isObject()){
-        QJsonObject responseObj = json.object();
-        if(responseObj.contains("ErrorModel")){
-            loginMessage = responseObj["ErrorModel"].toObject()["Message"].toString();
-            emit loginMessageChanged();
-            loginMessageType = "error";
-            emit loginMessageTypeChanged();
-        } else if(responseObj.contains("error_description")) {
-            loginMessage = responseObj["error_description"].toString();
-            emit loginMessageChanged();
-            loginMessageType = "error";
-            emit loginMessageTypeChanged();
-        } else if(responseObj.contains("error")) {
-            loginMessage = responseObj["error"].toString();
-            emit loginMessageChanged();
-            loginMessageType = "error";
-            emit loginMessageTypeChanged();
-        } else {
-            loginMessage = "";
-            emit loginMessageChanged();
-        }
-    } else {
-        loginMessage = "Invalid API response";
-        emit loginMessageChanged();
-        loginMessageType = "error";
-        emit loginMessageTypeChanged();
-    }
+
     loginProcessing = false;
     emit loginProcessingChanged();
+
+    QJsonDocument json = QJsonDocument::fromJson(identityReply->readAll());
+    qDebug() << "json response:" << json.toJson(QJsonDocument::Compact);
+
+    if(!json.isObject()){
+        setLoginMessage("Invalid API response", "error");
+        return;
+    }
+
+    QJsonObject root = json.object();
+    if(root.contains("ErrorModel")){
+        setLoginMessage(root["ErrorModel"].toObject()["Message"].toString(), "error");
+        return;
+    }
+    if(root.contains("error_description")) {
+        setLoginMessage(root["error_description"].toString(), "error");
+        return;
+    }
+    if(root.contains("error")) {
+        setLoginMessage(root["error"].toString(), "error");
+        return;
+    }
+
+    if(!root.contains("access_token")){
+        setLoginMessage("Invalid API response #2", "error");
+        return;
+    }
+    if(!root.contains("refresh_token")){
+        setLoginMessage("Invalid API response #3", "error");
+        return;
+    }
+
+    setLoginMessage("");
+
+    tokenService->setTokens(root["access_token"].toString(), root["refresh_token"].toString());
+    user->setInformation(tokenService->getUserIdFromToken(), tokenService->getEmailFromToken(), static_cast<KdfType>(root["Kdf"].toInt()), root["KdfIterations"].toInt());
 }
