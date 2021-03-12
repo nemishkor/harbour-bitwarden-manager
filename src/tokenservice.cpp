@@ -2,7 +2,10 @@
 
 TokenService::TokenService(QSettings *settings) : QObject(nullptr), settings(settings)
 {
-
+    if(settings->contains("accessToken") && settings->contains("refreshToken")){
+        this->accessToken = settings->value("accessToken").toString();
+        this->accessToken = settings->value("refreshToken").toString();
+    }
 }
 
 void TokenService::setTokens(QString accessToken, QString refreshToken)
@@ -22,6 +25,11 @@ QString TokenService::getEmailFromToken()
 {
     QJsonObject decodedToken = decodeAccessToken();
     return decodedToken["email"].toString();
+}
+
+bool TokenService::exists()
+{
+    return accessToken != "" && refreshToken != "";
 }
 
 void TokenService::persistTokens()

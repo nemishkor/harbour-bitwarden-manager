@@ -8,8 +8,7 @@ Page {
     allowedOrientations: Orientation.All
 
     function login(){
-        console.log("login")
-        auth.login(passwordField.text)
+        auth.preLogin(emailField.text)
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
@@ -40,32 +39,45 @@ Page {
             TextField {
                 id: emailField
                 focus: true
+                visible: auth.loginStage >= 0
+                readOnly: auth.loginStage !== 0
                 label: qsTr("Email")
                 placeholderText: label
                 width: parent.width
-                validator: RegExpValidator { regExp: /^.+@.+$/ }
+                validator: RegExpValidator { regExp: /^[^\s]+@[^\s]+\.[^\s]+$/ }
                 EnterKey.enabled: acceptableInput
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: passwordField.focus = true
-                text: auth.email
-            }
-
-            PasswordField {
-                id: passwordField
-                label: qsTr("Password")
-                width: parent.width
-                validator: RegExpValidator { regExp: /^.+$/ }
-                EnterKey.enabled: acceptableInput
-                EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: login()
+                EnterKey.onClicked: auth.preLogin(emailField.text)
             }
 
             ButtonLayout {
                 Button {
-                    id: loginBtn
-                    enabled: emailField.acceptableInput && passwordField.acceptableInput
+                    visible: auth.loginStage === 0
+                    enabled: emailField.acceptableInput
+                    text: qsTr("Next")
+                    onClicked: auth.preLogin(emailField.text)
+                }
+            }
+
+            PasswordField {
+                id: passwordField
+                visible: auth.loginStage >= 2
+                readOnly: auth.loginStage > 2
+                label: qsTr("Password")
+                width: parent.width
+                validator: RegExpValidator { regExp: /^.+$/ }
+                showEchoModeToggle: true
+                EnterKey.enabled: acceptableInput
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: auth.login(passwordField.text)
+            }
+
+            ButtonLayout {
+                Button {
+                    visible: auth.loginStage === 2
+                    enabled: passwordField.acceptableInput
                     text: qsTr("Login")
-                    onClicked: login()
+                    onClicked: auth.login(passwordField.text)
                 }
             }
 
@@ -77,9 +89,13 @@ Page {
 
     Connections {
         target: auth
-        onAuthorizedChanged: {
+        onLoginStageChanged: {
             console.log("received authorized changed signal");
-            if(auth.authorized){
+            if(auth.loginStage === 2){
+                passwordField.forceActiveFocus();
+            }
+
+            if(auth.loginStage === 4){
                 pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"));
             }
         }
@@ -96,7 +112,7 @@ Page {
 
         ProgressCircle {
             id: circle
-            visible: auth.loginProcessing
+            visible: [-1, 1, 3].indexOf(auth.loginStage) !== -1
             anchors { left: parent.left; leftMargin: Theme.horizontalPageMargin; verticalCenter: parent.verticalCenter }
 
             NumberAnimation on value {

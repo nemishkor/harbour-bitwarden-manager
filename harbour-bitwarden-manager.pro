@@ -18,6 +18,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/api.cpp \
     src/appidservice.cpp \
     src/auth.cpp \
+    src/authentication.cpp \
     src/cryptoservice.cpp \
     src/tokenservice.cpp \
     src/user.cpp
@@ -26,6 +27,7 @@ DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/cover/CoverPage.qml \
     qml/pages/Login.qml \
     qml/pages/Home.qml \
+    qml/pages/Items.qml \
     rpm/harbour-bitwarden-manager.changes.in \
     rpm/harbour-bitwarden-manager.changes.run.in \
     rpm/harbour-bitwarden-manager.spec \
@@ -50,6 +52,7 @@ HEADERS += \
     src/api.h \
     src/appidservice.h \
     src/auth.h \
+    src/authentication.h \
     src/cryptoservice.h \
     src/devicetype.h \
     src/kdftype.h \

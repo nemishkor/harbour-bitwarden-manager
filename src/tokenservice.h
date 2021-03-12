@@ -15,6 +15,7 @@ public:
     void setTokens(QString accessToken, QString refreshToken);
     QString getUserIdFromToken();
     QString getEmailFromToken();
+    bool exists();
 
 private:
     QString accessToken;

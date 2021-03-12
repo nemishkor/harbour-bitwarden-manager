@@ -1,8 +1,15 @@
 #include "user.h"
 
-User::User(QObject *parent) : QObject(parent)
+User::User(QSettings *settings) : QObject(nullptr), settings(settings)
 {
-
+    if(settings->contains("userId"))
+        userId = settings->value("userId").toString();
+    if(settings->contains("email"))
+        email = settings->value("email").toString();
+    if(settings->contains("kdf"))
+        kdf = static_cast<KdfType>(settings->value("kdf").toInt());
+    if(settings->contains("kdfIterations"))
+        kdfIterations = settings->value("kdfIterations").toInt();
 }
 
 void User::setInformation(QString userId, QString email, KdfType kdf, int kdfIterations)
@@ -18,4 +25,17 @@ void User::setInformation(QString userId, QString email, KdfType kdf, int kdfIte
 QString User::getEmail()
 {
     return email;
+}
+
+bool User::existsInformation()
+{
+    return userId != "" && email != "";
+}
+
+void User::persistInformation()
+{
+    settings->setValue("userId", userId);
+    settings->setValue("email", email);
+    settings->setValue("kdf", (int)kdf);
+    settings->setValue("kdfIterations", kdfIterations);
 }

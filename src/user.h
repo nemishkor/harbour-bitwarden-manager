@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
+#include <QSettings>
 
 #include "kdftype.h"
 
@@ -14,15 +15,18 @@ class User : public QObject
     Q_OBJECT
     Q_PROPERTY(QString email READ getEmail NOTIFY emailChanged)
 public:
-    explicit User(QObject *parent = nullptr);
+    User(QSettings *settings);
     void setInformation(QString userId, QString email, KdfType kdf, int kdfIterations);
     QString getEmail();
+    bool existsInformation();
 
 private:
+    QSettings *settings;
     QString userId;
     QString email;
     KdfType kdf;
     int kdfIterations;
+    void persistInformation();
 
 signals:
     void emailChanged();

@@ -5,20 +5,23 @@ Auth::Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, Cry
     tokenService(tokenService),
     api(api),
     crypto(crypto),
-    user(user),
-    email("nemish94@gmail.com")
+    user(user)
 {
-
+    authentication = new Authentication();
+    if(tokenService->exists()){
+        qDebug() << "tokens is exist";
+    }
+    if(user->existsInformation()){
+        qDebug() << "user's information is exists";
+    }
+    if(tokenService->exists() && user->existsInformation()){
+        setLoginStage(4);
+    }
 }
 
-QString Auth::getEmail()
+int Auth::getLoginStage()
 {
-    return email;
-}
-
-bool Auth::isLoginProcessing()
-{
-    return loginProcessing;
+    return loginStage;
 }
 
 QString Auth::getLoginMessage()
@@ -31,9 +34,12 @@ QString Auth::getLoginMessageType()
     return loginMessageType;
 }
 
-bool Auth::isAuthorized()
+void Auth::setLoginStage(int value)
 {
-    return authorized;
+    if(value != loginStage){
+        loginStage = value;
+        emit loginStageChanged();
+    }
 }
 
 void Auth::setLoginMessage(QString message, QString type)
@@ -48,43 +54,55 @@ void Auth::setLoginMessage(QString message, QString type)
     }
 }
 
-void Auth::login(QString password)
+void Auth::preLogin(QString email)
 {
-    loginProcessing = true;
-    emit loginProcessingChanged();
-    loginMessage = "";
-    emit loginMessageChanged();
-    loginMessageType = "info";
-    emit loginMessageTypeChanged();
-
-    this->password = password;
-    prelogin();
-}
-
-void Auth::prelogin()
-{
+    setLoginStage(1);
     setLoginMessage("Checking encoding settings");
-    QJsonObject jsonBody{ {"email", email} };
+    authentication->setEmail(email);
+    QJsonObject jsonBody{ {"email", authentication->getEmail()} };
+    // send request to load key derivation function parameters
     preloginReply = api->postPrelogin(QUrl(api->getApiUrl() + "/accounts/prelogin"), QJsonDocument(jsonBody).toJson(QJsonDocument::Compact));
-    connect(preloginReply, &QNetworkReply::finished, this, &Auth::makePreloginKey);
+    connect(preloginReply, &QNetworkReply::finished, this, &Auth::saveKDFParameters);
 }
 
-void Auth::makePreloginKey()
+void Auth::saveKDFParameters()
 {
-    setLoginMessage("Credentials encoding");
+    if(preloginReply->error() != QNetworkReply::NoError){
+        setLoginStage(0);
+        setLoginMessage(preloginReply->errorString(), "error");
+        return;
+    }
 
     QJsonDocument json = QJsonDocument::fromJson(preloginReply->readAll());
-//    qDebug() << "json response:" << json.toJson(QJsonDocument::Compact);
-    KdfType kdfType = static_cast<KdfType>(json.object()["Kdf"].toInt());
-    QByteArray key = crypto->makeKey(password, email, kdfType, json.object()["KdfIterations"].toInt());
-    hashedPassword = crypto->hashPassword(key, password);
-    password = ""; // we don't need raw password anymore
+    if(!json.isObject()){
+        setLoginMessage("Invalid prelogin API response #1", "error");
+        return;
+    }
+    QJsonObject root = json.object();
+    if(!root.contains("Kdf")){
+        setLoginMessage("Invalid prelogin API response #2", "error");
+        return;
+    }
+    if(!root.contains("KdfIterations")){
+        setLoginMessage("Invalid prelogin API response #3", "error");
+        return;
+    }
+    authentication->setKdfType(static_cast<KdfType>(root["Kdf"].toInt()));
+    authentication->setKdfIterations(root["KdfIterations"].toInt());
 
+    setLoginStage(2);
+    setLoginMessage("");
+}
+
+void Auth::login(QString password)
+{
+    setLoginStage(3);
+    setLoginMessage("Hashing");
+    authentication->setKey(crypto->makeKey(password, authentication->getEmail(), authentication->getKdfType(), authentication->getKdfIterations()));
+    authentication->setHashedPassword(crypto->hashPassword(authentication->getKey(), password));
     setLoginMessage("Logging in");
-
-    // postIdentityToken
-    identityReply = api->postIdentityToken(api->getIdentityUrl() + "/connect/token", makeIdentityTokenRequestBody());
-    connect(identityReply, &QNetworkReply::finished, this, &Auth::identityReplyFinished);
+    authenticateReply = api->postIdentityToken(api->getIdentityUrl() + "/connect/token", makeIdentityTokenRequestBody());
+    connect(authenticateReply, &QNetworkReply::finished, this, &Auth::postAuthenticate);
 }
 
 QByteArray Auth::makeIdentityTokenRequestBody()
@@ -93,8 +111,8 @@ QByteArray Auth::makeIdentityTokenRequestBody()
     query.addQueryItem("scope", "api offline_access");
     query.addQueryItem("client_id", "cli");
     query.addQueryItem("grant_type", "password"); // auth via password
-    query.addQueryItem("username", QUrl::toPercentEncoding(email));
-    query.addQueryItem("password", QUrl::toPercentEncoding(hashedPassword, "%"));
+    query.addQueryItem("username", QUrl::toPercentEncoding(authentication->getEmail()));
+    query.addQueryItem("password", QUrl::toPercentEncoding(authentication->getHashedPassword(), "%"));
     query.addQueryItem("deviceType", QString::number(static_cast<int>(DeviceType::LinuxDesktop)));
     query.addQueryItem("deviceIdentifier", appIdService->getAppId());
     query.addQueryItem("deviceName", "linux"); // TODO: try to change to real device name
@@ -105,14 +123,15 @@ QByteArray Auth::makeIdentityTokenRequestBody()
     return body;
 }
 
-void Auth::identityReplyFinished()
+void Auth::postAuthenticate()
 {
-    qDebug() << "Auth::identityReplyFinished";
+    if(authenticateReply->error() != QNetworkReply::NoError){
+        setLoginStage(0);
+        setLoginMessage(authenticateReply->errorString(), "error");
+        return;
+    }
 
-    loginProcessing = false;
-    emit loginProcessingChanged();
-
-    QJsonDocument json = QJsonDocument::fromJson(identityReply->readAll());
+    QJsonDocument json = QJsonDocument::fromJson(authenticateReply->readAll());
     qDebug() << "json response:" << json.toJson(QJsonDocument::Compact);
 
     if(!json.isObject()){
@@ -143,10 +162,21 @@ void Auth::identityReplyFinished()
         return;
     }
 
-    setLoginMessage("");
-
     tokenService->setTokens(root["access_token"].toString(), root["refresh_token"].toString());
     user->setInformation(tokenService->getUserIdFromToken(), tokenService->getEmailFromToken(), static_cast<KdfType>(root["Kdf"].toInt()), root["KdfIterations"].toInt());
-    authorized = true;
-    emit authorizedChanged();
+
+    setLoginStage(4);
+    setLoginMessage("");
+}
+
+void Auth::abortAuthentication()
+{
+    authentication->clear();
+    loginStage = 0;
+    if(preloginReply->isRunning()){
+        preloginReply->abort();
+    }
+    if(authenticateReply->isRunning()){
+        authenticateReply->abort();
+    }
 }
