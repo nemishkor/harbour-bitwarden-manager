@@ -3,6 +3,10 @@
 #endif
 
 #include <sailfishapp.h>
+#include "api.h"
+#include "cryptoservice.h"
+#include "auth.h"
+#include "appidservice.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,5 +20,21 @@ int main(int argc, char *argv[])
     //
     // To display the view, call "show()" (will show fullscreen on device).
 
-    return SailfishApp::main(argc, argv);
+    // Set up QML engine.
+    QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
+    QScopedPointer<QQuickView> view(SailfishApp::createView());
+
+    QQmlContext *context = view.data()->rootContext();
+
+    Api api(QString("https://api.bitwarden.com"), QString("https://identity.bitwarden.com"));
+    context->setContextProperty("api", &api);
+    CryptoService crypto;
+    AppIdService appIdService;
+    Auth auth(&appIdService, &api, &crypto);
+    context->setContextProperty("auth", &auth);
+
+    // Start the application.
+    view->setSource(SailfishApp::pathTo("qml/harbour-bitwarden-manager.qml"));
+    view->show();
+    return app->exec();
 }

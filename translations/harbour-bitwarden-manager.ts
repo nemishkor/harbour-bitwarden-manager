@@ -9,28 +9,21 @@
     </message>
 </context>
 <context>
-    <name>FirstPage</name>
+    <name>Login</name>
     <message>
-        <source>Show Page 2</source>
+        <source>Log In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>UI Template</source>
+        <source>Email</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hello Sailors</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SecondPage</name>
-    <message>
-        <source>Nested Page</source>
+        <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Item</source>
+        <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
