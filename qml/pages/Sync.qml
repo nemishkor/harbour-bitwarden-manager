@@ -57,7 +57,7 @@ Page {
 
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: !syncService.isSyncing && !syncService.synchronized
+                visible: !syncService.isSyncing
                 text: qsTr("Sync now")
                 onClicked: syncService.syncAll()
             }
