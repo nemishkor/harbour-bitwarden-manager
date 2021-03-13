@@ -11,9 +11,11 @@
 #include <QNetworkRequest>
 #include <QString>
 #include <QUrl>
+#include <QUrlQuery>
 
 #include "devicetype.h"
 #include "kdftype.h"
+#include "tokenservice.h"
 
 class Api : public QObject
 {
@@ -27,8 +29,10 @@ public:
     QString getIdentityUrl();
     QString getLastError();
     bool getRequestRunning();
-    QNetworkReply *postPrelogin(QUrl url, QByteArray body);
-    QNetworkReply *postIdentityToken(QUrl url, QByteArray body);
+    QNetworkReply *postPrelogin(QString email);
+    QNetworkReply *postIdentityToken(QByteArray body);
+    QNetworkReply *refreshAccessToken(QString userIdFromToken, QString refreshToken);
+    QNetworkReply *getSync(QString accessToken);
 
 private:
     QNetworkAccessManager *networkManager;
@@ -38,6 +42,7 @@ private:
     QString lastError;
 
     QNetworkRequest buildRequest(QUrl url);
+    QNetworkReply *get(QNetworkRequest request);
     QNetworkReply *post(QNetworkRequest request, QByteArray body);
     QNetworkReply *reply;
     void replyFinished();

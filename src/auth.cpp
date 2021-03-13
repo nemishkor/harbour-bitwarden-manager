@@ -73,9 +73,8 @@ void Auth::preLogin(QString email)
     setLoginStage(1);
     setLoginMessage("Checking encoding settings");
     authentication->setEmail(email);
-    QJsonObject jsonBody{ {"email", authentication->getEmail()} };
     // send request to load key derivation function parameters
-    preloginReply = api->postPrelogin(QUrl(api->getApiUrl() + "/accounts/prelogin"), QJsonDocument(jsonBody).toJson(QJsonDocument::Compact));
+    preloginReply = api->postPrelogin(email);
     connect(preloginReply, &QNetworkReply::finished, this, &Auth::saveKDFParameters);
 }
 
@@ -119,7 +118,7 @@ void Auth::login(QString password)
     authentication->setKey(crypto->makeKey(password, authentication->getEmail(), authentication->getKdfType(), authentication->getKdfIterations()));
     authentication->setHashedPassword(crypto->hashPassword(authentication->getKey(), password));
     setLoginMessage("Logging in");
-    authenticateReply = api->postIdentityToken(api->getIdentityUrl() + "/connect/token", makeIdentityTokenRequestBody());
+    authenticateReply = api->postIdentityToken(makeIdentityTokenRequestBody());
     connect(authenticateReply, &QNetworkReply::finished, this, &Auth::postAuthenticate);
 }
 
@@ -193,7 +192,10 @@ void Auth::postAuthenticate()
 
     tokenService->setTokens(root["access_token"].toString(), root["refresh_token"].toString());
     user->setInformation(tokenService->getUserIdFromToken(), tokenService->getEmailFromToken(), static_cast<KdfType>(root["Kdf"].toInt()), root["KdfIterations"].toInt());
+    crypto->setKey(authentication->getKey());
+    crypto->setHashedPassword(authentication->getHashedPassword());
 
+    authentication->clear();
     setLoginStage(4);
     setLoginMessage("");
 }

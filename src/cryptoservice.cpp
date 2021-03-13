@@ -1,8 +1,17 @@
 #include "cryptoservice.h"
 
-CryptoService::CryptoService()
+CryptoService::CryptoService(QSettings *settings):
+    settings(settings)
 {
-
+    if(settings->contains("key")){
+        key = settings->value("key").toString();
+    }
+    if(settings->contains("encKey")){
+        encKey = settings->value("encKey").toString();
+    }
+    if(settings->contains("hashedPassword")){
+        hashedPassword = settings->value("hashedPassword").toString();
+    }
 }
 
 QByteArray CryptoService::makeKey(QString password, QString email, KdfType kdf, int kdfIterations)
@@ -20,6 +29,42 @@ QByteArray CryptoService::makeKey(QString password, QString email, KdfType kdf, 
 QString CryptoService::hashPassword(QByteArray key, QString password)
 {
     return pbkdf2(key, password, 1).toBase64();
+}
+
+void CryptoService::setKey(const QString &value)
+{
+    key = value;
+    settings->setValue("key", key);
+    settings->sync();
+}
+
+void CryptoService::setHashedPassword(const QString &value)
+{
+    hashedPassword = value;
+    settings->setValue("hashedPassword", hashedPassword);
+    settings->sync();
+}
+
+QString CryptoService::getEncKey() const
+{
+    return encKey;
+}
+
+void CryptoService::setEncKey(const QString &value)
+{
+    encKey = value;
+    settings->setValue("encKey", encKey);
+    settings->sync();
+}
+
+QString CryptoService::getPrivateKey() const
+{
+    return privateKey;
+}
+
+void CryptoService::setPrivateKey(const QString &value)
+{
+    privateKey = value;
 }
 
 QByteArray CryptoService::pbkdf2(QByteArray passwordByteArray, QString saltString, int iterations)

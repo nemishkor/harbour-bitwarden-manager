@@ -95,9 +95,16 @@ Page {
 
     }
 
+    onStatusChanged: {
+        if (status == PageStatus.Active && auth.loginStage === 4) { // if authorized already
+            pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"), {}, PageStackAction.Immediate)
+        }
+    }
+
     Connections {
         target: auth
         onLoginStageChanged: {
+            console.log("login stage: " + auth.loginStage)
             if(auth.loginStage === 0){
                 emailField.forceActiveFocus()
                 passwordField.text = ""
@@ -105,7 +112,6 @@ Page {
             if(auth.loginStage === 2){
                 passwordField.forceActiveFocus()
             }
-
             if(auth.loginStage === 4){
                 pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"))
             }

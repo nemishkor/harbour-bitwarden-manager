@@ -1,6 +1,8 @@
 #include "api.h"
 
-Api::Api(QString apiUrl, QString identityUrl): apiUrl(apiUrl), identityUrl(identityUrl)
+Api::Api(QString apiUrl, QString identityUrl):
+    apiUrl(apiUrl),
+    identityUrl(identityUrl)
 {
     networkManager = new QNetworkAccessManager();
 }
@@ -25,23 +27,55 @@ bool Api::getRequestRunning()
     return requestRunning;
 }
 
-QNetworkReply *Api::postPrelogin(QUrl url, QByteArray body)
+QNetworkReply *Api::postPrelogin(QString email)
 {
-    QNetworkRequest request = buildRequest(url);
+    QNetworkRequest request = buildRequest(QUrl(getApiUrl() + "/accounts/prelogin"));
     request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
+    QJsonObject jsonBody{ {"email", email} };
+    reply = post(request, QJsonDocument(jsonBody).toJson(QJsonDocument::Compact));
+    connect(reply, &QNetworkReply::finished, this, &Api::replyFinished);
+
+    return reply;
+}
+
+QNetworkReply *Api::postIdentityToken(QByteArray body)
+{
+    QNetworkRequest request = buildRequest(getIdentityUrl() + "/connect/token");
+    request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=utf-8");
     reply = post(request, body);
     connect(reply, &QNetworkReply::finished, this, &Api::replyFinished);
 
     return reply;
 }
 
-QNetworkReply *Api::postIdentityToken(QUrl url, QByteArray body)
+QNetworkReply *Api::refreshAccessToken(QString userIdFromToken, QString refreshToken)
 {
-    QNetworkRequest request = buildRequest(url);
+    QNetworkRequest request = buildRequest(QUrl(getIdentityUrl() + "/connect/token"));
     request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=utf-8");
+
+    QUrlQuery query;
+    query.addQueryItem("grant_type", "refresh_token");
+    query.addQueryItem("client_id", userIdFromToken);
+    query.addQueryItem("refresh_token", refreshToken);
+
+    QByteArray body;
+    body.append(query.toString(QUrl::FullyEncoded));
+    qDebug() << "request body: " << body;
     reply = post(request, body);
+    connect(reply, &QNetworkReply::finished, this, &Api::replyFinished);
+
+    return reply;
+}
+
+QNetworkReply *Api::getSync(QString accessToken)
+{
+    QNetworkRequest request = buildRequest(QUrl(getApiUrl() + "/sync?excludeDomains=true"));
+    request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
+    request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer " + accessToken.toLatin1()));
+    reply = get(request);
     connect(reply, &QNetworkReply::finished, this, &Api::replyFinished);
 
     return reply;
@@ -57,9 +91,20 @@ QNetworkRequest Api::buildRequest(QUrl url)
     return request;
 }
 
+QNetworkReply *Api::get(QNetworkRequest request)
+{
+    qDebug() << "GET request to: " << request.url().toEncoded();
+
+    requestRunning = true;
+    emit requestRunningChanged();
+    lastError = "";
+    emit lastErrorChanged();
+
+    return networkManager->get(request);
+}
+
 QNetworkReply *Api::post(QNetworkRequest request, QByteArray body)
 {
-
     qDebug() << "POST request to: " << request.url().toEncoded();
 //    QList<QByteArray>::const_iterator i;
 //    for (i = request.rawHeaderList().constBegin(); i != request.rawHeaderList().constEnd(); ++i)
@@ -90,3 +135,6 @@ void Api::replyFinished()
         emit lastErrorChanged();
     }
 }
+
+
+

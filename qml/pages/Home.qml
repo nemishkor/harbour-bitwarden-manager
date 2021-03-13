@@ -25,6 +25,39 @@ Page {
                 title: user.email
             }
 
+            BackgroundItem {
+                width: section.width
+                Label {
+                    text: qsTr("Sync")
+                    color: highlighted ? Theme.highlightColor : Theme.primaryColor
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: Theme.horizontalPageMargin
+                }
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("Sync.qml"))
+            }
+
+            BackgroundItem {
+                width: section.width
+                Label {
+                    text: qsTr("Profile")
+                    color: highlighted ? Theme.highlightColor : Theme.primaryColor
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: Theme.horizontalPageMargin
+                }
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("Profile.qml"))
+            }
+
+            BackgroundItem {
+                width: section.width
+                Label {
+                    text: qsTr("Folders")
+                    color: highlighted ? Theme.highlightColor : Theme.primaryColor
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: Theme.horizontalPageMargin
+                }
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("Folders.qml"))
+            }
+
             ExpandingSection {
                 id: section
 

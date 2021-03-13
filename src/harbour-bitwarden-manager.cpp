@@ -5,9 +5,11 @@
 #include <QSettings>
 #include <sailfishapp.h>
 #include "api.h"
-#include "cryptoservice.h"
 #include "auth.h"
 #include "appidservice.h"
+#include "foldersmodel.h"
+#include "cryptoservice.h"
+#include "syncservice.h"
 #include "tokenservice.h"
 #include "user.h"
 
@@ -28,17 +30,28 @@ int main(int argc, char *argv[])
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
     QQmlContext *context = view.data()->rootContext();
+    QSettings settings("harbour-bitwarden-manager");
+
+    TokenService tokenService(&settings);
+    context->setContextProperty("tokenService", &tokenService);
 
     Api api(QString("https://api.bitwarden.com"), QString("https://identity.bitwarden.com"));
     context->setContextProperty("api", &api);
-    QSettings settings("harbour-bitwarden-manager");
-    CryptoService crypto;
+
+    CryptoService crypto(&settings);
     AppIdService appIdService(&settings);
-    TokenService tokenService(&settings);
+
     User user(&settings);
     context->setContextProperty("user", &user);
+
     Auth auth(&appIdService, &tokenService, &api, &crypto, &user);
     context->setContextProperty("auth", &auth);
+
+    FoldersModel foldersModel;
+    context->setContextProperty("foldersModel", &foldersModel);
+
+    SyncService syncService(&api, &user, &tokenService, &crypto, &foldersModel);
+    context->setContextProperty("syncService", &syncService);
 
     // Start the application.
     view->setSource(SailfishApp::pathTo("qml/harbour-bitwarden-manager.qml"));

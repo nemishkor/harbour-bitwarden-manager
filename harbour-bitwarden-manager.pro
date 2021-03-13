@@ -19,14 +19,22 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/appidservice.cpp \
     src/auth.cpp \
     src/authentication.cpp \
+    src/cipherservice.cpp \
     src/cryptoservice.cpp \
+    src/folder.cpp \
+    src/foldersmodel.cpp \
+    src/syncservice.cpp \
     src/tokenservice.cpp \
     src/user.cpp
 
 DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/cover/CoverPage.qml \
+    qml/pages/Folders.qml \
     qml/pages/Login.qml \
     qml/pages/Home.qml \
+    qml/pages/Profile.qml \
+    qml/pages/Sync.qml \
+    qml/pages/Sync.qml \
     qml/pages/Items.qml \
     rpm/harbour-bitwarden-manager.changes.in \
     rpm/harbour-bitwarden-manager.changes.run.in \
@@ -53,9 +61,13 @@ HEADERS += \
     src/appidservice.h \
     src/auth.h \
     src/authentication.h \
+    src/cipherservice.h \
     src/cryptoservice.h \
     src/devicetype.h \
+    src/folder.h \
+    src/foldersmodel.h \
     src/kdftype.h \
+    src/syncservice.h \
     src/tokenservice.h \
     src/user.h
 

@@ -13,6 +13,7 @@ QString AppIdService::getAppId()
     // remove "{" and "}"
     uuidStr = uuidStr.mid(1, uuidStr.length() - 2);
     settings->setValue("appId", uuidStr);
+    settings->sync();
 
     return uuidStr;
 }
