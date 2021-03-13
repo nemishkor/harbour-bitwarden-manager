@@ -7,7 +7,9 @@ Page {
     backNavigation: !syncService.isSyncing
 
     Component.onCompleted: {
-        syncService.syncAll()
+        if(!syncService.isSyncing && !syncService.synchronized){
+            syncService.syncAll()
+        }
     }
 
     // The effective value will be restricted by ApplicationWindow.allowedOrientations
@@ -51,6 +53,13 @@ Page {
                 text: syncService.message
                 color: syncService.messageType === "error" ? Theme.errorColor : Theme.primaryColor
                 wrapMode: "WordWrap"
+            }
+
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
+                visible: !syncService.isSyncing && !syncService.synchronized
+                text: qsTr("Sync now")
+                onClicked: syncService.syncAll()
             }
 
         }

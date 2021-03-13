@@ -19,7 +19,9 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/appidservice.cpp \
     src/auth.cpp \
     src/authentication.cpp \
+    src/cipher.cpp \
     src/cipherservice.cpp \
+    src/ciphersmodel.cpp \
     src/cryptoservice.cpp \
     src/folder.cpp \
     src/foldersmodel.cpp \
@@ -29,6 +31,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
 
 DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/cover/CoverPage.qml \
+    qml/pages/Ciphers.qml \
     qml/pages/Folders.qml \
     qml/pages/Login.qml \
     qml/pages/Home.qml \
@@ -61,7 +64,9 @@ HEADERS += \
     src/appidservice.h \
     src/auth.h \
     src/authentication.h \
+    src/cipher.h \
     src/cipherservice.h \
+    src/ciphersmodel.h \
     src/cryptoservice.h \
     src/devicetype.h \
     src/folder.h \

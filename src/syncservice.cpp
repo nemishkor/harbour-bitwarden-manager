@@ -1,15 +1,22 @@
 #include "syncservice.h"
 
-SyncService::SyncService(Api *api, User *user, TokenService *tokenService, CryptoService *cryptoService, FoldersModel *foldersModel) :
+SyncService::SyncService(Api *api, User *user, TokenService *tokenService, CryptoService *cryptoService, FoldersModel *foldersModel,
+                         CiphersModel *ciphersModel,
+                         QSettings *settings) :
     QObject(nullptr),
     api(api),
     user(user),
     tokenService(tokenService),
     cryptoService(cryptoService),
-    foldersModel(foldersModel)
+    foldersModel(foldersModel),
+    ciphersModel(ciphersModel),
+    settings(settings)
 {
     syncReply = nullptr;
     refreshTokenReply = nullptr;
+    if(settings->contains("last_sync_" + user->getUserId())){
+        lastSync = settings->value("last_sync_" + user->getUserId()).toDateTime();
+    }
 }
 
 void SyncService::syncAll()
@@ -81,6 +88,27 @@ void SyncService::setMessage(QString value, QString type)
     if(messageType != type){
         messageType = type;
         emit messageTypeChanged();
+    }
+}
+
+bool SyncService::isSynchronized() const
+{
+    return lastSync.isValid();
+}
+
+QDateTime SyncService::getLastSync() const
+{
+    return lastSync;
+}
+
+void SyncService::setLastSync(const QDateTime &value)
+{
+    if(lastSync != value){
+        lastSync = value;
+        emit synchronizedChanged();
+        emit lastSyncChanged();
+        settings->setValue("last_sync_" + user->getUserId(), lastSync);
+        settings->sync();
     }
 }
 
@@ -170,7 +198,7 @@ void SyncService::syncReplyFinished()
         return;
     }
 
-    syncCiphers();
+    syncCiphers(userId, root["Ciphers"].toArray());
     if(!isSyncing){
         return;
     }
@@ -186,6 +214,8 @@ void SyncService::syncReplyFinished()
     }
 
     syncPolicies();
+
+    setLastSync(QDateTime::currentDateTime());
 
     setMessage("Done", "info");
     setIsSyncing(false);
@@ -231,9 +261,28 @@ void SyncService::syncCollections()
     // TODO sync collections
 }
 
-void SyncService::syncCiphers()
+void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
 {
-
+    ciphersModel->clear();
+    QJsonArray::const_iterator i;
+    for (i = ciphers.constBegin(); i != ciphers.constEnd(); i++){
+        Cipher cipher;
+        cipher.setId((*i).toObject()["Id"].toString());
+        cipher.setOrganizationId((*i).toObject()["OrganizationId"].toString());
+        cipher.setFolderId((*i).toObject()["FolderId"].toString());
+        cipher.setUserId(userId);
+        cipher.setEdit((*i).toObject()["Edit"].toBool());
+        cipher.setViewPassword((*i).toObject()["ViewPassword"].toBool());
+        cipher.setOrganizationUseTotp((*i).toObject()["OrganizationUseTotp"].toBool());
+        cipher.setFavorite((*i).toObject()["Favorite"].toBool());
+        cipher.setRevisionDate((*i).toObject()["RevisionDate"].toString());
+//        cipher.setType(static_cast<Cipher::CipherType>((*i).toObject()["Type"].toInt()));
+        cipher.setSizeName((*i).toObject()["SizeName"].toString());
+        cipher.setName((*i).toObject()["Name"].toString());
+        cipher.setNotes((*i).toObject()["Notes"].toString());
+        cipher.setDeletedDate((*i).toObject()["DeletedDate"].toString());
+        ciphersModel->add(cipher);
+    }
 }
 
 void SyncService::syncSends()

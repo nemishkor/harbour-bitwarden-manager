@@ -19,7 +19,7 @@ Page {
             id: column
 
             width: page.width
-            spacing: Theme.paddingLarge
+            spacing: Theme.paddingMedium
 
             PageHeader {
                 title: user.email
@@ -27,11 +27,26 @@ Page {
 
             BackgroundItem {
                 width: section.width
-                Label {
-                    text: qsTr("Sync")
-                    color: highlighted ? Theme.highlightColor : Theme.primaryColor
-                    anchors.verticalCenter: parent.verticalCenter
-                    x: Theme.horizontalPageMargin
+                height: contentItem.childrenRect.height
+                Column {
+                    Label {
+                        text: qsTr("Sync")
+                        color: highlighted ? Theme.highlightColor : Theme.primaryColor
+                        x: Theme.horizontalPageMargin
+                    }
+                    Label {
+                        text: qsTr("Required")
+                        visible: !syncService.synchronized
+                        color: highlighted ? Theme.highlightColor : Theme.errorColor
+                        x: Theme.horizontalPageMargin
+                    }
+                    Label {
+                        text: qsTr("Last sync") + ": " + syncService.lastSync
+                        visible: syncService.synchronized
+                        color: highlighted ? Theme.highlightColor : Theme.primaryColor
+                        x: Theme.horizontalPageMargin
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                    }
                 }
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl("Sync.qml"))
             }
@@ -56,6 +71,17 @@ Page {
                     x: Theme.horizontalPageMargin
                 }
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl("Folders.qml"))
+            }
+
+            BackgroundItem {
+                width: section.width
+                Label {
+                    text: qsTr("Ciphers")
+                    color: highlighted ? Theme.highlightColor : Theme.primaryColor
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: Theme.horizontalPageMargin
+                }
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("Ciphers.qml"))
             }
 
             ExpandingSection {
