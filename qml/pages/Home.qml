@@ -65,7 +65,7 @@ Page {
             BackgroundItem {
                 width: section.width
                 Label {
-                    text: qsTr("Folders")
+                    text: qsTr("Folders") + " (" + foldersModel.count + ")"
                     color: highlighted ? Theme.highlightColor : Theme.primaryColor
                     anchors.verticalCenter: parent.verticalCenter
                     x: Theme.horizontalPageMargin
@@ -76,7 +76,7 @@ Page {
             BackgroundItem {
                 width: section.width
                 Label {
-                    text: qsTr("Ciphers")
+                    text: qsTr("Ciphers") + " (" + ciphersModel.count + ")"
                     color: highlighted ? Theme.highlightColor : Theme.primaryColor
                     anchors.verticalCenter: parent.verticalCenter
                     x: Theme.horizontalPageMargin
