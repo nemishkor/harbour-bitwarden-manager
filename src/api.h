@@ -33,6 +33,7 @@ public:
     QNetworkReply *postIdentityToken(QByteArray body);
     QNetworkReply *refreshAccessToken(QString userIdFromToken, QString refreshToken);
     QNetworkReply *getSync(QString accessToken);
+    QNetworkReply *postAccountVerifyPassword(QString masterPasswordHash, QString accessToken);
 
 private:
     QNetworkAccessManager *networkManager;

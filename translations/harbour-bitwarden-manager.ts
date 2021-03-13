@@ -48,6 +48,14 @@
         <source>Last sync</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Unlocked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Login</name>
@@ -60,10 +68,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
@@ -73,6 +77,10 @@
     </message>
     <message>
         <source>Edit email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -103,6 +111,37 @@
     </message>
     <message>
         <source>Sync now</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Unlock</name>
+    <message>
+        <source>Master password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unlock vault</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock/unlock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unlocked vault means that application has key to decrypt data. Master password required only to generate key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock vault</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vault is locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vault is unlocked</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

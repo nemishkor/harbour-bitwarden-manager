@@ -18,6 +18,8 @@ class User : public QObject
     Q_PROPERTY(QString premium READ getPremium NOTIFY premiumChanged)
 public:
     User(QSettings *settings);
+
+    // on successfully login
     void setInformation(QString userId, QString email, KdfType kdf, int kdfIterations);
 
     QString getUserId() const;
@@ -36,6 +38,12 @@ public:
 
     bool getPremium() const;
     void setPremium(bool value);
+
+    // required to unlock vault
+    KdfType getKdf() const;
+
+    // required to unlock vault
+    int getKdfIterations() const;
 
 private:
     QSettings *settings;

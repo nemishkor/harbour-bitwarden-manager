@@ -12,6 +12,7 @@
 #include "cryptoservice.h"
 #include "syncservice.h"
 #include "tokenservice.h"
+#include "vaultmanager.h"
 #include "user.h"
 
 int main(int argc, char *argv[])
@@ -40,6 +41,7 @@ int main(int argc, char *argv[])
     context->setContextProperty("api", &api);
 
     CryptoService crypto(&settings);
+    context->setContextProperty("crypto", &crypto);
     AppIdService appIdService(&settings);
 
     User user(&settings);
@@ -56,6 +58,10 @@ int main(int argc, char *argv[])
 
     SyncService syncService(&api, &user, &tokenService, &crypto, &foldersModel, &ciphersModel, &settings);
     context->setContextProperty("syncService", &syncService);
+
+    VaultManager vaultManager(&crypto, &user, &api, &tokenService);
+    context->setContextProperty("vaultManager", &vaultManager);
+
 
     // Start the application.
     view->setSource(SailfishApp::pathTo("qml/harbour-bitwarden-manager.qml"));

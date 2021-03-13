@@ -70,7 +70,7 @@ Page {
                 id: passwordField
                 visible: auth.loginStage >= 2
                 readOnly: auth.loginStage > 2
-                label: qsTr("Password")
+                label: qsTr("Master password")
                 width: parent.width
                 validator: RegExpValidator { regExp: /^.+$/ }
                 showEchoModeToggle: true

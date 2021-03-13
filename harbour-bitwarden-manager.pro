@@ -27,7 +27,8 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/foldersmodel.cpp \
     src/syncservice.cpp \
     src/tokenservice.cpp \
-    src/user.cpp
+    src/user.cpp \
+    src/vaultmanager.cpp
 
 DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/cover/CoverPage.qml \
@@ -39,6 +40,7 @@ DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/pages/Sync.qml \
     qml/pages/Sync.qml \
     qml/pages/Items.qml \
+    qml/pages/Unlock.qml \
     rpm/harbour-bitwarden-manager.changes.in \
     rpm/harbour-bitwarden-manager.changes.run.in \
     rpm/harbour-bitwarden-manager.spec \
@@ -74,7 +76,8 @@ HEADERS += \
     src/kdftype.h \
     src/syncservice.h \
     src/tokenservice.h \
-    src/user.h
+    src/user.h \
+    src/vaultmanager.h
 
 QT += network
 

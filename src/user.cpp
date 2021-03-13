@@ -79,6 +79,16 @@ void User::setPremium(bool value)
     }
 }
 
+KdfType User::getKdf() const
+{
+    return kdf;
+}
+
+int User::getKdfIterations() const
+{
+    return kdfIterations;
+}
+
 void User::setEmail(const QString &value)
 {
     if(email != value){

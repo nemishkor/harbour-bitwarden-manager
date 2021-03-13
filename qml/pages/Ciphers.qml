@@ -10,6 +10,7 @@ Page {
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaListView {
 
+        visible: crypto.hasKey
         model: ciphersModel
         anchors.fill: parent
         header: PageHeader {
@@ -208,6 +209,12 @@ Page {
         }
         VerticalScrollDecorator {}
 
+    }
+
+    Image {
+        anchors.centerIn: parent
+        visible: !crypto.hasKey
+        source: "image://theme/icon-m-device-lock"
     }
 
 }

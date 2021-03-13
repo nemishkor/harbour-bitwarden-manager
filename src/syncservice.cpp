@@ -24,6 +24,7 @@ void SyncService::syncAll()
     setIsSyncing(true);
     if(user->getUserId() == "" || !tokenService->exists()){
         setMessage("Can not sync. Not authorized!", "error");
+        setIsSyncing(false);
         return;
     }
     if(tokenService->tokenNeedsRefresh()){
@@ -133,7 +134,6 @@ void SyncService::refreshTokenReplyFinished()
         return;
     }
     QJsonDocument json = QJsonDocument::fromJson(refreshTokenReply->readAll());
-    qDebug() << json.toJson();
     if(!json.isObject()){
         setMessage("Invalid refresh token API response #1", "error");
         setIsSyncing(false);

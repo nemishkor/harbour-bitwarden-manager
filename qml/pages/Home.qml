@@ -27,6 +27,24 @@ Page {
 
             BackgroundItem {
                 width: section.width
+                visible: !crypto.hasKey
+                Image {
+                    id: cryptoIcon
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: Theme.horizontalPageMargin
+                    source: vaultManager.isLocked ? "image://theme/icon-m-device-lock" : "image://theme/icon-m-keys"
+                }
+                Label {
+                    anchors { left: cryptoIcon.right; leftMargin: Theme.paddingSmall; verticalCenter: cryptoIcon.verticalCenter }
+                    text: vaultManager.isLocked ? qsTr("Locked") : qsTr("Unlocked")
+                    color: highlighted ? Theme.highlightColor : Theme.primaryColor
+                    width: page.width - 2 * Theme.horizontalPageMargin - cryptoIcon.width - Theme.paddingSmall
+                }
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("Unlock.qml"))
+            }
+
+            BackgroundItem {
+                width: section.width
                 height: contentItem.childrenRect.height
                 Column {
                     Label {

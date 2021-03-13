@@ -81,6 +81,18 @@ QNetworkReply *Api::getSync(QString accessToken)
     return reply;
 }
 
+QNetworkReply *Api::postAccountVerifyPassword(QString masterPasswordHash, QString accessToken)
+{
+    QNetworkRequest request = buildRequest(QUrl(getApiUrl() + "/accounts/verify-password"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
+    request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer " + accessToken.toLatin1()));
+    QJsonObject jsonBody{ {"masterPasswordHash", masterPasswordHash} };
+    reply = post(request, QJsonDocument(jsonBody).toJson(QJsonDocument::Compact));
+    connect(reply, &QNetworkReply::finished, this, &Api::replyFinished);
+
+    return reply;
+}
+
 QNetworkRequest Api::buildRequest(QUrl url)
 {
     QNetworkRequest request(url);

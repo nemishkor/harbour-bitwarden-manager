@@ -1,15 +1,15 @@
 #include "cryptoservice.h"
 
 CryptoService::CryptoService(QSettings *settings):
+    QObject(nullptr),
     settings(settings)
 {
-    if(settings->contains("key")){
-        key = settings->value("key").toString();
-    }
     if(settings->contains("encKey")){
+        qDebug() << "found encKey in settings";
         encKey = settings->value("encKey").toString();
     }
     if(settings->contains("hashedPassword")){
+        qDebug() << "found hashedPassword in settings";
         hashedPassword = settings->value("hashedPassword").toString();
     }
 }
@@ -33,9 +33,15 @@ QString CryptoService::hashPassword(QByteArray key, QString password)
 
 void CryptoService::setKey(const QString &value)
 {
-    key = value;
-    settings->setValue("key", key);
-    settings->sync();
+    if(key != value){
+        key = value;
+        if(key == "") {
+            qDebug() << "key was deleted. Lock state";
+        } else {
+            qDebug() << "key was installed. Unlock state";
+        }
+        emit keyChanged();
+    }
 }
 
 void CryptoService::setHashedPassword(const QString &value)
@@ -53,6 +59,7 @@ QString CryptoService::getEncKey() const
 void CryptoService::setEncKey(const QString &value)
 {
     encKey = value;
+    // TODO: remove saving encKey using QSettings ???
     settings->setValue("encKey", encKey);
     settings->sync();
 }
@@ -65,6 +72,33 @@ QString CryptoService::getPrivateKey() const
 void CryptoService::setPrivateKey(const QString &value)
 {
     privateKey = value;
+}
+
+QString CryptoService::getKey() const
+{
+    return key;
+}
+
+QString CryptoService::getHashedPassword() const
+{
+    return hashedPassword;
+}
+
+void CryptoService::clearKey()
+{
+    setKey("");
+}
+
+void CryptoService::clearKeyPair()
+{
+    setPrivateKey("");
+    // TODO: add public key ???
+    //    setPublicKey("");
+}
+
+void CryptoService::clearEncKey()
+{
+    setEncKey("");
 }
 
 QByteArray CryptoService::pbkdf2(QByteArray passwordByteArray, QString saltString, int iterations)
