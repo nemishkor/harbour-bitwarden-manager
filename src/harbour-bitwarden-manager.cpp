@@ -3,12 +3,14 @@
 #endif
 
 #include <QSettings>
+#include <QList>
+
 #include <sailfishapp.h>
 #include "api.h"
 #include "auth.h"
 #include "appidservice.h"
 #include "foldersmodel.h"
-#include "ciphersmodel.h"
+#include "cipherservice.h"
 #include "cryptoservice.h"
 #include "syncservice.h"
 #include "tokenservice.h"
@@ -53,10 +55,11 @@ int main(int argc, char *argv[])
     FoldersModel foldersModel;
     context->setContextProperty("foldersModel", &foldersModel);
 
-    CiphersModel ciphersModel;
-    context->setContextProperty("ciphersModel", &ciphersModel);
+    CipherService cipherService;
+    context->setContextProperty("cipherService", &cipherService);
+    context->setContextProperty("ciphersListModel", cipherService.getCiphersListModel());
 
-    SyncService syncService(&api, &user, &tokenService, &crypto, &foldersModel, &ciphersModel, &settings);
+    SyncService syncService(&api, &user, &tokenService, &crypto, &foldersModel, &cipherService, &settings);
     context->setContextProperty("syncService", &syncService);
 
     VaultManager vaultManager(&crypto, &user, &api, &tokenService);

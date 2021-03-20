@@ -19,7 +19,7 @@ void VaultManager::unlock(QString password)
     key = cryptoService->makeKey(password, user->getEmail(), user->getKdf(), user->getKdfIterations());
     masterPasswordHash = cryptoService->hashPassword(key, password);
     if(masterPasswordHash == cryptoService->getHashedPassword()){
-        cryptoService->setKey(key);
+        cryptoService->setKey(SymmetricCryptoKey(key));
         key.clear();
         masterPasswordHash.clear();
         setUnlocking(false);
@@ -59,11 +59,13 @@ void VaultManager::lock()
 //    cryptoService->clearOrgKeys();
     cryptoService->clearKeyPair();
     cryptoService->clearEncKey();
+
+    // TODO: clear view models
 }
 
 bool VaultManager::isLocked()
 {
-    return cryptoService->getKey() == "";
+    return !cryptoService->hasKey();
 }
 
 void VaultManager::keyChanged()

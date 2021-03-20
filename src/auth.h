@@ -16,6 +16,7 @@
 #include "devicetype.h"
 #include "tokenservice.h"
 #include "user.h"
+#include "symmetriccryptokey.h"
 
 class Auth : public QObject
 {

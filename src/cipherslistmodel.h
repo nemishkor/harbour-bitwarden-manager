@@ -3,32 +3,21 @@
 
 #include <QAbstractListModel>
 
-#include "cipher.h"
+#include "cipherlistitem.h"
 
-class CiphersModel : public QAbstractListModel
+class CiphersListModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
 
 public:
     enum CipherRoles {
-        IdRole = Qt::UserRole + 1,
-        OrganizationIdRole,
-        FolderIdRole,
-        UserIdRole,
-        EditRole,
-        ViewPasswordRole,
-        OrganizationUseTotpRole,
-        FavoriteRole,
-        RevisionDateRole,
-        SizeNameRole,
-        NameRole,
-        NotesRole,
-        DeletedDateRole
+        NameRole = Qt::UserRole + 1,
+        LoginUsernameRole
     };
-    explicit CiphersModel(QObject *parent = nullptr);
+    explicit CiphersListModel(QObject *parent = nullptr);
 
-    void add(Cipher &item);
+    void add(CipherListItem &item);
     void clear();
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -36,7 +25,7 @@ public:
 protected:
     QHash<int, QByteArray> roleNames() const override;
 private:
-    QList<Cipher> items;
+    QList<CipherListItem> items;
 
 signals:
     void countChanged();

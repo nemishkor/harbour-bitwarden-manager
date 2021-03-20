@@ -3,10 +3,12 @@
 
 #include <QString>
 
+#include "cipherstring.h"
+
 class Cipher
 {
 public:
-    Cipher();
+    Cipher(CipherString name);
     enum CipherType {
         Login = 1,
         SecureNote = 2,
@@ -47,8 +49,8 @@ public:
     QString getSizeName() const;
     void setSizeName(const QString &value);
 
-    QString getName() const;
-    void setName(const QString &value);
+    CipherString getName() const;
+    void setName(const CipherString &value);
 
     QString getNotes() const;
     void setNotes(const QString &value);
@@ -68,7 +70,7 @@ private:
     QString revisionDate;
     CipherType type;
     QString sizeName;
-    QString name;
+    CipherString name;
     QString notes;
     QString deletedDate;
 };

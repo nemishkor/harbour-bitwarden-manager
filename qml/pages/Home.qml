@@ -94,7 +94,7 @@ Page {
             BackgroundItem {
                 width: section.width
                 Label {
-                    text: qsTr("Ciphers") + " (" + ciphersModel.count + ")"
+                    text: qsTr("Ciphers") + " (" + cipherService.count + ")"
                     color: highlighted ? Theme.highlightColor : Theme.primaryColor
                     anchors.verticalCenter: parent.verticalCenter
                     x: Theme.horizontalPageMargin

@@ -1,6 +1,6 @@
 #include "cipher.h"
 
-Cipher::Cipher()
+Cipher::Cipher(CipherString name): name(name)
 {
 
 }
@@ -115,12 +115,12 @@ void Cipher::setSizeName(const QString &value)
     sizeName = value;
 }
 
-QString Cipher::getName() const
+CipherString Cipher::getName() const
 {
     return name;
 }
 
-void Cipher::setName(const QString &value)
+void Cipher::setName(const CipherString &value)
 {
     name = value;
 }

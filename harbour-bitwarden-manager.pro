@@ -20,11 +20,15 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/auth.cpp \
     src/authentication.cpp \
     src/cipher.cpp \
+    src/cipherlistitem.cpp \
     src/cipherservice.cpp \
-    src/ciphersmodel.cpp \
+    src/cipherslistmodel.cpp \
+    src/cipherstring.cpp \
     src/cryptoservice.cpp \
+    src/decryptparametersarraybuffer.cpp \
     src/folder.cpp \
     src/foldersmodel.cpp \
+    src/symmetriccryptokey.cpp \
     src/syncservice.cpp \
     src/tokenservice.cpp \
     src/user.cpp \
@@ -67,13 +71,17 @@ HEADERS += \
     src/auth.h \
     src/authentication.h \
     src/cipher.h \
+    src/cipherlistitem.h \
     src/cipherservice.h \
-    src/ciphersmodel.h \
+    src/cipherslistmodel.h \
+    src/cipherstring.h \
     src/cryptoservice.h \
+    src/decryptparametersarraybuffer.h \
     src/devicetype.h \
     src/folder.h \
     src/foldersmodel.h \
     src/kdftype.h \
+    src/symmetriccryptokey.h \
     src/syncservice.h \
     src/tokenservice.h \
     src/user.h \

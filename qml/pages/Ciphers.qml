@@ -7,11 +7,15 @@ Page {
     // The effective value will be restricted by ApplicationWindow.allowedOrientations
     allowedOrientations: Orientation.All
 
+    Component.onCompleted: {
+        cipherService.decryptAll();
+    }
+
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaListView {
 
         visible: crypto.hasKey
-        model: ciphersModel
+        model: ciphersListModel
         anchors.fill: parent
         header: PageHeader {
             title: qsTr("Ciphers")

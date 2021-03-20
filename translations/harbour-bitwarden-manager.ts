@@ -129,10 +129,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unlocked vault means that application has key to decrypt data. Master password required only to generate key</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Lock vault</source>
         <translation type="unfinished"></translation>
     </message>
@@ -142,6 +138,10 @@
     </message>
     <message>
         <source>Vault is unlocked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unlocked vault means that application has key to decrypt data. Master password required to generate key only</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

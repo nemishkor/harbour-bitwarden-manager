@@ -1,7 +1,7 @@
 #include "syncservice.h"
 
 SyncService::SyncService(Api *api, User *user, TokenService *tokenService, CryptoService *cryptoService, FoldersModel *foldersModel,
-                         CiphersModel *ciphersModel,
+                         CipherService *cipherService,
                          QSettings *settings) :
     QObject(nullptr),
     api(api),
@@ -9,7 +9,7 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService, Crypt
     tokenService(tokenService),
     cryptoService(cryptoService),
     foldersModel(foldersModel),
-    ciphersModel(ciphersModel),
+    cipherService(cipherService),
     settings(settings)
 {
     syncReply = nullptr;
@@ -229,7 +229,6 @@ void SyncService::syncProfile(QJsonObject profile)
         setIsSyncing(false);
     }
 
-    // TODO: ?
     cryptoService->setEncKey(profile["Key"].toString());
     // TODO: ?
     cryptoService->setPrivateKey(profile["PrivateKey"].toString());
@@ -263,10 +262,10 @@ void SyncService::syncCollections()
 
 void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
 {
-    ciphersModel->clear();
+    cipherService->clear();
     QJsonArray::const_iterator i;
     for (i = ciphers.constBegin(); i != ciphers.constEnd(); i++){
-        Cipher cipher;
+        Cipher cipher(CipherString((*i).toObject()["Name"].toString()));
         cipher.setId((*i).toObject()["Id"].toString());
         cipher.setOrganizationId((*i).toObject()["OrganizationId"].toString());
         cipher.setFolderId((*i).toObject()["FolderId"].toString());
@@ -276,12 +275,11 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
         cipher.setOrganizationUseTotp((*i).toObject()["OrganizationUseTotp"].toBool());
         cipher.setFavorite((*i).toObject()["Favorite"].toBool());
         cipher.setRevisionDate((*i).toObject()["RevisionDate"].toString());
-//        cipher.setType(static_cast<Cipher::CipherType>((*i).toObject()["Type"].toInt()));
+        cipher.setType(static_cast<Cipher::CipherType>((*i).toObject()["Type"].toInt()));
         cipher.setSizeName((*i).toObject()["SizeName"].toString());
-        cipher.setName((*i).toObject()["Name"].toString());
         cipher.setNotes((*i).toObject()["Notes"].toString());
         cipher.setDeletedDate((*i).toObject()["DeletedDate"].toString());
-        ciphersModel->add(cipher);
+        cipherService->add(cipher);
     }
 }
 
