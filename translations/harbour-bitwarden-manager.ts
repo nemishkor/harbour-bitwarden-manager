@@ -58,6 +58,17 @@
     </message>
 </context>
 <context>
+    <name>LockBlock</name>
+    <message>
+        <source>Vault is locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unlock</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Login</name>
     <message>
         <source>Log In</source>
@@ -111,6 +122,10 @@
     </message>
     <message>
         <source>Sync now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To sync unlock first</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

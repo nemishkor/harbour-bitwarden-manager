@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 
 Page {
     id: page
@@ -33,6 +34,8 @@ Page {
                 title: qsTr("Sync")
             }
 
+            LockBlock { text: qsTr("Unlock to sync data") }
+
             ProgressCircle {
                 id: circle
                 visible: syncService.isSyncing
@@ -57,7 +60,7 @@ Page {
 
             Button {
                 anchors.horizontalCenter: parent.horizontalCenter
-                visible: !syncService.isSyncing
+                visible: !syncService.isSyncing && !vaultManager.isLocked
                 text: qsTr("Sync now")
                 onClicked: syncService.syncAll()
             }
