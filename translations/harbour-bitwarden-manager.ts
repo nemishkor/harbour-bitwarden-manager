@@ -2,6 +2,45 @@
 <!DOCTYPE TS>
 <TS version="2.1">
 <context>
+    <name>Cipher</name>
+    <message>
+        <source>Cipher</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secure note</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Identity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Ciphers</name>
     <message>
         <source>Ciphers</source>
@@ -98,19 +137,7 @@
 <context>
     <name>Profile</name>
     <message>
-        <source>Profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Email</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Premium</source>
+        <source>Cipher</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

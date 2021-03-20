@@ -25,6 +25,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/cipherservice.cpp \
     src/cipherslistmodel.cpp \
     src/cipherstring.cpp \
+    src/cipherview.cpp \
     src/cryptoservice.cpp \
     src/decryptparametersarraybuffer.cpp \
     src/folder.cpp \
@@ -39,6 +40,7 @@ DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/components/LockBlock.qml \
     qml/components/SyncBlock.qml \
     qml/cover/CoverPage.qml \
+    qml/pages/Cipher.qml \
     qml/pages/Ciphers.qml \
     qml/pages/Folders.qml \
     qml/pages/Login.qml \
@@ -78,6 +80,7 @@ HEADERS += \
     src/cipherservice.h \
     src/cipherslistmodel.h \
     src/cipherstring.h \
+    src/cipherview.h \
     src/cryptoservice.h \
     src/decryptparametersarraybuffer.h \
     src/devicetype.h \

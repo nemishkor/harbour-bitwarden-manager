@@ -9,6 +9,9 @@ class CipherListItem
 public:
     CipherListItem();
 
+    QString getId() const;
+    void setId(const QString &value);
+
     QString getName() const;
     void setName(const QString &value);
 
@@ -19,6 +22,7 @@ public:
     void setSubtitle(const QString &value);
 
 private:
+    QString id;
     QString name;
     QString subtitle;
     Cipher::CipherType type;

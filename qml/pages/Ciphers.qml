@@ -54,6 +54,7 @@ Page {
         delegate: ListItem {
             id: delegate
             contentHeight: column.height + separator.height + Theme.paddingMedium * 2
+            onClicked: pageStack.animatorPush(Qt.resolvedUrl("Cipher.qml"), {cipherId: model.id})
 
             Icon {
                 source: {

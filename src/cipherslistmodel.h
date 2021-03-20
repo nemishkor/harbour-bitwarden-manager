@@ -12,7 +12,8 @@ class CiphersListModel : public QAbstractListModel
 
 public:
     enum CipherRoles {
-        NameRole = Qt::UserRole + 1,
+        IdRole = Qt::UserRole + 1,
+        NameRole,
         SubtitleRole,
         TypeRole
     };

@@ -34,3 +34,13 @@ void CipherListItem::setSubtitle(const QString &value)
 {
     subtitle = value;
 }
+
+QString CipherListItem::getId() const
+{
+    return id;
+}
+
+void CipherListItem::setId(const QString &value)
+{
+    id = value;
+}

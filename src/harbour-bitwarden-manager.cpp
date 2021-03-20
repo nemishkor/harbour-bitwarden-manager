@@ -10,6 +10,7 @@
 #include "auth.h"
 #include "appidservice.h"
 #include "foldersmodel.h"
+#include "cipherview.h"
 #include "cipherservice.h"
 #include "cryptoservice.h"
 #include "syncservice.h"
@@ -55,7 +56,10 @@ int main(int argc, char *argv[])
     FoldersModel foldersModel;
     context->setContextProperty("foldersModel", &foldersModel);
 
-    CipherService cipherService(&crypto);
+    CipherView cipher;
+    context->setContextProperty("cipher", &cipher);
+
+    CipherService cipherService(&crypto, &cipher);
     context->setContextProperty("cipherService", &cipherService);
     context->setContextProperty("ciphersListModel", cipherService.getCiphersListModel());
 
@@ -64,7 +68,6 @@ int main(int argc, char *argv[])
 
     VaultManager vaultManager(&crypto, &user, &api, &tokenService);
     context->setContextProperty("vaultManager", &vaultManager);
-
 
     // Start the application.
     view->setSource(SailfishApp::pathTo("qml/harbour-bitwarden-manager.qml"));
