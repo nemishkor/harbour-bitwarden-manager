@@ -26,7 +26,7 @@ Page {
             }
 
             BackgroundItem {
-                width: section.width
+                width: column.width
                 visible: !crypto.hasKey
                 Image {
                     id: cryptoIcon
@@ -44,7 +44,7 @@ Page {
             }
 
             BackgroundItem {
-                width: section.width
+                width: column.width
                 height: contentItem.childrenRect.height
                 Column {
                     Label {
@@ -70,7 +70,7 @@ Page {
             }
 
             BackgroundItem {
-                width: section.width
+                width: column.width
                 Label {
                     text: qsTr("Profile")
                     color: highlighted ? Theme.highlightColor : Theme.primaryColor
@@ -81,7 +81,7 @@ Page {
             }
 
             BackgroundItem {
-                width: section.width
+                width: column.width
                 Label {
                     text: qsTr("Folders") + " (" + foldersModel.count + ")"
                     color: highlighted ? Theme.highlightColor : Theme.primaryColor
@@ -92,7 +92,7 @@ Page {
             }
 
             BackgroundItem {
-                width: section.width
+                width: column.width
                 Label {
                     text: qsTr("Ciphers") + " (" + cipherService.count + ")"
                     color: highlighted ? Theme.highlightColor : Theme.primaryColor
@@ -102,6 +102,7 @@ Page {
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl("Ciphers.qml"))
             }
 
+            /*
             ExpandingSection {
                 id: section
 
@@ -167,6 +168,7 @@ Page {
                     }
                 }
             }
+            */
 
         }
 

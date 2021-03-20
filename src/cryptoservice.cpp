@@ -114,9 +114,9 @@ void CryptoService::clearEncKey()
     setEncKey("");
 }
 
-QString CryptoService::decryptToUtf8(CipherString *encrypted)
+QString CryptoService::decryptToUtf8(const CipherString &encrypted)
 {
-    return aesDecryptToUtf8(encrypted->getData(), encrypted->getIv(), encrypted->getMac());
+    return aesDecryptToUtf8(encrypted.getEncryptionType(), encrypted.getData(), encrypted.getIv(), encrypted.getMac());
 }
 
 QByteArray CryptoService::pbkdf2(QByteArray passwordByteArray, QString saltString, int iterations)
@@ -152,8 +152,8 @@ void CryptoService::PBKDF2_HMAC_SHA_256_string(const char* pass, const unsigned 
 
 SymmetricCryptoKey CryptoService::getKeyForEncryption()
 {
-    // TODO:
-    return SymmetricCryptoKey(QByteArray());
+    // TODO
+    return getEncKey();
 }
 
 SymmetricCryptoKey CryptoService::stretchKey(SymmetricCryptoKey key) const
@@ -202,37 +202,44 @@ const QByteArray CryptoService::hkdfExpandSHA256(QByteArray prk, QString info, i
 
 DecryptParametersArrayBuffer CryptoService::aesDecryptFastParameters(const QString data, const QString iv, const QString mac, SymmetricCryptoKey key) const
 {
-    qDebug() << "aesDecryptFastParameters()";
     DecryptParametersArrayBuffer p;
 
     p.encKey.append(key.getEncKey());
-
-    QByteArray dataByteArray;
-    dataByteArray.append(data);
-    p.data.append(QByteArray::fromBase64(dataByteArray));
-
-    QByteArray ivByteArray;
-    ivByteArray.append(iv);
-    p.iv.append(QByteArray::fromBase64(ivByteArray));
-
-    p.macData.append(iv).append(data);
+    p.data.append(QByteArray::fromBase64(data.toLatin1()));
+    p.iv.append(QByteArray::fromBase64(iv.toLatin1()));
+    for(int i = 0; i < p.iv.length(); i++) {
+        p.macData.append(p.iv.at(i));
+    }
+    for(int i = 0; i < p.data.length(); i++) {
+        p.macData.append(p.data.at(i));
+    }
 
     if(!key.getMacKey().isNull()){
         p.macKey.append(key.getMacKey());
     }
     if(!mac.isNull()){
-        QByteArray macByteArray;
-        macByteArray.append(mac);
-        p.mac.append(QByteArray::fromBase64(macByteArray));
+        qDebug() << "mac is not null";
+        p.mac.append(QByteArray::fromBase64(mac.toLatin1()));
     }
-    qDebug() << "aesDecryptFastParameters() finished";
 
     return p;
 }
 
-QString CryptoService::aesDecryptToUtf8(const QString data, const QString iv, const QString mac)
+QString CryptoService::aesDecryptToUtf8(CipherString::EncryptionType encType, const QString data, const QString iv, const QString mac)
 {
     SymmetricCryptoKey keyForEnc = getKeyForEncryption();
+//    const theKey = this.resolveLegacyKey(encType, keyForEnc);
+
+    if(!keyForEnc.getMacKey().isNull() && mac.isNull()){
+        qWarning() << "mac required";
+        throw new QException();
+    }
+
+    if(keyForEnc.getEncType() != encType){
+        qWarning() << "encType unavailable";
+        throw new QException();
+    }
+
     DecryptParametersArrayBuffer fastParams = aesDecryptFastParameters(data, iv, mac, keyForEnc);
     if(!fastParams.macKey.isEmpty() && !fastParams.mac.isEmpty()){
         QByteArray computedMac = QMessageAuthenticationCode::hash(fastParams.macData, fastParams.macKey, QCryptographicHash::Sha256);
@@ -241,8 +248,8 @@ QString CryptoService::aesDecryptToUtf8(const QString data, const QString iv, co
             return QString();
         }
     }
-    return QString();
-//    return aesDecrypt(fastParams);
+
+    return QString(QAesDecrypt(fastParams.data, fastParams.iv, fastParams.encKey));
 }
 
 QByteArray CryptoService::decryptToBytes(CipherString encryptedEncKey, SymmetricCryptoKey key) const

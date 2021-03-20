@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     FoldersModel foldersModel;
     context->setContextProperty("foldersModel", &foldersModel);
 
-    CipherService cipherService;
+    CipherService cipherService(&crypto);
     context->setContextProperty("cipherService", &cipherService);
     context->setContextProperty("ciphersListModel", cipherService.getCiphersListModel());
 

@@ -1,6 +1,8 @@
 #include "cipherservice.h"
 
-CipherService::CipherService(QObject *parent) : QObject(parent)
+CipherService::CipherService(CryptoService *cryptoService, QObject *parent) :
+    QObject(parent),
+    cryptoService(cryptoService)
 {
     ciphers = new QList<Cipher>;
     ciphersListModel = new CiphersListModel();
@@ -12,7 +14,8 @@ void CipherService::decryptAll()
     QList<Cipher>::const_iterator i;
     for(i = ciphers->constBegin(); i != ciphers->constEnd(); i++){
         CipherListItem cipherListItem;
-//        cipherListItem.setName()
+        cipherListItem.setName(cryptoService->decryptToUtf8((*i).getName()));
+        ciphersListModel->add(cipherListItem);
     }
 }
 

@@ -55,7 +55,7 @@ public:
     void clearKeyPair();
     void clearEncKey();
 
-    QString decryptToUtf8(CipherString *encrypted);
+    QString decryptToUtf8(const CipherString &encrypted);
 
 private:
     QSettings *settings;
@@ -80,7 +80,7 @@ private:
     SymmetricCryptoKey stretchKey(SymmetricCryptoKey key) const;
     const QByteArray hkdfExpandSHA256(QByteArray prk, QString info, int outputByteSize) const;
     DecryptParametersArrayBuffer aesDecryptFastParameters(const QString data, const QString iv, const QString mac, SymmetricCryptoKey key) const;
-    QString aesDecryptToUtf8(const QString data, const QString iv, const QString mac);
+    QString aesDecryptToUtf8(CipherString::EncryptionType encType, const QString data, const QString iv, const QString mac);
     QByteArray decryptToBytes(CipherString encryptedEncKey, SymmetricCryptoKey key) const;
     QByteArray QAesDecrypt(QByteArray data, QByteArray iv, QByteArray encKey) const;
     int aesDecrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
