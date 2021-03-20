@@ -144,3 +144,8 @@ void Cipher::setDeletedDate(const QString &value)
 {
     deletedDate = value;
 }
+
+CipherLogin *Cipher::getLogin()
+{
+    return &login;
+}

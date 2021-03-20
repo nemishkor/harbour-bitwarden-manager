@@ -55,20 +55,42 @@ Page {
             id: delegate
             contentHeight: column.height + separator.height + Theme.paddingMedium * 2
 
+            Icon {
+                source: {
+                    console.log(model.type)
+                    if(model.type === 1){
+                        return "image://theme/icon-m-keys";
+                    }
+                    if(model.type === 2){
+                        return "image://theme/icon-m-note";
+                    }
+                    if(model.type === 3){
+                        return "image://theme/icon-m-file-vcard";
+                    }
+                    if(model.type === 4){
+                        return "image://theme/icon-m-contact";
+                    }
+                    return "image://theme/icon-m-keys";
+                }
+                y: Theme.paddingMedium
+                anchors { left: parent.left; leftMargin: Theme.horizontalPageMargin }
+            }
+
             Column {
                 id: column
+                x: Theme.horizontalPageMargin + Theme.paddingMedium + Theme.iconSizeMedium
                 y: Theme.paddingMedium
+                width: parent.width - Theme.horizontalPageMargin - Theme.paddingMedium - Theme.iconSizeMedium
 
                 Label {
-                    x: Theme.paddingLarge
                     width: parent.width - 2 * Theme.horizontalPageMargin
                     text: model.name
                     color: Theme.primaryColor
+
                 }
                 Label {
-                    x: Theme.paddingLarge
                     width: parent.width - 2 * Theme.horizontalPageMargin
-                    text: model.username
+                    text: model.subtitle
                     color: Theme.secondaryColor
                 }
 

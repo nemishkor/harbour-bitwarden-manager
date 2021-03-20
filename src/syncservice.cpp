@@ -265,23 +265,44 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
 {
     cipherService->clear();
     QJsonArray::const_iterator i;
+    QJsonObject c, l;
     for (i = ciphers.constBegin(); i != ciphers.constEnd(); i++){
-        Cipher cipher(CipherString((*i).toObject()["Name"].toString()));
-        cipher.setId((*i).toObject()["Id"].toString());
-        cipher.setOrganizationId((*i).toObject()["OrganizationId"].toString());
-        cipher.setFolderId((*i).toObject()["FolderId"].toString());
+        qDebug() << "add cipher";
+        c = (*i).toObject();
+        Cipher cipher(CipherString(c["Name"].toString()));
+        cipher.setId(c["Id"].toString());
+        if(c["OrganizationId"].isString()) {
+            cipher.setOrganizationId(c["OrganizationId"].toString());
+        }
+        if(c["FolderId"].isString()) {
+            cipher.setFolderId(c["FolderId"].toString());
+        }
         cipher.setUserId(userId);
-        cipher.setEdit((*i).toObject()["Edit"].toBool());
-        cipher.setViewPassword((*i).toObject()["ViewPassword"].toBool());
-        cipher.setOrganizationUseTotp((*i).toObject()["OrganizationUseTotp"].toBool());
-        cipher.setFavorite((*i).toObject()["Favorite"].toBool());
-        cipher.setRevisionDate((*i).toObject()["RevisionDate"].toString());
-        cipher.setType(static_cast<Cipher::CipherType>((*i).toObject()["Type"].toInt()));
-        cipher.setSizeName((*i).toObject()["SizeName"].toString());
-        cipher.setNotes((*i).toObject()["Notes"].toString());
-        cipher.setDeletedDate((*i).toObject()["DeletedDate"].toString());
+        cipher.setEdit(c["Edit"].toBool());
+        cipher.setViewPassword(c["ViewPassword"].toBool());
+        cipher.setOrganizationUseTotp(c["OrganizationUseTotp"].toBool());
+        cipher.setFavorite(c["Favorite"].toBool());
+        cipher.setRevisionDate(c["RevisionDate"].toString());
+        cipher.setType(static_cast<Cipher::CipherType>(c["Type"].toInt()));
+        cipher.setSizeName(c["SizeName"].toString());
+        cipher.setNotes(c["Notes"].toString());
+        cipher.setDeletedDate(c["DeletedDate"].toString());
+        if(c.contains("Login") && c["Login"].isObject()){
+            l = c["Login"].toObject();
+            cipher.getLogin()->fillPassword(l["Password"].toString());
+            if(l["PasswordRevisionDate"].isString()){
+                cipher.getLogin()->setPasswordRevisionDate(l["PasswordRevisionDate"].toString());
+            }
+            if(l["Uri"].isString()) {
+                cipher.getLogin()->fillUri(l["Uri"].toString());
+            }
+            qDebug() << "fillUsername" << l["Username"].toString();
+            cipher.getLogin()->fillUsername(l["Username"].toString());
+            qDebug() << "filled userName mac" << cipher.getLogin()->getUsername().getMac();
+        }
         cipherService->add(cipher);
     }
+    qDebug() << "Ciphers added";
 }
 
 void SyncService::syncSends()

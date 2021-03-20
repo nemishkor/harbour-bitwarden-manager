@@ -1,8 +1,40 @@
 #include "cipherstring.h"
 
-CipherString::CipherString(QString encryptedString):
-    encryptedString(encryptedString)
+CipherString::CipherString()
 {
+
+}
+
+CipherString::CipherString(QString encryptedString)
+{
+    fill(encryptedString);
+}
+
+CipherString::EncryptionType CipherString::getEncryptionType() const
+{
+    return encryptionType;
+}
+
+QString CipherString::getData() const
+{
+    return data;
+}
+
+QString CipherString::getIv() const
+{
+    return iv;
+}
+
+QString CipherString::getMac() const
+{
+    return mac;
+}
+
+void CipherString::fill(QString encryptedString)
+{
+    if(encryptedString.isEmpty()){
+        qWarning() << "encrypted string is empty";
+    }
     qDebug() << "create cipher string";
     QStringList headerPieses = encryptedString.split(".");
     QStringList encPieses;
@@ -37,25 +69,5 @@ CipherString::CipherString(QString encryptedString):
         break;
     }
     qDebug() << "encryption type" << encryptionType;
-}
-
-CipherString::EncryptionType CipherString::getEncryptionType() const
-{
-    return encryptionType;
-}
-
-QString CipherString::getData() const
-{
-    return data;
-}
-
-QString CipherString::getIv() const
-{
-    return iv;
-}
-
-QString CipherString::getMac() const
-{
-    return mac;
 }
 

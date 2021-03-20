@@ -2,6 +2,7 @@
 #define DECRYPTEDCIPHER_H
 
 #include <QString>
+#include "cipher.h"
 
 class CipherListItem
 {
@@ -11,12 +12,16 @@ public:
     QString getName() const;
     void setName(const QString &value);
 
-    QString getLoginUsername() const;
-    void setLoginUsername(const QString &value);
+    void setType(const Cipher::CipherType &value);
+    Cipher::CipherType getType() const;
+
+    QString getSubtitle() const;
+    void setSubtitle(const QString &value);
 
 private:
     QString name;
-    QString loginUsername;
+    QString subtitle;
+    Cipher::CipherType type;
 };
 
 #endif // DECRYPTEDCIPHER_H

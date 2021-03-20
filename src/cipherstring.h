@@ -8,6 +8,7 @@
 class CipherString
 {
 public:
+    CipherString();
     CipherString(QString encryptedString);
     enum EncryptionType {
         AesCbc256_B64 = 0,
@@ -18,6 +19,16 @@ public:
         Rsa2048_OaepSha256_HmacSha256_B64 = 5,
         Rsa2048_OaepSha1_HmacSha256_B64 = 6,
     };
+    CipherString(const CipherString& c) :
+        encryptionType(c.getEncryptionType()),
+        data(c.getData()),
+        iv(c.getIv()),
+        mac(c.getMac())
+    {
+        qDebug() << "copy cipherString";
+    }
+
+    void fill(QString encryptedString);
 
     EncryptionType getEncryptionType() const;
 
@@ -28,7 +39,6 @@ public:
     QString getMac() const;
 
 private:
-    QString encryptedString;
     EncryptionType encryptionType;
     QString data;
     QString iv;

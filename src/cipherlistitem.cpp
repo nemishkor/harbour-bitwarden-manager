@@ -15,12 +15,22 @@ void CipherListItem::setName(const QString &value)
     name = value;
 }
 
-QString CipherListItem::getLoginUsername() const
+void CipherListItem::setType(const Cipher::CipherType &value)
 {
-    return loginUsername;
+    type = value;
 }
 
-void CipherListItem::setLoginUsername(const QString &value)
+Cipher::CipherType CipherListItem::getType() const
 {
-    loginUsername = value;
+    return type;
+}
+
+QString CipherListItem::getSubtitle() const
+{
+    return subtitle;
+}
+
+void CipherListItem::setSubtitle(const QString &value)
+{
+    subtitle = value;
 }

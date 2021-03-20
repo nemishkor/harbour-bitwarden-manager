@@ -232,6 +232,9 @@ QString CryptoService::aesDecryptToUtf8(CipherString::EncryptionType encType, co
 
     if(!keyForEnc.getMacKey().isNull() && mac.isNull()){
         qWarning() << "mac required";
+        qDebug() << "data" << data;
+        qDebug() << "iv" << iv;
+        qDebug() << "mac" << mac;
         throw new QException();
     }
 

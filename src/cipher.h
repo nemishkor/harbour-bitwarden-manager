@@ -3,6 +3,7 @@
 
 #include <QString>
 
+#include "cipherlogin.h"
 #include "cipherstring.h"
 
 class Cipher
@@ -58,6 +59,8 @@ public:
     QString getDeletedDate() const;
     void setDeletedDate(const QString &value);
 
+    CipherLogin *getLogin();
+
 private:
     QString id;
     QString organizationId;
@@ -73,6 +76,8 @@ private:
     CipherString name;
     QString notes;
     QString deletedDate;
+    CipherLogin login;
+
 };
 
 #endif // CIPHER_H

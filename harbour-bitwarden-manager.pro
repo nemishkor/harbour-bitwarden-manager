@@ -21,6 +21,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/authentication.cpp \
     src/cipher.cpp \
     src/cipherlistitem.cpp \
+    src/cipherlogin.cpp \
     src/cipherservice.cpp \
     src/cipherslistmodel.cpp \
     src/cipherstring.cpp \
@@ -73,6 +74,7 @@ HEADERS += \
     src/authentication.h \
     src/cipher.h \
     src/cipherlistitem.h \
+    src/cipherlogin.h \
     src/cipherservice.h \
     src/cipherslistmodel.h \
     src/cipherstring.h \

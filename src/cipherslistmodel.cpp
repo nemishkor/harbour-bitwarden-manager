@@ -35,8 +35,10 @@ QVariant CiphersListModel::data(const QModelIndex &index, int role) const
     const CipherListItem &item = items[index.row()];
     if (role == NameRole)
         return item.getName();
-    if(role == LoginUsernameRole)
-        return item.getLoginUsername();
+    if(role == SubtitleRole)
+        return item.getSubtitle();
+    if(role == TypeRole)
+        return (int) item.getType();
 
     return QVariant();
 }
@@ -45,7 +47,7 @@ QHash<int, QByteArray> CiphersListModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[NameRole] = "name";
-    roles[LoginUsernameRole] = "loginUsername";
-
+    roles[SubtitleRole] = "subtitle";
+    roles[TypeRole] = "type";
     return roles;
 }
