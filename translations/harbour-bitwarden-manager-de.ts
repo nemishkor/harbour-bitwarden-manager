@@ -7,6 +7,14 @@
         <source>Ciphers</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Ciphers1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ciphers2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
@@ -125,7 +133,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To sync unlock first</source>
+        <source>Unlock to sync data</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SyncBlock</name>
+    <message>
+        <source>Data is not synchronized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sync</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

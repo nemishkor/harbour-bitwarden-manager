@@ -15,7 +15,8 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService, Crypt
     syncReply = nullptr;
     refreshTokenReply = nullptr;
     if(settings->contains("last_sync_" + user->getUserId())){
-        lastSync = settings->value("last_sync_" + user->getUserId()).toDateTime();
+//        lastSync = settings->value("last_sync_" + user->getUserId()).toDateTime();
+        settings->remove("last_sync_" + user->getUserId());
     }
 }
 

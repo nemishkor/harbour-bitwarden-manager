@@ -36,6 +36,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
 
 DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/components/LockBlock.qml \
+    qml/components/SyncBlock.qml \
     qml/cover/CoverPage.qml \
     qml/pages/Ciphers.qml \
     qml/pages/Folders.qml \

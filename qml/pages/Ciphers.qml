@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../components"
 
 Page {
     id: page
@@ -8,13 +9,43 @@ Page {
     allowedOrientations: Orientation.All
 
     Component.onCompleted: {
-        cipherService.decryptAll();
+        if(!vaultManager.isLocked) {
+            cipherService.decryptAll()
+        }
+    }
+
+    SilicaFlickable {
+        visible: vaultManager.isLocked
+        contentHeight: unlockColumn.height
+
+        Column {
+            id: unlockColumn
+            width: page.width
+
+            PageHeader {
+                title: qsTr("Ciphers1")
+            }
+
+            LockBlock {}
+        }
+    }
+    SilicaFlickable {
+        visible: !vaultManager.isLocked && !syncService.synchronized
+        contentHeight: syncColumn.height
+        Column {
+            id: syncColumn
+            width: page.width
+            PageHeader {
+                title: qsTr("Ciphers2")
+            }
+            SyncBlock {}
+        }
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaListView {
 
-        visible: crypto.hasKey
+        visible: !vaultManager.isLocked && syncService.synchronized
         model: ciphersListModel
         anchors.fill: parent
         header: PageHeader {
