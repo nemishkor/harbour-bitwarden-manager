@@ -74,38 +74,51 @@ Page {
             spacing: Theme.paddingMedium
 
             PageHeader {
-                title: qsTr("Cipher")
-            }
-
-            BackgroundItem {
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Type"); color: Theme.highlightColor }
-                    Label {
-                        x: Theme.paddingLarge
-                        text: getTypeLabel(cipher.type)
-                        wrapMode: "WordWrap"
+                title: cipher.name
+                width: parent.width - 2 * icon.width - Theme.paddingSmall - Theme.horizontalPageMargin
+                Icon {
+                    id: icon
+                    source: {
+                        if(cipher.type === 1){
+                            return "image://theme/icon-m-keys";
+                        }
+                        if(cipher.type === 2){
+                            return "image://theme/icon-m-note";
+                        }
+                        if(cipher.type === 3){
+                            return "image://theme/icon-m-file-vcard";
+                        }
+                        if(cipher.type === 4){
+                            return "image://theme/icon-m-contact";
+                        }
+                        return "image://theme/icon-m-keys";
+                    }
+                    anchors {
+                        left: parent.right
+                        verticalCenter: parent.verticalCenter
+                        leftMargin: Theme.paddingSmall
+                    }
+                }
+                Icon {
+                    source: "image://theme/icon-m-favorite" + (cipher.favorite ? "-selected" : "")
+                    anchors {
+                        left: icon.right
+                        verticalCenter: parent.verticalCenter
+                        leftMargin: Theme.paddingSmall
                     }
                 }
             }
 
-            BackgroundItem {
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Name"); color: Theme.highlightColor }
-                    Label {
-                        x: Theme.paddingLarge
-                        text: cipher.name
-                        wrapMode: "WordWrap"
-                    }
-                }
+            SectionHeader { text: qsTr("Notes") }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                text: cipher.notes
+                wrapMode: "WordWrap"
             }
+
+            SectionHeader { text: qsTr("Login"); visible: cipher.type === 1 }
 
             BackgroundItem {
                 visible: cipher.type === 1
@@ -122,6 +135,55 @@ Page {
                     }
                 }
             }
+
+            BackgroundItem {
+                visible: cipher.type === 1
+                width: column.width
+                height: contentItem.childrenRect.height
+                Column {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    Label { text: qsTr("Password"); color: Theme.highlightColor }
+                    Label {
+                        x: Theme.paddingLarge
+                        text: cipher.loginPassword ? cipher.loginPassword : " "
+                        wrapMode: "WordWrap"
+                    }
+                }
+            }
+
+            BackgroundItem {
+                visible: cipher.type === 1
+                width: column.width
+                height: contentItem.childrenRect.height
+                Column {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    Label { text: qsTr("Password revision date"); color: Theme.highlightColor }
+                    Label {
+                        x: Theme.paddingLarge
+                        text: cipher.loginPasswordRevisionDate ? cipher.loginPasswordRevisionDate : qsTr("None")
+                        wrapMode: "WordWrap"
+                    }
+                }
+            }
+
+            BackgroundItem {
+                visible: cipher.type === 1
+                width: column.width
+                height: contentItem.childrenRect.height
+                Column {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    Label { text: qsTr("Uri"); color: Theme.highlightColor }
+                    Label {
+                        x: Theme.paddingLarge
+                        text: cipher.loginUri ? cipher.loginUri : " "
+                        wrapMode: "WordWrap"
+                    }
+                }
+            }
+
 
         }
 
