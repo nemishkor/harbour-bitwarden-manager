@@ -60,10 +60,26 @@ Page {
             spacing: Theme.paddingLarge
 
             PageHeader {
-                title: qsTr("Cipher")
+                title: qsTr("Profile")
             }
 
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                text: qsTr("Email") + ": " + user.email
+            }
 
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                text: qsTr("Name") + ": " + user.name
+            }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                text: qsTr("Premium") + ": " + (user.premium ? "Yes" : "No")
+            }
 
         }
 
