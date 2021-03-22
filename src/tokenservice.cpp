@@ -51,6 +51,16 @@ bool TokenService::tokenNeedsRefresh(int minutes)
     return secondsRemaining < (60 * minutes);
 }
 
+void TokenService::clearTokens()
+{
+    qDebug() << "clear tokens";
+    accessToken.clear();
+    settings->remove("accessToken");
+    refreshToken.clear();
+    settings->remove("refreshToken");
+    settings->sync();
+}
+
 void TokenService::setAccessToken(const QString &value)
 {
     if(accessToken != value){

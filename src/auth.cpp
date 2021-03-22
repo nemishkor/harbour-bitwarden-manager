@@ -13,10 +13,7 @@ Auth::Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, Cry
     if(tokenService->exists()){
         qDebug() << "tokens is exist";
     }
-    if(user->existsInformation()){
-        qDebug() << "user's information is exists";
-    }
-    if(tokenService->exists() && user->existsInformation()){
+    if(tokenService->exists() && user->isAuthenticated()){
         setLoginStage(4);
     }
 }
@@ -120,6 +117,22 @@ void Auth::login(QString password)
     setLoginMessage("Logging in");
     authenticateReply = api->postIdentityToken(makeIdentityTokenRequestBody());
     connect(authenticateReply, &QNetworkReply::finished, this, &Auth::postAuthenticate);
+}
+
+void Auth::logout()
+{
+    reset();
+//    this.syncService.setLastSync(new Date(0)),
+    tokenService->clearTokens();
+    crypto->clearKeys();
+    user->clear();
+//    this.settingsService.clear(userId),
+//    this.cipherService.clear(userId),
+//    this.folderService.clear(userId),
+//    this.collectionService.clear(userId),
+//    this.policyService.clear(userId),
+//    this.passwordGenerationService.clear(),
+    qDebug() << "logout finished";
 }
 
 QByteArray Auth::makeIdentityTokenRequestBody()

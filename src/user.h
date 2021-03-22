@@ -13,6 +13,7 @@
 class User : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool authenticated READ isAuthenticated NOTIFY authenticatedChanged)
     Q_PROPERTY(QString email READ getEmail NOTIFY emailChanged)
     Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
     Q_PROPERTY(QString premium READ getPremium NOTIFY premiumChanged)
@@ -27,8 +28,6 @@ public:
 
     QString getEmail();
     void setEmail(const QString &value);
-
-    bool existsInformation();
 
     QString getStamp() const;
     void setStamp(const QString &value);
@@ -45,8 +44,13 @@ public:
     // required to unlock vault
     int getKdfIterations() const;
 
+    void clear();
+
+    bool isAuthenticated() const;
+
 private:
     QSettings *settings;
+    bool authenticated;
     QString userId;
     QString email;
     KdfType kdf;
@@ -56,6 +60,7 @@ private:
     bool premium;
 
 signals:
+    void authenticatedChanged();
     void emailChanged();
     void nameChanged();
     void premiumChanged();

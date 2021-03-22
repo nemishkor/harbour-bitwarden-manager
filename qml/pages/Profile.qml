@@ -25,7 +25,8 @@ Page {
             width: page.width
 
             PageHeader {
-                title: qsTr("Cipher")
+                title: qsTr("Profile")
+                description: "Bitwarden manager"
             }
 
             LockBlock {}
@@ -38,7 +39,8 @@ Page {
             id: syncColumn
             width: page.width
             PageHeader {
-                title: qsTr("Cipher")
+                title: qsTr("Profile")
+                description: "Bitwarden manager"
             }
             SyncBlock {}
         }
@@ -61,6 +63,7 @@ Page {
 
             PageHeader {
                 title: qsTr("Profile")
+                description: "Bitwarden manager"
             }
 
             Label {

@@ -24,6 +24,7 @@ Page {
 
             PageHeader {
                 title: qsTr("Ciphers")
+                description: "Bitwarden manager"
             }
 
             LockBlock {}
@@ -37,6 +38,7 @@ Page {
             width: page.width
             PageHeader {
                 title: qsTr("Ciphers")
+                description: "Bitwarden manager"
             }
             SyncBlock {}
         }
@@ -50,6 +52,7 @@ Page {
         anchors.fill: parent
         header: PageHeader {
             title: qsTr("Ciphers")
+            description: "Bitwarden manager"
         }
         delegate: ListItem {
             id: delegate

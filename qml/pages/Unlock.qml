@@ -24,6 +24,7 @@ Page {
 
             PageHeader {
                 title: qsTr("Lock/unlock")
+                description: "Bitwarden manager"
             }
 
             Label {

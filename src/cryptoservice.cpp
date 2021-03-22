@@ -96,6 +96,21 @@ QString CryptoService::getHashedPassword() const
     return hashedPassword;
 }
 
+void CryptoService::clearKeys()
+{
+    qDebug() << "clear keys";
+    clearKey();
+//    this.clearKeyHash(),
+//    this.clearOrgKeys(),
+    clearEncKey();
+    clearKeyPair();
+//    this.clearPinProtectedKey(),
+
+    hashedPassword.clear();
+    settings->remove("hashedPassword");
+    settings->sync();
+}
+
 void CryptoService::clearKey()
 {
     key.clear();

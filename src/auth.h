@@ -29,6 +29,7 @@ public:
     Q_INVOKABLE void reset();
     Q_INVOKABLE void preLogin(QString email);
     Q_INVOKABLE void login(QString password);
+    Q_INVOKABLE void logout();
     int getLoginStage();
     QString getLoginMessage();
     QString getLoginMessageType();

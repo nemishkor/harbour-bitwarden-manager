@@ -23,6 +23,7 @@ public:
     QString getAccessToken() const;
     QString getRefreshToken() const;
     bool tokenNeedsRefresh(int minutes = 5);
+    void clearTokens();
 
 private:
     QString accessToken;

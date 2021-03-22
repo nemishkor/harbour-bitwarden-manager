@@ -14,6 +14,7 @@ Page {
         anchors.fill: parent
         header: PageHeader {
             title: qsTr("Folders")
+            description: "Bitwarden manager"
         }
         delegate: ListItem {
             id: delegate

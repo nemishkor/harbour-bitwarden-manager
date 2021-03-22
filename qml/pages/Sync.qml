@@ -32,6 +32,7 @@ Page {
 
             PageHeader {
                 title: qsTr("Sync")
+                description: "Bitwarden manager"
             }
 
             LockBlock { text: qsTr("Unlock to sync data") }

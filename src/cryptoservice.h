@@ -50,6 +50,7 @@ public:
     // required to unlock process
     QString getHashedPassword() const;
 
+    void clearKeys();
     void clearKey();
 //    void clearOrgKeys();
     void clearKeyPair();

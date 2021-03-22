@@ -35,6 +35,7 @@ Page {
 
             PageHeader {
                 title: qsTr("Cipher")
+                description: "Bitwarden manager"
             }
 
             LockBlock {}
@@ -49,6 +50,7 @@ Page {
             width: page.width
             PageHeader {
                 title: qsTr("Cipher")
+                description: "Bitwarden manager"
             }
             SyncBlock {}
         }
@@ -75,6 +77,7 @@ Page {
 
             PageHeader {
                 title: cipher.name
+                description: "Bitwarden manager"
                 width: parent.width - 2 * icon.width - Theme.paddingSmall - Theme.horizontalPageMargin
                 Icon {
                     id: icon

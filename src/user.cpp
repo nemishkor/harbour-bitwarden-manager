@@ -2,16 +2,15 @@
 
 User::User(QSettings *settings) : QObject(nullptr), settings(settings)
 {
-    if(settings->contains("userId"))
+    if(settings->contains("userId")){
         userId = settings->value("userId").toString();
-    if(settings->contains("email"))
         email = settings->value("email").toString();
-    if(settings->contains("kdf"))
         kdf = static_cast<KdfType>(settings->value("kdf").toInt());
-    if(settings->contains("kdfIterations"))
         kdfIterations = settings->value("kdfIterations").toInt();
-    if(settings->contains("stamp"))
         stamp = settings->value("securityStamp").toString();
+        authenticated = true;
+        emit authenticatedChanged();
+    }
 }
 
 void User::setInformation(QString userId, QString email, KdfType kdf, int kdfIterations)
@@ -24,6 +23,8 @@ void User::setInformation(QString userId, QString email, KdfType kdf, int kdfIte
     this->kdfIterations = kdfIterations;
     settings->setValue("kdfIterations", kdfIterations);
     settings->sync();
+    authenticated = true;
+    emit authenticatedChanged();
 }
 
 QString User::getUserId() const
@@ -34,11 +35,6 @@ QString User::getUserId() const
 QString User::getEmail()
 {
     return email;
-}
-
-bool User::existsInformation()
-{
-    return userId != "" && email != "";
 }
 
 QString User::getStamp() const
@@ -87,6 +83,27 @@ KdfType User::getKdf() const
 int User::getKdfIterations() const
 {
     return kdfIterations;
+}
+
+void User::clear()
+{
+    qDebug() << "clear user's data";
+    userId.clear();
+    settings->remove("userId");
+    email.clear();
+    settings->remove("email");
+    kdfIterations = 0;
+    stamp.clear();
+    settings->remove("securityStamp");
+    name.clear();
+    settings->sync();
+    authenticated = false;
+    emit authenticatedChanged();
+}
+
+bool User::isAuthenticated() const
+{
+    return authenticated;
 }
 
 void User::setEmail(const QString &value)

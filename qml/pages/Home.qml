@@ -23,6 +23,7 @@ Page {
 
             PageHeader {
                 title: user.email
+                description: "Bitwarden manager"
             }
 
             BackgroundItem {
@@ -169,6 +170,12 @@ Page {
                 }
             }
             */
+
+            Button {
+                text: "Logout"
+                onClicked: auth.logout()
+                anchors.horizontalCenter: parent.horizontalCenter
+            }
 
         }
 

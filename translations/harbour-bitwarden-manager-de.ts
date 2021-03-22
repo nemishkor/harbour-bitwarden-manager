@@ -149,7 +149,19 @@
 <context>
     <name>Profile</name>
     <message>
-        <source>Cipher</source>
+        <source>Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Premium</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

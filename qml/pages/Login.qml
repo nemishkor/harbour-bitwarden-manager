@@ -34,6 +34,7 @@ Page {
 
             PageHeader {
                 title: qsTr("Log In")
+                description: "Bitwarden manager"
             }
 
             TextField {
