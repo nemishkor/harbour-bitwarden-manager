@@ -145,6 +145,18 @@
         <source>Master password</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Api host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Identity host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set default URLs</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Profile</name>

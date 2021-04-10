@@ -11,6 +11,11 @@ Page {
         auth.preLogin(emailField.text)
     }
 
+    RegExpValidator {
+        id: urlValidator
+        regExp: /(^https?:\/\/(www\.)?([a-zA-Z0-9]([a-zA-Z0-9\-]*)[a-zA-Z0-9]\.)+)([a-zA-Z0-9]{2,})$/
+    }
+
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
         anchors {
@@ -35,6 +40,46 @@ Page {
             PageHeader {
                 title: qsTr("Log In")
                 description: "Bitwarden manager"
+            }
+
+            TextField {
+                id: apiHostField
+                visible: auth.loginStage >= 0
+                readOnly: auth.loginStage !== 0
+                label: qsTr("Api host")
+                text: api.apiUrl
+                width: parent.width
+                validator: urlValidator
+                EnterKey.enabled: acceptableInput
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: auth.preLogin(emailField.text)
+                onTextChanged: api.apiUrl = text
+            }
+
+            TextField {
+                id: identityHostField
+                visible: auth.loginStage >= 0
+                readOnly: auth.loginStage !== 0
+                label: qsTr("Identity host")
+                text: api.identityUrl
+                width: parent.width
+                validator: urlValidator
+                EnterKey.enabled: acceptableInput
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: auth.preLogin(emailField.text)
+                onTextChanged: api.identityUrl = text
+            }
+
+            ButtonLayout {
+                preferredWidth: Theme.buttonWidthExtraSmall
+                Button {
+                    visible: auth.loginStage === 0
+                    text: qsTr("Set default URLs")
+                    onClicked: {
+                        api.apiUrl = "https://api.bitwarden.com"
+                        api.identityUrl = "https://identity.bitwarden.com"
+                    }
+                }
             }
 
             TextField {

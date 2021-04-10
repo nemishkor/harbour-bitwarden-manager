@@ -9,6 +9,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QSettings>
 #include <QString>
 #include <QUrl>
 #include <QUrlQuery>
@@ -20,13 +21,20 @@
 class Api : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl NOTIFY apiUrlChanged);
+    Q_PROPERTY(QString identityUrl READ getIdentityUrl WRITE setIdentityUrl NOTIFY identityUrlChanged);
     Q_PROPERTY(QString lastError READ getLastError NOTIFY lastErrorChanged);
     Q_PROPERTY(bool requestRunning READ getRequestRunning NOTIFY requestRunningChanged);
 
 public:
-    Api(QString apiUrl, QString identityUrl);
+    Api(QSettings *settings);
+
     QString getApiUrl();
+    void setApiUrl(const QString &value);
+
     QString getIdentityUrl();
+    void setIdentityUrl(const QString &value);
+
     QString getLastError();
     bool getRequestRunning();
     QNetworkReply *postPrelogin(QString email);
@@ -36,6 +44,7 @@ public:
     QNetworkReply *postAccountVerifyPassword(QString masterPasswordHash, QString accessToken);
 
 private:
+    QSettings *settings;
     QNetworkAccessManager *networkManager;
     QString apiUrl;
     QString identityUrl;
@@ -49,6 +58,8 @@ private:
     void replyFinished();
 
 signals:
+    void apiUrlChanged();
+    void identityUrlChanged();
     void lastErrorChanged();
     void requestRunningChanged();
 };

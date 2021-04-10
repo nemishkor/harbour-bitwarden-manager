@@ -49,7 +49,7 @@ DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/pages/Sync.qml \
     qml/pages/Sync.qml \
     qml/pages/Unlock.qml \
-    rpm/harbour-bitwarden-manager.changes.in \
+    rpm/harbour-bitwarden-manager.changes \
     rpm/harbour-bitwarden-manager.changes.run.in \
     rpm/harbour-bitwarden-manager.spec \
     rpm/harbour-bitwarden-manager.yaml \

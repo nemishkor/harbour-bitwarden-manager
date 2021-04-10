@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     TokenService tokenService(&settings);
     context->setContextProperty("tokenService", &tokenService);
 
-    Api api(QString("https://api.bitwarden.com"), QString("https://identity.bitwarden.com"));
+    Api api(&settings);
     context->setContextProperty("api", &api);
 
     CryptoService crypto(&settings);

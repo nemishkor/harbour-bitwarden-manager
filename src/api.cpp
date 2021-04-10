@@ -1,9 +1,10 @@
 #include "api.h"
 
-Api::Api(QString apiUrl, QString identityUrl):
-    apiUrl(apiUrl),
-    identityUrl(identityUrl)
+Api::Api(QSettings *settings):
+    settings(settings)
 {
+    apiUrl = settings->value("apiUrl", "https://api.bitwarden.com").toString();
+    identityUrl = settings->value("identityUrl", "https://identity.bitwarden.com").toString();
     networkManager = new QNetworkAccessManager();
 }
 
@@ -12,9 +13,31 @@ QString Api::getApiUrl()
     return apiUrl;
 }
 
+void Api::setApiUrl(const QString &value)
+{
+    if(apiUrl == value){
+        return;
+    }
+    apiUrl = value;
+    emit apiUrlChanged();
+    settings->setValue("apiUrl", value);
+    settings->sync();
+}
+
 QString Api::getIdentityUrl()
 {
     return identityUrl;
+}
+
+void Api::setIdentityUrl(const QString &value)
+{
+    if(identityUrl == value){
+        return;
+    }
+    identityUrl = value;
+    emit identityUrlChanged();
+    settings->setValue("identityUrl", value);
+    settings->sync();
 }
 
 QString Api::getLastError()
