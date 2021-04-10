@@ -78,7 +78,13 @@ Page {
             PageHeader {
                 title: cipher.name
                 description: "Bitwarden manager"
-                width: parent.width - 2 * icon.width - Theme.paddingSmall - Theme.horizontalPageMargin
+            }
+
+            Item {
+                x: Theme.horizontalPageMargin
+                height: Theme.iconSizeMedium
+                width: parent.width - 2 * Theme.horizontalPageMargin
+
                 Icon {
                     id: icon
                     source: {
@@ -96,19 +102,44 @@ Page {
                         }
                         return "image://theme/icon-m-keys";
                     }
-                    anchors {
-                        left: parent.right
-                        verticalCenter: parent.verticalCenter
-                        leftMargin: Theme.paddingSmall
+                }
+                Label {
+                    height: Theme.iconSizeMedium
+                    x: Theme.iconSizeMedium + Theme.paddingSmall
+                    color: Theme.primaryColor
+                    verticalAlignment: Text.AlignVCenter
+                    text: {
+                        if(cipher.type === 1){
+                            return "Login";
+                        }
+                        if(cipher.type === 2){
+                            return "Secure note";
+                        }
+                        if(cipher.type === 3){
+                            return "Card";
+                        }
+                        if(cipher.type === 4){
+                            return "Personal data";
+                        }
+                        return "Other";
                     }
                 }
+            }
+
+            Item {
+                x: Theme.horizontalPageMargin
+                height: Theme.iconSizeMedium
+                width: parent.width - 2 * Theme.horizontalPageMargin
+
                 Icon {
                     source: "image://theme/icon-m-favorite" + (cipher.favorite ? "-selected" : "")
-                    anchors {
-                        left: icon.right
-                        verticalCenter: parent.verticalCenter
-                        leftMargin: Theme.paddingSmall
-                    }
+                }
+                Label {
+                    x: Theme.iconSizeMedium + Theme.paddingSmall
+                    height: Theme.iconSizeMedium
+                    color: Theme.primaryColor
+                    verticalAlignment: Text.AlignVCenter
+                    text: cipher.favorite ? qsTr("Is favorite") : qsTr("Isn't favorite")
                 }
             }
 
