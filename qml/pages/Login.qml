@@ -54,6 +54,7 @@ Page {
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: auth.preLogin(emailField.text)
                 onTextChanged: api.apiUrl = text
+                inputMethodHints: Qt.ImhUrlCharactersOnly
             }
 
             TextField {
@@ -68,6 +69,7 @@ Page {
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: auth.preLogin(emailField.text)
                 onTextChanged: api.identityUrl = text
+                inputMethodHints: Qt.ImhUrlCharactersOnly
             }
 
             ButtonLayout {
@@ -94,6 +96,7 @@ Page {
                 EnterKey.enabled: acceptableInput
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: auth.preLogin(emailField.text)
+                inputMethodHints: Qt.ImhEmailCharactersOnly
             }
 
             ButtonLayout {
