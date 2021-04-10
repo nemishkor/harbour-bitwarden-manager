@@ -16,6 +16,7 @@ void VaultManager::unlock(QString password)
 {
     setUnlocking(true);
     setUnlockMessage("Encrypting");
+
     key = cryptoService->makeKey(password, user->getEmail(), user->getKdf(), user->getKdfIterations());
     masterPasswordHash = cryptoService->hashPassword(key, password);
     if(masterPasswordHash == cryptoService->getHashedPassword()){

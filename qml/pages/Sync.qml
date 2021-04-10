@@ -35,8 +35,6 @@ Page {
                 description: "Bitwarden manager"
             }
 
-            LockBlock { text: qsTr("Unlock to sync data") }
-
             ProgressCircle {
                 id: circle
                 visible: syncService.isSyncing

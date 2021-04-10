@@ -51,6 +51,14 @@
         <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Is favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Isn&apos;t favorite</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ciphers</name>
