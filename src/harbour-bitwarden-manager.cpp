@@ -2,8 +2,11 @@
 #include <QtQuick>
 #endif
 
+#include <QGuiApplication>
 #include <QSettings>
 #include <QList>
+#include <QQuickView>
+#include <QQmlContext>
 
 #include <sailfishapp.h>
 #include "api.h"

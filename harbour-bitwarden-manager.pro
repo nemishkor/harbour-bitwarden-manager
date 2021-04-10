@@ -94,6 +94,7 @@ HEADERS += \
     src/vaultmanager.h
 
 QT += network
+QT += quick
 
 INCLUDEPATH += ../libs/openssl/include
 LIBS += -L$$PWD/../libs -lssl -lcrypto
