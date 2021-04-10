@@ -218,6 +218,55 @@ Page {
                 }
             }
 
+            BackgroundItem {
+                id: fieldsButton
+
+                width: parent.width
+                height: Theme.itemSizeMedium
+
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("CipherFields.qml"))
+
+                Rectangle {
+                    anchors.fill: parent
+                    gradient: Gradient {
+                        GradientStop {
+                            position: 0.0
+                            color: Theme.rgba(fieldsButton.palette.highlightBackgroundColor, 0.1)
+                        }
+                        GradientStop {
+                            position: 1.0
+                            color: "transparent"
+                        }
+                    }
+                }
+
+                Label {
+                    text: qsTr("Custom fields") + " (" + cipherFieldsListModel.count + ")"
+                    color: fieldsButton.highlighted ? Theme.secondaryHighlightColor : Theme.highlightColor
+                    anchors {
+                        left: parent.left
+                        leftMargin: Theme.horizontalPageMargin
+                        right: parent.right
+                        rightMargin: fieldsButtonIconRightImg.width + Theme.paddingSmall + Theme.horizontalPageMargin
+                        verticalCenter: parent.verticalCenter
+                    }
+                    font.pixelSize: Theme.fontSizeLarge
+                    truncationMode: TruncationMode.Fade
+                }
+
+                Icon {
+                    id: fieldsButtonIconRightImg
+
+                    anchors {
+                        right: parent.right
+                        rightMargin: Theme.horizontalPageMargin
+                        verticalCenter: parent.verticalCenter
+                    }
+                    source: "image://theme/icon-m-right"
+                    highlighted: fieldsButton.down
+                }
+            }
+
 
         }
 

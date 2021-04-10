@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
     CipherService cipherService(&crypto, &cipher);
     context->setContextProperty("cipherService", &cipherService);
     context->setContextProperty("ciphersListModel", cipherService.getCiphersListModel());
+    context->setContextProperty("cipherFieldsListModel", cipherService.getCipherFieldsListModel());
 
     SyncService syncService(&api, &user, &tokenService, &crypto, &foldersModel, &cipherService, &settings);
     context->setContextProperty("syncService", &syncService);

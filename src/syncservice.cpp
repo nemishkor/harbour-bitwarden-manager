@@ -264,8 +264,9 @@ void SyncService::syncCollections()
 void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
 {
     cipherService->clear();
-    QJsonArray::const_iterator i;
-    QJsonObject c, l;
+    QJsonArray::const_iterator i, f;
+    QJsonObject c, l, field;
+    QJsonArray fields;
     for (i = ciphers.constBegin(); i != ciphers.constEnd(); i++){
         qDebug() << "add cipher";
         c = (*i).toObject();
@@ -300,6 +301,17 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
             cipher.getLogin()->fillUsername(l["Username"].toString());
             qDebug() << "filled userName mac" << cipher.getLogin()->getUsername().getMac();
         }
+
+        fields = c["Fields"].toArray();
+        for(f = fields.constBegin(); f != fields.constEnd(); f++){
+            field = (*f).toObject();
+            cipher.addField(CipherField(
+                CipherString(field["Name"].toString()),
+                static_cast<CipherField::FieldType>(field["Type"].toInt()),
+                CipherString(field["Value"].toString())
+            ));
+        }
+
         cipherService->add(cipher);
     }
     qDebug() << "Ciphers added";

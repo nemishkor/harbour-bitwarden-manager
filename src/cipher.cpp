@@ -2,7 +2,7 @@
 
 Cipher::Cipher(CipherString name): name(name)
 {
-
+    fields = new QList<CipherField>();
 }
 
 QString Cipher::getId() const
@@ -148,4 +148,14 @@ void Cipher::setDeletedDate(const QString &value)
 CipherLogin *Cipher::getLogin()
 {
     return &login;
+}
+
+void Cipher::addField(CipherField cipherField)
+{
+    fields->append(cipherField);
+}
+
+QList<CipherField> *Cipher::getFields() const
+{
+    return fields;
 }

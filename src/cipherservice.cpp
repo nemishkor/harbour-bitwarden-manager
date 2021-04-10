@@ -7,6 +7,7 @@ CipherService::CipherService(CryptoService *cryptoService, CipherView *cipherVie
 {
     ciphers = new QList<Cipher>;
     ciphersListModel = new CiphersListModel();
+    cipherFieldsListModel = new CipherFieldsListModel();
 }
 
 void CipherService::decryptAll()
@@ -28,6 +29,7 @@ void CipherService::decryptAll()
 void CipherService::display(QString id)
 {
     QList<Cipher>::iterator i;
+    QList<CipherField>::const_iterator fields_i;
     for(i = ciphers->begin(); i != ciphers->end(); i++){
         if(i->getId() != id){
             continue;
@@ -41,6 +43,16 @@ void CipherService::display(QString id)
             cipherView->setLoginPassword(cryptoService->decryptToUtf8(i->getLogin()->getPassword()));
             cipherView->setLoginUri(cryptoService->decryptToUtf8(i->getLogin()->getUri()));
         }
+
+        cipherFieldsListModel->clear();
+        for(fields_i = i->getFields()->constBegin(); fields_i != i->getFields()->constEnd(); fields_i++){
+            cipherFieldsListModel->add(CipherFieldListItem(
+                cryptoService->decryptToUtf8(fields_i->getName()),
+                fields_i->getType(),
+                cryptoService->decryptToUtf8(fields_i->getValue())
+            ));
+        }
+
         return;
     }
 
@@ -68,4 +80,9 @@ void CipherService::clear()
 CiphersListModel *CipherService::getCiphersListModel() const
 {
     return ciphersListModel;
+}
+
+CipherFieldsListModel *CipherService::getCipherFieldsListModel() const
+{
+    return cipherFieldsListModel;
 }

@@ -5,6 +5,7 @@
 #include <QList>
 
 #include "cipher.h"
+#include "cipherfieldslistmodel.h"
 #include "cipherlistitem.h"
 #include "cipherview.h"
 #include "cipherslistmodel.h"
@@ -26,11 +27,14 @@ public:
 
     CiphersListModel *getCiphersListModel() const;
 
+    CipherFieldsListModel *getCipherFieldsListModel() const;
+
 private:
     CryptoService *cryptoService;
     CipherView *cipherView;
     QList<Cipher> *ciphers; // all encrypted ciphers
     CiphersListModel *ciphersListModel; // filtered cached decrypted ciphers for list view
+    CipherFieldsListModel *cipherFieldsListModel; // filtered cached decrypted fields of specific displayed cipher
 
 signals:
     void countChanged();

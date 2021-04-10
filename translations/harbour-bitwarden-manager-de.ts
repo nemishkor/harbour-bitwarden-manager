@@ -59,6 +59,17 @@
         <source>Isn&apos;t favorite</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Custom fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CipherFields</name>
+    <message>
+        <source>Custom fields</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Ciphers</name>
@@ -193,10 +204,6 @@
     </message>
     <message>
         <source>Sync now</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unlock to sync data</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

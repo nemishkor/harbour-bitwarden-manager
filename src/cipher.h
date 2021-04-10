@@ -2,9 +2,11 @@
 #define CIPHER_H
 
 #include <QString>
+#include <QList>
 
 #include "cipherlogin.h"
 #include "cipherstring.h"
+#include "cipherfield.h"
 
 class Cipher
 {
@@ -61,6 +63,10 @@ public:
 
     CipherLogin *getLogin();
 
+    void addField(CipherField cipherField);
+
+    QList<CipherField> *getFields() const;
+
 private:
     QString id;
     QString organizationId;
@@ -77,6 +83,7 @@ private:
     QString notes;
     QString deletedDate;
     CipherLogin login;
+    QList<CipherField> *fields;
 
 };
 

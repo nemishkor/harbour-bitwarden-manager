@@ -12,6 +12,6 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Sat Apr 10 2021 Koreniev Vitalii <nemish94@gmail.com> 0.2
+* Sat Apr 10 2021 Koreniev Vitalii <nemish94@gmail.com> 0.3.0
  - Application saves API URLs to settings. URLs could be changed in login page (https://github.com/nemishkor/harbour-bitwarden-manager/issues/1)
 
