@@ -161,10 +161,10 @@ Page {
                 Column {
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Username"); color: Theme.highlightColor }
+                    Label { text: qsTr("Username") }
                     Label {
-                        x: Theme.paddingLarge
                         text: cipher.loginUsername
+                        font.pixelSize: Theme.fontSizeExtraSmall
                         wrapMode: "WordWrap"
                     }
                 }
@@ -177,10 +177,10 @@ Page {
                 Column {
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Password"); color: Theme.highlightColor }
+                    Label { text: qsTr("Password") }
                     Label {
-                        x: Theme.paddingLarge
                         text: cipher.loginPassword ? cipher.loginPassword : " "
+                        font.pixelSize: Theme.fontSizeExtraSmall
                         wrapMode: "WordWrap"
                     }
                 }
@@ -193,10 +193,10 @@ Page {
                 Column {
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Password revision date"); color: Theme.highlightColor }
+                    Label { text: qsTr("Password revision date") }
                     Label {
-                        x: Theme.paddingLarge
                         text: cipher.loginPasswordRevisionDate ? cipher.loginPasswordRevisionDate : qsTr("None")
+                        font.pixelSize: Theme.fontSizeExtraSmall
                         wrapMode: "WordWrap"
                     }
                 }
@@ -209,10 +209,10 @@ Page {
                 Column {
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Uri"); color: Theme.highlightColor }
+                    Label { text: qsTr("Uri") }
                     Label {
-                        x: Theme.paddingLarge
                         text: cipher.loginUri ? cipher.loginUri : " "
+                        font.pixelSize: Theme.fontSizeExtraSmall
                         wrapMode: "WordWrap"
                     }
                 }
