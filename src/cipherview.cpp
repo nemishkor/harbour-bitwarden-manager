@@ -103,3 +103,87 @@ void CipherView::setLoginTotp(const QString &value)
     loginTotp = value;
     emit loginTotpChanged();
 }
+
+QString CipherView::getCardBrand() const
+{
+    return cardBrand;
+}
+
+void CipherView::setCardBrand(const QString &value)
+{
+    if(cardBrand == value){
+        return;
+    }
+    cardBrand = value;
+    emit cardBrandChanged();
+}
+
+QString CipherView::getCardCardholder() const
+{
+    return cardCardholder;
+}
+
+void CipherView::setCardCardholder(const QString &value)
+{
+    if(cardCardholder == value){
+        return;
+    }
+    cardCardholder = value;
+    emit cardCardholderChanged();
+}
+
+QString CipherView::getCardCode() const
+{
+    return cardCode;
+}
+
+void CipherView::setCardCode(const QString &value)
+{
+    if(cardCode == value){
+        return;
+    }
+    cardCode = value;
+    emit cardCodeChanged();
+}
+
+QString CipherView::getCardExpMonth() const
+{
+    return cardExpMonth;
+}
+
+void CipherView::setCardExpMonth(const QString &value)
+{
+    if(cardExpMonth == value){
+        return;
+    }
+    cardExpMonth = value;
+    emit cardExpMonthChanged();
+}
+
+QString CipherView::getCardExpYear() const
+{
+    return cardExpYear;
+}
+
+void CipherView::setCardExpYear(const QString &value)
+{
+    if(cardExpYear == value){
+        return;
+    }
+    cardExpYear = value;
+    emit cardExpYearChanged();
+}
+
+QString CipherView::getCardNumber() const
+{
+    return cardNumber;
+}
+
+void CipherView::setCardNumber(const QString &value)
+{
+    if(cardNumber == value){
+        return;
+    }
+    cardNumber = value;
+    emit cardNumberChanged();
+}

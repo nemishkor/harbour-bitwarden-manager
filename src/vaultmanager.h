@@ -42,7 +42,7 @@ private:
     void verifyPasswordFinished();
 
     // for GUI
-    bool unlocking;
+    bool unlocking = false;
     void setUnlocking(const bool &value);
     QString unlockMessage;
     void setUnlockMessage(const QString &value);

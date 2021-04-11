@@ -40,6 +40,7 @@ void CipherService::display(QString id)
         cipherView->setType(i->getType());
         qDebug() << "decrypt notes";
         cipherView->setNotes(cryptoService->decryptToUtf8(i->getNotes()));
+
         if(i->getType() == Cipher::CipherType::Login){
             qDebug() << "decrypt login username";
             cipherView->setLoginUsername(cryptoService->decryptToUtf8(i->getLogin()->getUsername()));
@@ -50,6 +51,21 @@ void CipherService::display(QString id)
             cipherView->setLoginUri(cryptoService->decryptToUtf8(i->getLogin()->getUri()));
             qDebug() << "decrypt login totp";
             cipherView->setLoginTotp(cryptoService->decryptToUtf8(i->getLogin()->getTotp()));
+        }
+
+        if(i->getType() == Cipher::CipherType::Card){
+            qDebug() << "decrypt card brand";
+            cipherView->setCardBrand(cryptoService->decryptToUtf8(i->getCard()->getBrand()));
+            qDebug() << "decrypt card cardholder";
+            cipherView->setCardCardholder(cryptoService->decryptToUtf8(i->getCard()->getCardholderName()));
+            qDebug() << "decrypt card code";
+            cipherView->setCardCode(cryptoService->decryptToUtf8(i->getCard()->getCode()));
+            qDebug() << "decrypt card expMonth";
+            cipherView->setCardExpMonth(cryptoService->decryptToUtf8(i->getCard()->getExpMonth()));
+            qDebug() << "decrypt card expYear";
+            cipherView->setCardExpYear(cryptoService->decryptToUtf8(i->getCard()->getExpYear()));
+            qDebug() << "decrypt card number";
+            cipherView->setCardNumber(cryptoService->decryptToUtf8(i->getCard()->getNumber()));
         }
 
         cipherFieldsListModel->clear();

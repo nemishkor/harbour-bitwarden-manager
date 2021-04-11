@@ -1,9 +1,10 @@
-#ifndef CIPHER_H
+﻿#ifndef CIPHER_H
 #define CIPHER_H
 
 #include <QString>
 #include <QList>
 
+#include "ciphercard.h"
 #include "cipherlogin.h"
 #include "cipherstring.h"
 #include "cipherfield.h"
@@ -67,6 +68,8 @@ public:
 
     QList<CipherField> *getFields() const;
 
+    CipherCard *getCard();
+
 private:
     QString id;
     QString organizationId;
@@ -84,6 +87,7 @@ private:
     QString deletedDate;
     CipherLogin login;
     QList<CipherField> *fields;
+    CipherCard card;
 
 };
 

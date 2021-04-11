@@ -234,6 +234,104 @@ Page {
                 }
             }
 
+            SectionHeader { text: qsTr("Card"); visible: cipher.type === 3 }
+
+            BackgroundItem {
+                visible: cipher.type === 3
+                width: column.width
+                height: contentItem.childrenRect.height
+                Column {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    Label { text: qsTr("Brand") }
+                    Label {
+                        text: cipher.cardBrand
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        wrapMode: "WordWrap"
+                    }
+                }
+            }
+
+            BackgroundItem {
+                visible: cipher.type === 3
+                width: column.width
+                height: contentItem.childrenRect.height
+                Column {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    Label { text: qsTr("Cardholder") }
+                    Label {
+                        text: cipher.cardCardholder
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        wrapMode: "WordWrap"
+                    }
+                }
+            }
+
+            BackgroundItem {
+                visible: cipher.type === 3
+                width: column.width
+                height: contentItem.childrenRect.height
+                Column {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    Label { text: qsTr("Code") }
+                    Label {
+                        text: cipher.cardCode
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        wrapMode: "WordWrap"
+                    }
+                }
+            }
+
+            BackgroundItem {
+                visible: cipher.type === 3
+                width: column.width
+                height: contentItem.childrenRect.height
+                Column {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    Label { text: qsTr("Exp month") }
+                    Label {
+                        text: cipher.cardExpMonth
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        wrapMode: "WordWrap"
+                    }
+                }
+            }
+
+            BackgroundItem {
+                visible: cipher.type === 3
+                width: column.width
+                height: contentItem.childrenRect.height
+                Column {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    Label { text: qsTr("Exp year") }
+                    Label {
+                        text: cipher.cardExpYear
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        wrapMode: "WordWrap"
+                    }
+                }
+            }
+
+            BackgroundItem {
+                visible: cipher.type === 3
+                width: column.width
+                height: contentItem.childrenRect.height
+                Column {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    Label { text: qsTr("Number") }
+                    Label {
+                        text: cipher.cardNumber
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        wrapMode: "WordWrap"
+                    }
+                }
+            }
+
             BackgroundItem {
                 id: fieldsButton
 

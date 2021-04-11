@@ -159,3 +159,8 @@ QList<CipherField> *Cipher::getFields() const
 {
     return fields;
 }
+
+CipherCard *Cipher::getCard()
+{
+    return &card;
+}

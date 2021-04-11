@@ -17,6 +17,12 @@ class CipherView : public QObject
     Q_PROPERTY(QString loginPassword READ getLoginPassword NOTIFY loginPasswordChanged)
     Q_PROPERTY(QString loginUri READ getLoginUri NOTIFY loginUriChanged)
     Q_PROPERTY(QString loginTotp READ getLoginTotp NOTIFY loginTotpChanged)
+    Q_PROPERTY(QString cardBrand READ getCardBrand NOTIFY cardBrandChanged)
+    Q_PROPERTY(QString cardCardholder READ getCardCardholder NOTIFY cardCardholderChanged)
+    Q_PROPERTY(QString cardCode READ getCardCode NOTIFY cardCodeChanged)
+    Q_PROPERTY(QString cardExpMonth READ getCardExpMonth NOTIFY cardExpMonthChanged)
+    Q_PROPERTY(QString cardExpYear READ getCardExpYear NOTIFY cardExpYearChanged)
+    Q_PROPERTY(QString cardNumber READ getCardNumber NOTIFY cardNumberChanged)
 public:
     explicit CipherView(QObject *parent = nullptr);
 
@@ -47,6 +53,24 @@ public:
     QString getLoginTotp() const;
     void setLoginTotp(const QString &value);
 
+    QString getCardBrand() const;
+    void setCardBrand(const QString &value);
+
+    QString getCardCardholder() const;
+    void setCardCardholder(const QString &value);
+
+    QString getCardCode() const;
+    void setCardCode(const QString &value);
+
+    QString getCardExpMonth() const;
+    void setCardExpMonth(const QString &value);
+
+    QString getCardExpYear() const;
+    void setCardExpYear(const QString &value);
+
+    QString getCardNumber() const;
+    void setCardNumber(const QString &value);
+
 private:
     QString name;
     Cipher::CipherType type;
@@ -57,6 +81,12 @@ private:
     QString loginPassword;
     QString loginUri;
     QString loginTotp;
+    QString cardBrand;
+    QString cardCardholder;
+    QString cardCode;
+    QString cardExpMonth;
+    QString cardExpYear;
+    QString cardNumber;
 
 signals:
     void nameChanged();
@@ -68,6 +98,12 @@ signals:
     void loginPasswordChanged();
     void loginUriChanged();
     void loginTotpChanged();
+    void cardBrandChanged();
+    void cardCardholderChanged();
+    void cardCodeChanged();
+    void cardExpMonthChanged();
+    void cardExpYearChanged();
+    void cardNumberChanged();
 
 };
 

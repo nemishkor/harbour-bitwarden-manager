@@ -265,7 +265,7 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
 {
     cipherService->clear();
     QJsonArray::const_iterator i, f;
-    QJsonObject c, l, field;
+    QJsonObject c, l, card, field;
     QJsonArray fields;
     for (i = ciphers.constBegin(); i != ciphers.constEnd(); i++){
         qDebug() << "add cipher";
@@ -288,6 +288,7 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
         cipher.setSizeName(c["SizeName"].toString());
         cipher.setNotes(c["Notes"].toString());
         cipher.setDeletedDate(c["DeletedDate"].toString());
+
         if(c.contains("Login") && c["Login"].isObject()){
             l = c["Login"].toObject();
             cipher.getLogin()->fillPassword(l["Password"].toString());
@@ -301,6 +302,28 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
                 cipher.getLogin()->fillTotp(l["Totp"].toString());
             }
             cipher.getLogin()->fillUsername(l["Username"].toString());
+        }
+
+        if(c.contains("Card") && c["Card"].isObject()){
+            card = c["Card"].toObject();
+            if(card["Brand"].isString()){
+                cipher.getCard()->fillBrand(card["Brand"].toString());
+            }
+            if(card["CardholderName"].isString()){
+                cipher.getCard()->fillCardholderName(card["CardholderName"].toString());
+            }
+            if(card["CardholderName"].isString()){
+                cipher.getCard()->fillCode(card["CardholderName"].toString());
+            }
+            if(card["ExpMonth"].isString()){
+                cipher.getCard()->fillExpMonth(card["ExpMonth"].toString());
+            }
+            if(card["ExpYear"].isString()){
+                cipher.getCard()->fillExpYear(card["ExpYear"].toString());
+            }
+            if(card["Number"].isString()){
+                cipher.getCard()->fillNumber(card["Number"].toString());
+            }
         }
 
         fields = c["Fields"].toArray();

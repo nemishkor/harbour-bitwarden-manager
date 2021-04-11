@@ -20,6 +20,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/auth.cpp \
     src/authentication.cpp \
     src/cipher.cpp \
+    src/ciphercard.cpp \
     src/cipherfield.cpp \
     src/cipherfieldlistitem.cpp \
     src/cipherfieldslistmodel.cpp \
@@ -79,6 +80,7 @@ HEADERS += \
     src/auth.h \
     src/authentication.h \
     src/cipher.h \
+    src/ciphercard.h \
     src/cipherfield.h \
     src/cipherfieldlistitem.h \
     src/cipherfieldslistmodel.h \
