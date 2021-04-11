@@ -16,6 +16,7 @@ class CipherView : public QObject
     Q_PROPERTY(QString loginPasswordRevisionDate READ getLoginPasswordRevisionDate NOTIFY loginPasswordRevisionDateChanged)
     Q_PROPERTY(QString loginPassword READ getLoginPassword NOTIFY loginPasswordChanged)
     Q_PROPERTY(QString loginUri READ getLoginUri NOTIFY loginUriChanged)
+    Q_PROPERTY(QString loginTotp READ getLoginTotp NOTIFY loginTotpChanged)
 public:
     explicit CipherView(QObject *parent = nullptr);
 
@@ -43,6 +44,9 @@ public:
     bool getFavorite() const;
     void setFavorite(bool value);
 
+    QString getLoginTotp() const;
+    void setLoginTotp(const QString &value);
+
 private:
     QString name;
     Cipher::CipherType type;
@@ -52,6 +56,7 @@ private:
     QString loginPasswordRevisionDate;
     QString loginPassword;
     QString loginUri;
+    QString loginTotp;
 
 signals:
     void nameChanged();
@@ -62,6 +67,7 @@ signals:
     void loginPasswordRevisionDateChanged();
     void loginPasswordChanged();
     void loginUriChanged();
+    void loginTotpChanged();
 
 };
 

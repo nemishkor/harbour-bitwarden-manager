@@ -297,9 +297,10 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
             if(l["Uri"].isString()) {
                 cipher.getLogin()->fillUri(l["Uri"].toString());
             }
-            qDebug() << "fillUsername" << l["Username"].toString();
+            if(l["Totp"].isString()) {
+                cipher.getLogin()->fillTotp(l["Totp"].toString());
+            }
             cipher.getLogin()->fillUsername(l["Username"].toString());
-            qDebug() << "filled userName mac" << cipher.getLogin()->getUsername().getMac();
         }
 
         fields = c["Fields"].toArray();
@@ -314,7 +315,7 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
 
         cipherService->add(cipher);
     }
-    qDebug() << "Ciphers added";
+    qDebug() << "Ciphers were added";
 }
 
 void SyncService::syncSends()

@@ -63,6 +63,10 @@
         <source>Custom fields</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>TOTP</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CipherFields</name>

@@ -44,3 +44,13 @@ void CipherLogin::fillUsername(const QString &value)
 {
     username.fill(value);
 }
+
+CipherString CipherLogin::getTotp() const
+{
+    return totp;
+}
+
+void CipherLogin::fillTotp(const QString &value)
+{
+    totp.fill(value);
+}

@@ -35,7 +35,6 @@ void CipherString::fill(QString encryptedString)
     if(encryptedString.isEmpty()){
         qWarning() << "encrypted string is empty";
     }
-    qDebug() << "create cipher string";
     QStringList headerPieses = encryptedString.split(".");
     QStringList encPieses;
     qDebug() << "header pieses length" << headerPieses.length();

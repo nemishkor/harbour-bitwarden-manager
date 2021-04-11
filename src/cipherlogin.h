@@ -14,7 +14,8 @@ public:
         password(login.password),
         passwordRevisionDate(login.passwordRevisionDate),
         uri(login.uri),
-        username(login.username)
+        username(login.username),
+        totp(login.totp)
     {
         Q_UNUSED(login);
         qDebug() << "copy cipherLogin";
@@ -32,11 +33,15 @@ public:
     CipherString getUsername() const;
     void fillUsername(const QString &value);
 
+    CipherString getTotp() const;
+    void fillTotp(const QString &value);
+
 private:
     CipherString password;
     QString passwordRevisionDate;
     CipherString uri;
     CipherString username;
+    CipherString totp;
 
 };
 

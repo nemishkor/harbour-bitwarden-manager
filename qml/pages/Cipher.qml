@@ -209,6 +209,22 @@ Page {
                 Column {
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2 * Theme.horizontalPageMargin
+                    Label { text: qsTr("TOTP") }
+                    Label {
+                        text: cipher.loginTotp ? cipher.loginTotp : " "
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        wrapMode: "WordWrap"
+                    }
+                }
+            }
+
+            BackgroundItem {
+                visible: cipher.type === 1
+                width: column.width
+                height: contentItem.childrenRect.height
+                Column {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
                     Label { text: qsTr("Uri") }
                     Label {
                         text: cipher.loginUri ? cipher.loginUri : " "

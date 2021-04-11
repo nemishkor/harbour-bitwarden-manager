@@ -17,7 +17,7 @@ Page {
             description: cipher.name
         }
         delegate: BackgroundItem {
-            width: column.width
+            width: parent.width
             height: contentItem.childrenRect.height + Theme.paddingMedium
             Column {
                 x: Theme.horizontalPageMargin

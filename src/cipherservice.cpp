@@ -28,24 +28,33 @@ void CipherService::decryptAll()
 
 void CipherService::display(QString id)
 {
+    qDebug() << "display cipher" << id;
     QList<Cipher>::iterator i;
     QList<CipherField>::const_iterator fields_i;
     for(i = ciphers->begin(); i != ciphers->end(); i++){
         if(i->getId() != id){
             continue;
         }
+        qDebug() << "decrypt name";
         cipherView->setName(cryptoService->decryptToUtf8(i->getName()));
         cipherView->setType(i->getType());
+        qDebug() << "decrypt notes";
         cipherView->setNotes(cryptoService->decryptToUtf8(i->getNotes()));
         if(i->getType() == Cipher::CipherType::Login){
+            qDebug() << "decrypt login username";
             cipherView->setLoginUsername(cryptoService->decryptToUtf8(i->getLogin()->getUsername()));
             cipherView->setLoginPasswordRevisionDate(i->getLogin()->getPasswordRevisionDate());
+            qDebug() << "decrypt login password";
             cipherView->setLoginPassword(cryptoService->decryptToUtf8(i->getLogin()->getPassword()));
+            qDebug() << "decrypt login uri";
             cipherView->setLoginUri(cryptoService->decryptToUtf8(i->getLogin()->getUri()));
+            qDebug() << "decrypt login totp";
+            cipherView->setLoginTotp(cryptoService->decryptToUtf8(i->getLogin()->getTotp()));
         }
 
         cipherFieldsListModel->clear();
         for(fields_i = i->getFields()->constBegin(); fields_i != i->getFields()->constEnd(); fields_i++){
+            qDebug() << "decrypt fields";
             cipherFieldsListModel->add(CipherFieldListItem(
                 cryptoService->decryptToUtf8(fields_i->getName()),
                 fields_i->getType(),

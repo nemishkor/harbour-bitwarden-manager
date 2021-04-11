@@ -92,3 +92,14 @@ void CipherView::setFavorite(bool value)
     favorite = value;
     emit favoriteChanged();
 }
+
+QString CipherView::getLoginTotp() const
+{
+    return loginTotp;
+}
+
+void CipherView::setLoginTotp(const QString &value)
+{
+    loginTotp = value;
+    emit loginTotpChanged();
+}
