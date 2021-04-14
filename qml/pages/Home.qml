@@ -173,6 +173,7 @@ Page {
 
             Button {
                 text: "Logout"
+                // see harbour-bitwarden-manager.qml
                 onClicked: auth.logout()
                 anchors.horizontalCenter: parent.horizontalCenter
             }

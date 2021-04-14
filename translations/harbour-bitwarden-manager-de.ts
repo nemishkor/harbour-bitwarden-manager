@@ -277,4 +277,23 @@
         <translation type="unfinished"></translation>
     </message>
 </context>
+<context>
+    <name>Welcome</name>
+    <message>
+        <source>Login</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Register</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Github</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenRepos</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

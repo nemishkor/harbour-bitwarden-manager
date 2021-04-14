@@ -12,6 +12,9 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Wed Apr 14 2021 Koreniev Vitalii <nemish94@gmail.com> 0.4.1
+ - added welcome page
+
 * Sun Apr 11 2021 Koreniev Vitalii <nemish94@gmail.com> 0.4.0
  - added login totp field to view
  - added card's data to model and view

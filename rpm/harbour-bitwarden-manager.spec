@@ -9,7 +9,7 @@ Name:       harbour-bitwarden-manager
 # << macros
 
 Summary:    Bitwarden SFOS client
-Version:    0.4.0
+Version:    0.4.1
 Release:    1
 Group:      Applications/Productivity
 License:    MIT
