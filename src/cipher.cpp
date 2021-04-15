@@ -164,3 +164,8 @@ CipherCard *Cipher::getCard()
 {
     return &card;
 }
+
+CipherIdentity *Cipher::getIdentity()
+{
+    return &identity;
+}

@@ -265,7 +265,7 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
 {
     cipherService->clear();
     QJsonArray::const_iterator i, f;
-    QJsonObject c, l, card, field;
+    QJsonObject c, l, card, identity, field;
     QJsonArray fields;
     for (i = ciphers.constBegin(); i != ciphers.constEnd(); i++){
         qDebug() << "add cipher";
@@ -326,6 +326,66 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
             if(card["Number"].isString()){
                 cipher.getCard()->fillNumber(card["Number"].toString());
             }
+        }
+
+        if(c.contains("Identity") && c["Identity"].isObject()){
+            qDebug() << "Sync identity cipher";
+            identity = c["Identity"].toObject();
+            if(identity["Address1"].isString()){
+                cipher.getIdentity()->fillAddress1(identity["Address1"].toString());
+            }
+            if(identity["Address2"].isString()){
+                cipher.getIdentity()->fillAddress2(identity["Address1"].toString());
+            }
+            if(identity["Address3"].isString()){
+                cipher.getIdentity()->fillAddress3(identity["Address3"].toString());
+            }
+            if(identity["City"].isString()){
+                cipher.getIdentity()->fillCity(identity["City"].toString());
+            }
+            if(identity["Company"].isString()){
+                cipher.getIdentity()->fillCompany(identity["Company"].toString());
+            }
+            if(identity["Country"].isString()){
+                cipher.getIdentity()->fillCountry(identity["Country"].toString());
+            }
+            if(identity["Email"].isString()){
+                cipher.getIdentity()->fillEmail(identity["Email"].toString());
+            }
+            if(identity["FirstName"].isString()){
+                cipher.getIdentity()->fillFirstName(identity["FirstName"].toString());
+            }
+            if(identity["LastName"].isString()){
+                cipher.getIdentity()->fillLastName(identity["LastName"].toString());
+            }
+            if(identity["LicenseNumber"].isString()){
+                cipher.getIdentity()->fillLicenseNumber(identity["LicenseNumber"].toString());
+            }
+            if(identity["MiddleName"].isString()){
+                cipher.getIdentity()->fillMiddleName(identity["MiddleName"].toString());
+            }
+            if(identity["PassportNumber"].isString()){
+                cipher.getIdentity()->fillPassportNumber(identity["PassportNumber"].toString());
+            }
+            if(identity["Phone"].isString()){
+                cipher.getIdentity()->fillPhone(identity["Phone"].toString());
+            }
+            if(identity["PostalCode"].isString()){
+                cipher.getIdentity()->fillPostalCode(identity["PostalCode"].toString());
+            }
+            if(identity["SSN"].isString()){
+                cipher.getIdentity()->fillSSN(identity["SSN"].toString());
+            }
+            if(identity["State"].isString()){
+                cipher.getIdentity()->fillState(identity["State"].toString());
+            }
+            if(identity["Title"].isString()){
+                cipher.getIdentity()->fillTitle(identity["Title"].toString());
+            }
+            if(identity["Username"].isString()){
+                cipher.getIdentity()->fillUsername(identity["Username"].toString());
+            }
+            qDebug() << "Sync identity cipher finished";
         }
 
         fields = c["Fields"].toArray();

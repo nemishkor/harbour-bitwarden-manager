@@ -91,6 +91,74 @@
         <source>Number</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Middle name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Company</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SSN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Passport number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Phone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>City</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>State</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Postal code</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Country</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CipherFields</name>

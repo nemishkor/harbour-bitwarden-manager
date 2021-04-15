@@ -24,6 +24,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/cipherfield.cpp \
     src/cipherfieldlistitem.cpp \
     src/cipherfieldslistmodel.cpp \
+    src/cipheridentity.cpp \
     src/cipherlistitem.cpp \
     src/cipherlogin.cpp \
     src/cipherservice.cpp \
@@ -41,6 +42,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/vaultmanager.cpp
 
 DISTFILES += qml/harbour-bitwarden-manager.qml \
+    qml/components/CipherLabel.qml \
     qml/components/LockBlock.qml \
     qml/components/SyncBlock.qml \
     qml/cover/CoverPage.qml \
@@ -84,6 +86,7 @@ HEADERS += \
     src/cipherfield.h \
     src/cipherfieldlistitem.h \
     src/cipherfieldslistmodel.h \
+    src/cipheridentity.h \
     src/cipherlistitem.h \
     src/cipherlogin.h \
     src/cipherservice.h \

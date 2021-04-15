@@ -63,6 +63,7 @@ Page {
     SilicaFlickable {
 
         visible: !vaultManager.isLocked && syncService.synchronized
+        anchors.fill: parent
 
         // Tell SilicaFlickable the height of its content.
         contentHeight: column.height
@@ -349,6 +350,26 @@ Page {
                     }
                 }
             }
+
+            SectionHeader { text: qsTr("Identity"); visible: cipher.type === 4 }
+            CipherLabel { cipherType: 4; label: qsTr("Title"); value: cipher.identityTitle }
+            CipherLabel { cipherType: 4; label: qsTr("First name"); value: cipher.identityFirstName }
+            CipherLabel { cipherType: 4; label: qsTr("Middle name"); value: cipher.identityMiddleName }
+            CipherLabel { cipherType: 4; label: qsTr("Last name"); value: cipher.identityLastName }
+            CipherLabel { cipherType: 4; label: qsTr("Username"); value: cipher.identityUsername }
+            CipherLabel { cipherType: 4; label: qsTr("Company"); value: cipher.identityCompany }
+            CipherLabel { cipherType: 4; label: qsTr("SSN"); value: cipher.identitySSN }
+            CipherLabel { cipherType: 4; label: qsTr("Passport number"); value: cipher.identityPassportNumber }
+            CipherLabel { cipherType: 4; label: qsTr("License number"); value: cipher.identityLicenseNumber }
+            CipherLabel { cipherType: 4; label: qsTr("Email"); value: cipher.identityEmail }
+            CipherLabel { cipherType: 4; label: qsTr("Phone"); value: cipher.identityPhone }
+            CipherLabel { cipherType: 4; label: qsTr("Address 1"); value: cipher.identityAddress1 }
+            CipherLabel { cipherType: 4; label: qsTr("Address 2"); value: cipher.identityAddress2 }
+            CipherLabel { cipherType: 4; label: qsTr("Address 3"); value: cipher.identityAddress3 }
+            CipherLabel { cipherType: 4; label: qsTr("City"); value: cipher.identityCity }
+            CipherLabel { cipherType: 4; label: qsTr("State"); value: cipher.identityState }
+            CipherLabel { cipherType: 4; label: qsTr("Postal code"); value: cipher.identityPostalCode }
+            CipherLabel { cipherType: 4; label: qsTr("Country"); value: cipher.identityCountry }
 
             BackgroundItem {
                 id: fieldsButton

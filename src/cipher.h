@@ -8,6 +8,7 @@
 #include "cipherlogin.h"
 #include "cipherstring.h"
 #include "cipherfield.h"
+#include "cipheridentity.h"
 
 class Cipher
 {
@@ -70,6 +71,8 @@ public:
 
     CipherCard *getCard();
 
+    CipherIdentity *getIdentity();
+
 private:
     QString id;
     QString organizationId;
@@ -88,6 +91,7 @@ private:
     CipherLogin login;
     QList<CipherField> *fields;
     CipherCard card;
+    CipherIdentity identity;
 
 };
 

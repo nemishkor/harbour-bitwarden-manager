@@ -43,7 +43,6 @@ void CipherService::display(QString id)
         cipherView->setType(i->getType());
         qDebug() << "decrypt notes";
         cipherView->setNotes(cryptoService->decryptToUtf8(i->getNotes()));
-        qDebug() << "Deleteddate" << i->getDeletedDate();
         cipherView->setDeletedDate(i->getDeletedDate());
 
         if(i->getType() == Cipher::CipherType::Login){
@@ -71,6 +70,45 @@ void CipherService::display(QString id)
             cipherView->setCardExpYear(cryptoService->decryptToUtf8(i->getCard()->getExpYear()));
             qDebug() << "decrypt card number";
             cipherView->setCardNumber(cryptoService->decryptToUtf8(i->getCard()->getNumber()));
+        }
+
+        if(i->getType() == Cipher::CipherType::Identity){
+            qDebug() << "decrypt identity address1";
+            cipherView->setIdentityAddress1(cryptoService->decryptToUtf8(i->getIdentity()->getAddress1()));
+            qDebug() << "decrypt identity address2";
+            cipherView->setIdentityAddress2(cryptoService->decryptToUtf8(i->getIdentity()->getAddress2()));
+            qDebug() << "decrypt identity address3";
+            cipherView->setIdentityAddress3(cryptoService->decryptToUtf8(i->getIdentity()->getAddress3()));
+            qDebug() << "decrypt identity city";
+            cipherView->setIdentityCity(cryptoService->decryptToUtf8(i->getIdentity()->getCity()));
+            qDebug() << "decrypt identity company";
+            cipherView->setIdentityCompany(cryptoService->decryptToUtf8(i->getIdentity()->getCompany()));
+            qDebug() << "decrypt identity country";
+            cipherView->setIdentityCountry(cryptoService->decryptToUtf8(i->getIdentity()->getCountry()));
+            qDebug() << "decrypt identity email";
+            cipherView->setIdentityEmail(cryptoService->decryptToUtf8(i->getIdentity()->getEmail()));
+            qDebug() << "decrypt identity first name";
+            cipherView->setIdentityFirstName(cryptoService->decryptToUtf8(i->getIdentity()->getFirstName()));
+            qDebug() << "decrypt identity last name";
+            cipherView->setIdentityLastName(cryptoService->decryptToUtf8(i->getIdentity()->getLastName()));
+            qDebug() << "decrypt identity license number";
+            cipherView->setIdentityLicenseNumber(cryptoService->decryptToUtf8(i->getIdentity()->getLicenseNumber()));
+            qDebug() << "decrypt identity middle name";
+            cipherView->setIdentityMiddleName(cryptoService->decryptToUtf8(i->getIdentity()->getMiddleName()));
+            qDebug() << "decrypt identity password number";
+            cipherView->setIdentityPassportNumber(cryptoService->decryptToUtf8(i->getIdentity()->getPassportNumber()));
+            qDebug() << "decrypt identity phone";
+            cipherView->setIdentityPhone(cryptoService->decryptToUtf8(i->getIdentity()->getPhone()));
+            qDebug() << "decrypt identity postal code";
+            cipherView->setIdentityPostalCode(cryptoService->decryptToUtf8(i->getIdentity()->getPostalCode()));
+            qDebug() << "decrypt identity SSN";
+            cipherView->setIdentitySSN(cryptoService->decryptToUtf8(i->getIdentity()->getSSN()));
+            qDebug() << "decrypt identity state";
+            cipherView->setIdentityState(cryptoService->decryptToUtf8(i->getIdentity()->getState()));
+            qDebug() << "decrypt identity title";
+            cipherView->setIdentityTitle(cryptoService->decryptToUtf8(i->getIdentity()->getTitle()));
+            qDebug() << "decrypt identity username";
+            cipherView->setIdentityUsername(cryptoService->decryptToUtf8(i->getIdentity()->getUsername()));
         }
 
         cipherFieldsListModel->clear();

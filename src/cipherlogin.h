@@ -17,8 +17,6 @@ public:
         username(login.username),
         totp(login.totp)
     {
-        Q_UNUSED(login);
-        qDebug() << "copy cipherLogin";
     }
 
     QString getPasswordRevisionDate() const;
