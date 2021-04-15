@@ -287,7 +287,9 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
         cipher.setType(static_cast<Cipher::CipherType>(c["Type"].toInt()));
         cipher.setSizeName(c["SizeName"].toString());
         cipher.setNotes(c["Notes"].toString());
-        cipher.setDeletedDate(c["DeletedDate"].toString());
+        if(c["DeletedDate"].isString()) {
+            cipher.setDeletedDate(c["DeletedDate"].toString());
+        }
 
         if(c.contains("Login") && c["Login"].isObject()){
             l = c["Login"].toObject();

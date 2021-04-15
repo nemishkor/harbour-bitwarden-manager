@@ -187,3 +187,17 @@ void CipherView::setCardNumber(const QString &value)
     cardNumber = value;
     emit cardNumberChanged();
 }
+
+QString CipherView::getDeletedDate() const
+{
+    return deletedDate;
+}
+
+void CipherView::setDeletedDate(const QString &value)
+{
+    if(deletedDate == value){
+        return;
+    }
+    deletedDate = value;
+    emit deletedDateChanged();
+}

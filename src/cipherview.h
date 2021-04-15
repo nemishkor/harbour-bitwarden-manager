@@ -23,6 +23,7 @@ class CipherView : public QObject
     Q_PROPERTY(QString cardExpMonth READ getCardExpMonth NOTIFY cardExpMonthChanged)
     Q_PROPERTY(QString cardExpYear READ getCardExpYear NOTIFY cardExpYearChanged)
     Q_PROPERTY(QString cardNumber READ getCardNumber NOTIFY cardNumberChanged)
+    Q_PROPERTY(QString deletedDate READ getDeletedDate NOTIFY deletedDateChanged)
 public:
     explicit CipherView(QObject *parent = nullptr);
 
@@ -71,6 +72,9 @@ public:
     QString getCardNumber() const;
     void setCardNumber(const QString &value);
 
+    QString getDeletedDate() const;
+    void setDeletedDate(const QString &value);
+
 private:
     QString name;
     Cipher::CipherType type;
@@ -87,6 +91,7 @@ private:
     QString cardExpMonth;
     QString cardExpYear;
     QString cardNumber;
+    QString deletedDate;
 
 signals:
     void nameChanged();
@@ -104,6 +109,7 @@ signals:
     void cardExpMonthChanged();
     void cardExpYearChanged();
     void cardNumberChanged();
+    void deletedDateChanged();
 
 };
 

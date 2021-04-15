@@ -81,6 +81,24 @@ Page {
             }
 
             Item {
+                visible: cipher.deletedDate !== ""
+                x: Theme.horizontalPageMargin
+                height: Theme.iconSizeMedium
+                width: parent.width - 2 * Theme.horizontalPageMargin
+
+                Icon {
+                    source: "image://theme/icon-m-delete"
+                }
+                Label {
+                    height: Theme.iconSizeMedium
+                    x: Theme.iconSizeMedium + Theme.paddingSmall
+                    color: Theme.primaryColor
+                    verticalAlignment: Text.AlignVCenter
+                    text: "Is deleted: " + cipher.deletedDate
+                }
+            }
+
+            Item {
                 x: Theme.horizontalPageMargin
                 height: Theme.iconSizeMedium
                 width: parent.width - 2 * Theme.horizontalPageMargin

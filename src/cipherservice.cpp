@@ -40,6 +40,8 @@ void CipherService::display(QString id)
         cipherView->setType(i->getType());
         qDebug() << "decrypt notes";
         cipherView->setNotes(cryptoService->decryptToUtf8(i->getNotes()));
+        qDebug() << "Deleteddate" << i->getDeletedDate();
+        cipherView->setDeletedDate(i->getDeletedDate());
 
         if(i->getType() == Cipher::CipherType::Login){
             qDebug() << "decrypt login username";
