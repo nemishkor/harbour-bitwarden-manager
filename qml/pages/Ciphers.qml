@@ -5,12 +5,14 @@ import "../components"
 Page {
     id: page
 
+    property bool deleted
+
     // The effective value will be restricted by ApplicationWindow.allowedOrientations
     allowedOrientations: Orientation.All
 
     onStatusChanged: {
         if (status == PageStatus.Active && !vaultManager.isLocked && syncService.synchronized) {
-            cipherService.decryptAll()
+            cipherService.decryptAll(deleted)
         }
     }
 

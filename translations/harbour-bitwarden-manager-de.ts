@@ -135,10 +135,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Ciphers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Required</source>
         <translation type="unfinished"></translation>
     </message>
@@ -152,6 +148,14 @@
     </message>
     <message>
         <source>Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All ciphers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trash</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

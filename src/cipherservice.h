@@ -15,13 +15,15 @@ class CipherService : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int count READ getCount NOTIFY countChanged)
+    Q_PROPERTY(int countDeleted READ getCountDeleted NOTIFY countChanged)
 public:
     explicit CipherService(CryptoService *cryptoService, CipherView *cipherView, QObject *parent = nullptr);
 
-    Q_INVOKABLE void decryptAll();
+    Q_INVOKABLE void decryptAll(bool deletedOnly);
     Q_INVOKABLE void display(QString index);
 
     int getCount();
+    int getCountDeleted();
     void add(Cipher &item);
     void clear();
 

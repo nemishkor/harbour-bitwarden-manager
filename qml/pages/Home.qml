@@ -95,12 +95,23 @@ Page {
             BackgroundItem {
                 width: column.width
                 Label {
-                    text: qsTr("Ciphers") + " (" + cipherService.count + ")"
+                    text: qsTr("All ciphers") + " (" + cipherService.count + ")"
                     color: highlighted ? Theme.highlightColor : Theme.primaryColor
                     anchors.verticalCenter: parent.verticalCenter
                     x: Theme.horizontalPageMargin
                 }
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl("Ciphers.qml"))
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("Ciphers.qml"), { deleted: false })
+            }
+
+            BackgroundItem {
+                width: column.width
+                Label {
+                    text: qsTr("Trash") + " (" + cipherService.countDeleted + ")"
+                    color: highlighted ? Theme.highlightColor : Theme.primaryColor
+                    anchors.verticalCenter: parent.verticalCenter
+                    x: Theme.horizontalPageMargin
+                }
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("Ciphers.qml"), { deleted: true })
             }
 
             /*

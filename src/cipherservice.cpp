@@ -10,11 +10,14 @@ CipherService::CipherService(CryptoService *cryptoService, CipherView *cipherVie
     cipherFieldsListModel = new CipherFieldsListModel();
 }
 
-void CipherService::decryptAll()
+void CipherService::decryptAll(bool deletedOnly)
 {
     ciphersListModel->clear();
     QList<Cipher>::iterator i;
     for(i = ciphers->begin(); i != ciphers->end(); i++){
+        if(deletedOnly && i->getDeletedDate().isNull()){
+            continue;
+        }
         CipherListItem cipherListItem;
         cipherListItem.setId(i->getId());
         cipherListItem.setName(cryptoService->decryptToUtf8((*i).getName()));
@@ -90,6 +93,18 @@ void CipherService::display(QString id)
 int CipherService::getCount()
 {
     return ciphers->count();
+}
+
+int CipherService::getCountDeleted()
+{
+    int c = ciphers->count();
+    QList<Cipher>::iterator i;
+    for(i = ciphers->begin(); i != ciphers->end(); i++){
+        if(i->getDeletedDate().isEmpty()){
+            c--;
+        }
+    }
+    return c;
 }
 
 void CipherService::add(Cipher &item)
