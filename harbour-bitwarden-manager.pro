@@ -45,6 +45,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/vaultmanager.cpp
 
 DISTFILES += qml/harbour-bitwarden-manager.qml \
+    qml/components/BackgroundItemButton.qml \
     qml/components/CipherLabel.qml \
     qml/components/LockBlock.qml \
     qml/components/SyncBlock.qml \

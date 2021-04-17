@@ -16,11 +16,14 @@ Page {
             title: qsTr("Password history")
             description: cipher.name
         }
-        delegate: BackgroundItem {
-            width: parent.width
-            height: contentItem.childrenRect.height + Theme.paddingMedium
+        delegate: ListItem {
+            id: delegate
+            contentHeight: column.height + separator.height + Theme.paddingMedium * 2
+
             Column {
+                id: column
                 width: parent.width
+                spacing: Theme.paddingMedium
 
                 BackgroundItem {
                     width: parent.width
@@ -52,19 +55,20 @@ Page {
                     }
                 }
 
-                Separator {
-                    id: separator
-                    anchors {
-                        top: column.bottom
-                        topMargin: Theme.paddingMedium
-                    }
+            }
 
-                    width: parent.width
-                    color: Theme.primaryColor
-                    horizontalAlignment: Qt.AlignHCenter
+            Separator {
+                id: separator
+                anchors {
+                    top: column.bottom
+                    topMargin: Theme.paddingMedium
                 }
 
+                width: parent.width
+                color: Theme.primaryColor
+                horizontalAlignment: Qt.AlignHCenter
             }
+
         }
 
         VerticalScrollDecorator {}

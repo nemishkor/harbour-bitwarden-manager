@@ -172,184 +172,19 @@ Page {
             }
 
             SectionHeader { text: qsTr("Login"); visible: cipher.type === 1 }
-
-            BackgroundItem {
-                visible: cipher.type === 1
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Username") }
-                    Label {
-                        text: cipher.loginUsername
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        wrapMode: "WordWrap"
-                    }
-                }
-            }
-
-            BackgroundItem {
-                visible: cipher.type === 1
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Password") }
-                    Label {
-                        text: cipher.loginPassword ? cipher.loginPassword : " "
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        wrapMode: "WordWrap"
-                    }
-                }
-            }
-
-            BackgroundItem {
-                visible: cipher.type === 1
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Password revision date") }
-                    Label {
-                        text: cipher.loginPasswordRevisionDate ? cipher.loginPasswordRevisionDate : qsTr("None")
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        wrapMode: "WordWrap"
-                    }
-                }
-            }
-
-            BackgroundItem {
-                visible: cipher.type === 1
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("TOTP") }
-                    Label {
-                        text: cipher.loginTotp ? cipher.loginTotp : " "
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        wrapMode: "WordWrap"
-                    }
-                }
-            }
-
-            BackgroundItem {
-                visible: cipher.type === 1
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Uri") }
-                    Label {
-                        text: cipher.loginUri ? cipher.loginUri : " "
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        wrapMode: "WordWrap"
-                    }
-                }
-            }
+            CipherLabel { cipherType: 1; label: qsTr("Username"); value: cipher.loginUsername }
+            CipherLabel { cipherType: 1; label: qsTr("Password"); value: cipher.loginPassword ? cipher.loginPassword : " " }
+            CipherLabel { cipherType: 1; label: qsTr("Password revision date"); value: cipher.loginPasswordRevisionDate ? cipher.loginPasswordRevisionDate : qsTr("None") }
+            CipherLabel { cipherType: 1; label: qsTr("TOTP"); value: cipher.loginTotp ? cipher.loginTotp : " " }
+            CipherLabel { cipherType: 1; label: qsTr("Uri"); value: cipher.loginUri ? cipher.loginUri : " " }
 
             SectionHeader { text: qsTr("Card"); visible: cipher.type === 3 }
-
-            BackgroundItem {
-                visible: cipher.type === 3
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Brand") }
-                    Label {
-                        text: cipher.cardBrand
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        wrapMode: "WordWrap"
-                    }
-                }
-            }
-
-            BackgroundItem {
-                visible: cipher.type === 3
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Cardholder") }
-                    Label {
-                        text: cipher.cardCardholder
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        wrapMode: "WordWrap"
-                    }
-                }
-            }
-
-            BackgroundItem {
-                visible: cipher.type === 3
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Code") }
-                    Label {
-                        text: cipher.cardCode
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        wrapMode: "WordWrap"
-                    }
-                }
-            }
-
-            BackgroundItem {
-                visible: cipher.type === 3
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Exp month") }
-                    Label {
-                        text: cipher.cardExpMonth
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        wrapMode: "WordWrap"
-                    }
-                }
-            }
-
-            BackgroundItem {
-                visible: cipher.type === 3
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Exp year") }
-                    Label {
-                        text: cipher.cardExpYear
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        wrapMode: "WordWrap"
-                    }
-                }
-            }
-
-            BackgroundItem {
-                visible: cipher.type === 3
-                width: column.width
-                height: contentItem.childrenRect.height
-                Column {
-                    x: Theme.horizontalPageMargin
-                    width: parent.width - 2 * Theme.horizontalPageMargin
-                    Label { text: qsTr("Number") }
-                    Label {
-                        text: cipher.cardNumber
-                        font.pixelSize: Theme.fontSizeExtraSmall
-                        wrapMode: "WordWrap"
-                    }
-                }
-            }
+            CipherLabel { cipherType: 3; label: qsTr("Brand"); value: cipher.cardBrand }
+            CipherLabel { cipherType: 3; label: qsTr("Cardholder"); value: cipher.cardCardholder }
+            CipherLabel { cipherType: 3; label: qsTr("Code"); value: cipher.cardCode }
+            CipherLabel { cipherType: 3; label: qsTr("Exp month"); value: cipher.cardExpMonth }
+            CipherLabel { cipherType: 3; label: qsTr("Exp year"); value: cipher.cardExpYear }
+            CipherLabel { cipherType: 3; label: qsTr("Number"); value: cipher.cardNumber }
 
             SectionHeader { text: qsTr("Identity"); visible: cipher.type === 4 }
             CipherLabel { cipherType: 4; label: qsTr("Title"); value: cipher.identityTitle }
@@ -371,102 +206,13 @@ Page {
             CipherLabel { cipherType: 4; label: qsTr("Postal code"); value: cipher.identityPostalCode }
             CipherLabel { cipherType: 4; label: qsTr("Country"); value: cipher.identityCountry }
 
-            BackgroundItem {
-                id: fieldsButton
-
-                width: parent.width
-                height: Theme.itemSizeMedium
-
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl("CipherFields.qml"))
-
-                Rectangle {
-                    anchors.fill: parent
-                    gradient: Gradient {
-                        GradientStop {
-                            position: 0.0
-                            color: Theme.rgba(fieldsButton.palette.highlightBackgroundColor, 0.1)
-                        }
-                        GradientStop {
-                            position: 1.0
-                            color: "transparent"
-                        }
-                    }
-                }
-
-                Label {
-                    text: qsTr("Custom fields") + " (" + cipherFieldsListModel.count + ")"
-                    color: fieldsButton.highlighted ? Theme.secondaryHighlightColor : Theme.highlightColor
-                    anchors {
-                        left: parent.left
-                        leftMargin: Theme.horizontalPageMargin
-                        right: parent.right
-                        rightMargin: fieldsButtonIconRightImg.width + Theme.paddingSmall + Theme.horizontalPageMargin
-                        verticalCenter: parent.verticalCenter
-                    }
-                    font.pixelSize: Theme.fontSizeLarge
-                    truncationMode: TruncationMode.Fade
-                }
-
-                Icon {
-                    id: fieldsButtonIconRightImg
-
-                    anchors {
-                        right: parent.right
-                        rightMargin: Theme.horizontalPageMargin
-                        verticalCenter: parent.verticalCenter
-                    }
-                    source: "image://theme/icon-m-right"
-                    highlighted: fieldsButton.down
-                }
+            BackgroundItemButton {
+                page: "../pages/CipherFields.qml"
+                label: qsTr("Custom fields") + " (" + cipherFieldsListModel.count + ")"
             }
-
-            BackgroundItem {
-                id: passwordHistoryButton
-
-                width: parent.width
-                height: Theme.itemSizeMedium
-
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl("CipherPasswordHistory.qml"))
-
-                Rectangle {
-                    anchors.fill: parent
-                    gradient: Gradient {
-                        GradientStop {
-                            position: 0.0
-                            color: Theme.rgba(passwordHistoryButton.palette.highlightBackgroundColor, 0.1)
-                        }
-                        GradientStop {
-                            position: 1.0
-                            color: "transparent"
-                        }
-                    }
-                }
-
-                Label {
-                    text: qsTr("Password history") + " (" + cipherPasswordHistoryListModel.count + ")"
-                    color: passwordHistoryButton.highlighted ? Theme.secondaryHighlightColor : Theme.highlightColor
-                    anchors {
-                        left: parent.left
-                        leftMargin: Theme.horizontalPageMargin
-                        right: parent.right
-                        rightMargin: passwordHistoryButtonIconRightImg.width + Theme.paddingSmall + Theme.horizontalPageMargin
-                        verticalCenter: parent.verticalCenter
-                    }
-                    font.pixelSize: Theme.fontSizeLarge
-                    truncationMode: TruncationMode.Fade
-                }
-
-                Icon {
-                    id: passwordHistoryButtonIconRightImg
-
-                    anchors {
-                        right: parent.right
-                        rightMargin: Theme.horizontalPageMargin
-                        verticalCenter: parent.verticalCenter
-                    }
-                    source: "image://theme/icon-m-right"
-                    highlighted: passwordHistoryButton.down
-                }
+            BackgroundItemButton {
+                page: "../pages/CipherPasswordHistory.qml"
+                label: qsTr("Password history") + " (" + cipherPasswordHistoryListModel.count + ")"
             }
 
             BackgroundItem {
