@@ -74,7 +74,8 @@ CONFIG += crypto
 # planning to localize your app, remember to comment out the
 # following TRANSLATIONS line. And also do not forget to
 # modify the localized app name in the the .desktop file.
-TRANSLATIONS += translations/harbour-bitwarden-manager-de.ts
+TRANSLATIONS += translations/harbour-bitwarden-manager-de.ts \
+    translations/harbour-bitwarden-manager-sv.ts
 
 HEADERS += \
     src/api.h \

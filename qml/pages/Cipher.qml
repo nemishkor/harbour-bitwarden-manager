@@ -66,7 +66,7 @@ Page {
         anchors.fill: parent
 
         // Tell SilicaFlickable the height of its content.
-        contentHeight: column.height
+        contentHeight: column.height + Theme.paddingLarge
 
         // Place our content in a Column.  The PageHeader is always placed at the top
         // of the page, followed by our content.
@@ -420,8 +420,25 @@ Page {
                 }
             }
 
+            BackgroundItem {
+                visible: cipher.revisionDate !== ""
+                width: column.width
+                height: contentItem.childrenRect.height
+                Column {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    Label { text: qsTr("Revision date") }
+                    Label {
+                        text: cipher.revisionDate
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        wrapMode: "WordWrap"
+                    }
+                }
+            }
 
         }
+
+        VerticalScrollDecorator {}
 
     }
 

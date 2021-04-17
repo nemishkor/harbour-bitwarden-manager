@@ -41,6 +41,7 @@ void CipherService::display(QString id)
         qDebug() << "decrypt name";
         cipherView->setName(cryptoService->decryptToUtf8(i->getName()));
         cipherView->setType(i->getType());
+        cipherView->setRevisionDate(i->getRevisionDate());
         qDebug() << "decrypt notes";
         cipherView->setNotes(cryptoService->decryptToUtf8(i->getNotes()));
         cipherView->setDeletedDate(i->getDeletedDate());

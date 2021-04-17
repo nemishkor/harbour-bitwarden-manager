@@ -159,6 +159,10 @@
         <source>Country</source>
         <translation>Land</translation>
     </message>
+    <message>
+        <source>Revision date</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CipherFields</name>

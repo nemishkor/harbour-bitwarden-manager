@@ -435,3 +435,16 @@ void CipherView::setIdentityUsername(const QString &value)
     identityUsername = value;
     emit identityUsernameChanged();
 }
+
+QString CipherView::getRevisionDate() const
+{
+    return revisionDate;
+}
+
+void CipherView::setRevisionDate(const QString &value)
+{
+    if(revisionDate == value)
+        return;
+    revisionDate = value;
+    emit revisionDateChanged();
+}

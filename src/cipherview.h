@@ -12,6 +12,7 @@ class CipherView : public QObject
     Q_PROPERTY(int type READ getType NOTIFY typeChanged)
     Q_PROPERTY(QString notes READ getNotes NOTIFY notesChanged)
     Q_PROPERTY(bool favorite READ getFavorite NOTIFY favoriteChanged)
+    Q_PROPERTY(QString revisionDate READ getRevisionDate NOTIFY revisionDateChanged)
     Q_PROPERTY(QString loginUsername READ getLoginUsername NOTIFY loginUsernameChanged)
     Q_PROPERTY(QString loginPasswordRevisionDate READ getLoginPasswordRevisionDate NOTIFY loginPasswordRevisionDateChanged)
     Q_PROPERTY(QString loginPassword READ getLoginPassword NOTIFY loginPasswordChanged)
@@ -50,6 +51,9 @@ public:
 
     int getType() const;
     void setType(const Cipher::CipherType &value);
+
+    QString getRevisionDate() const;
+    void setRevisionDate(const QString &value);
 
     QString getLoginUsername() const;
     void setLoginUsername(const QString &value);
@@ -152,6 +156,7 @@ private:
     Cipher::CipherType type;
     QString notes;
     bool favorite;
+    QString revisionDate;
     QString loginUsername;
     QString loginPasswordRevisionDate;
     QString loginPassword;
@@ -188,6 +193,7 @@ signals:
     void typeChanged();
     void notesChanged();
     void favoriteChanged();
+    void revisionDateChanged();
     void loginUsernameChanged();
     void loginPasswordRevisionDateChanged();
     void loginPasswordChanged();
