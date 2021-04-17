@@ -3,6 +3,7 @@
 Cipher::Cipher(CipherString name): name(name)
 {
     fields = new QList<CipherField>();
+    passwordHistory = new QList<CipherPasswordHistoryItem>();
 }
 
 QString Cipher::getId() const
@@ -168,4 +169,14 @@ CipherCard *Cipher::getCard()
 CipherIdentity *Cipher::getIdentity()
 {
     return &identity;
+}
+
+void Cipher::addPasswordHistoryItem(CipherPasswordHistoryItem passwordHistoryItem)
+{
+    passwordHistory->append(passwordHistoryItem);
+}
+
+QList<CipherPasswordHistoryItem> *Cipher::getPasswordHistory() const
+{
+    return passwordHistory;
 }

@@ -9,6 +9,8 @@
 #include "cipherlistitem.h"
 #include "cipherview.h"
 #include "cipherslistmodel.h"
+#include "cipherpasswordhistoryitem.h"
+#include "cipherpasswordhistorylistmodel.h"
 #include "cryptoservice.h"
 
 class CipherService : public QObject
@@ -31,12 +33,15 @@ public:
 
     CipherFieldsListModel *getCipherFieldsListModel() const;
 
+    CipherPasswordHistoryListModel *getCipherPasswordHistoryListModel() const;
+
 private:
     CryptoService *cryptoService;
     CipherView *cipherView;
     QList<Cipher> *ciphers; // all encrypted ciphers
     CiphersListModel *ciphersListModel; // filtered cached decrypted ciphers for list view
     CipherFieldsListModel *cipherFieldsListModel; // filtered cached decrypted fields of specific displayed cipher
+    CipherPasswordHistoryListModel *cipherPasswordHistoryListModel; // filtered cached decrypted password history of specific displayed cipher
 
 signals:
     void countChanged();

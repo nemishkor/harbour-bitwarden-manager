@@ -421,6 +421,55 @@ Page {
             }
 
             BackgroundItem {
+                id: passwordHistoryButton
+
+                width: parent.width
+                height: Theme.itemSizeMedium
+
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("CipherPasswordHistory.qml"))
+
+                Rectangle {
+                    anchors.fill: parent
+                    gradient: Gradient {
+                        GradientStop {
+                            position: 0.0
+                            color: Theme.rgba(passwordHistoryButton.palette.highlightBackgroundColor, 0.1)
+                        }
+                        GradientStop {
+                            position: 1.0
+                            color: "transparent"
+                        }
+                    }
+                }
+
+                Label {
+                    text: qsTr("Password history") + " (" + cipherPasswordHistoryListModel.count + ")"
+                    color: passwordHistoryButton.highlighted ? Theme.secondaryHighlightColor : Theme.highlightColor
+                    anchors {
+                        left: parent.left
+                        leftMargin: Theme.horizontalPageMargin
+                        right: parent.right
+                        rightMargin: passwordHistoryButtonIconRightImg.width + Theme.paddingSmall + Theme.horizontalPageMargin
+                        verticalCenter: parent.verticalCenter
+                    }
+                    font.pixelSize: Theme.fontSizeLarge
+                    truncationMode: TruncationMode.Fade
+                }
+
+                Icon {
+                    id: passwordHistoryButtonIconRightImg
+
+                    anchors {
+                        right: parent.right
+                        rightMargin: Theme.horizontalPageMargin
+                        verticalCenter: parent.verticalCenter
+                    }
+                    source: "image://theme/icon-m-right"
+                    highlighted: passwordHistoryButton.down
+                }
+            }
+
+            BackgroundItem {
                 visible: cipher.revisionDate !== ""
                 width: column.width
                 height: contentItem.childrenRect.height

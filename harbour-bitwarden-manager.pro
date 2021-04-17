@@ -27,6 +27,9 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/cipheridentity.cpp \
     src/cipherlistitem.cpp \
     src/cipherlogin.cpp \
+    src/cipherpasswordhistoryitem.cpp \
+    src/cipherpasswordhistorylistitem.cpp \
+    src/cipherpasswordhistorylistmodel.cpp \
     src/cipherservice.cpp \
     src/cipherslistmodel.cpp \
     src/cipherstring.cpp \
@@ -48,6 +51,7 @@ DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/cover/CoverPage.qml \
     qml/pages/Cipher.qml \
     qml/pages/CipherFields.qml \
+    qml/pages/CipherPasswordHistory.qml \
     qml/pages/Ciphers.qml \
     qml/pages/Folders.qml \
     qml/pages/Login.qml \
@@ -90,6 +94,9 @@ HEADERS += \
     src/cipheridentity.h \
     src/cipherlistitem.h \
     src/cipherlogin.h \
+    src/cipherpasswordhistoryitem.h \
+    src/cipherpasswordhistorylistitem.h \
+    src/cipherpasswordhistorylistmodel.h \
     src/cipherservice.h \
     src/cipherslistmodel.h \
     src/cipherstring.h \

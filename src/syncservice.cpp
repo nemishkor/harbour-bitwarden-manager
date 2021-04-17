@@ -264,9 +264,11 @@ void SyncService::syncCollections()
 void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
 {
     cipherService->clear();
-    QJsonArray::const_iterator i, f;
-    QJsonObject c, l, card, identity, field;
-    QJsonArray fields;
+
+    QJsonArray::const_iterator i, cipherChildArrIt;
+    QJsonObject c, l, card, identity, cipherChildArrItem;
+    QJsonArray fields, passwordHistory;
+
     for (i = ciphers.constBegin(); i != ciphers.constEnd(); i++){
         qDebug() << "add cipher";
         c = (*i).toObject();
@@ -389,13 +391,24 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
         }
 
         fields = c["Fields"].toArray();
-        for(f = fields.constBegin(); f != fields.constEnd(); f++){
-            field = (*f).toObject();
+        for(cipherChildArrIt = fields.constBegin(); cipherChildArrIt != fields.constEnd(); cipherChildArrIt++){
+            cipherChildArrItem = (*cipherChildArrIt).toObject();
             cipher.addField(CipherField(
-                CipherString(field["Name"].toString()),
-                static_cast<CipherField::FieldType>(field["Type"].toInt()),
-                CipherString(field["Value"].toString())
+                CipherString(cipherChildArrItem["Name"].toString()),
+                static_cast<CipherField::FieldType>(cipherChildArrItem["Type"].toInt()),
+                CipherString(cipherChildArrItem["Value"].toString())
             ));
+        }
+
+        if(c["PasswordHistory"].isArray()){
+            passwordHistory = c["PasswordHistory"].toArray();
+            for(cipherChildArrIt = passwordHistory.constBegin(); cipherChildArrIt != passwordHistory.constEnd(); cipherChildArrIt++){
+                cipherChildArrItem = (*cipherChildArrIt).toObject();
+                cipher.addPasswordHistoryItem(CipherPasswordHistoryItem(
+                    cipherChildArrItem["LastUsedDate"].toString(),
+                    CipherString(cipherChildArrItem["Password"].toString())
+                ));
+            }
         }
 
         cipherService->add(cipher);

@@ -8,6 +8,7 @@ CipherService::CipherService(CryptoService *cryptoService, CipherView *cipherVie
     ciphers = new QList<Cipher>;
     ciphersListModel = new CiphersListModel();
     cipherFieldsListModel = new CipherFieldsListModel();
+    cipherPasswordHistoryListModel = new CipherPasswordHistoryListModel();
 }
 
 void CipherService::decryptAll(bool deletedOnly)
@@ -34,6 +35,7 @@ void CipherService::display(QString id)
     qDebug() << "display cipher" << id;
     QList<Cipher>::iterator i;
     QList<CipherField>::const_iterator fields_i;
+    QList<CipherPasswordHistoryItem>::const_iterator passwordHistoryIt;
     for(i = ciphers->begin(); i != ciphers->end(); i++){
         if(i->getId() != id){
             continue;
@@ -122,6 +124,15 @@ void CipherService::display(QString id)
             ));
         }
 
+        cipherPasswordHistoryListModel->clear();
+        for(passwordHistoryIt = i->getPasswordHistory()->constBegin(); passwordHistoryIt != i->getPasswordHistory()->constEnd(); passwordHistoryIt++){
+            qDebug() << "decrypt password history";
+            cipherPasswordHistoryListModel->add(CipherPasswordHistoryListItem(
+                passwordHistoryIt->getLastUsedDate(),
+                cryptoService->decryptToUtf8(passwordHistoryIt->getPassword())
+            ));
+        }
+
         return;
     }
 
@@ -166,4 +177,9 @@ CiphersListModel *CipherService::getCiphersListModel() const
 CipherFieldsListModel *CipherService::getCipherFieldsListModel() const
 {
     return cipherFieldsListModel;
+}
+
+CipherPasswordHistoryListModel *CipherService::getCipherPasswordHistoryListModel() const
+{
+    return cipherPasswordHistoryListModel;
 }

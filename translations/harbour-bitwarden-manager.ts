@@ -163,11 +163,30 @@
         <source>Revision date</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Password history</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CipherFields</name>
     <message>
         <source>Custom fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CipherPasswordHistory</name>
+    <message>
+        <source>Password history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

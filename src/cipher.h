@@ -7,6 +7,7 @@
 #include "ciphercard.h"
 #include "cipherlogin.h"
 #include "cipherstring.h"
+#include "cipherpasswordhistoryitem.h"
 #include "cipherfield.h"
 #include "cipheridentity.h"
 
@@ -73,6 +74,10 @@ public:
 
     CipherIdentity *getIdentity();
 
+    void addPasswordHistoryItem(CipherPasswordHistoryItem passwordHistoryItem);
+
+    QList<CipherPasswordHistoryItem> *getPasswordHistory() const;
+
 private:
     QString id;
     QString organizationId;
@@ -92,6 +97,7 @@ private:
     QList<CipherField> *fields;
     CipherCard card;
     CipherIdentity identity;
+    QList<CipherPasswordHistoryItem> *passwordHistory;
 
 };
 
