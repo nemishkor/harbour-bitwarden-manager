@@ -16,16 +16,28 @@ Page {
             title: qsTr("Custom fields")
             description: cipher.name
         }
-        delegate: BackgroundItem {
+
+        delegate: ListItem {
             width: parent.width
-            height: contentItem.childrenRect.height + Theme.paddingMedium
+            contentHeight: col.height
+
+            menu: ContextMenu {
+                MenuItem {
+                    text: qsTr("Copy to clipboard")
+                    onClicked: Clipboard.text = model.value
+                }
+            }
+
             Column {
+                id: col
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 TextSwitch {
                     visible: model.type === 2
                     text: model.name
                     checked: model.value === "true"
+                    automaticCheck: false
+                    highlighted: false
                 }
                 Label {
                     visible: model.type !== 2

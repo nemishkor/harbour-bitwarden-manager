@@ -167,11 +167,26 @@
         <source>Password history</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Copy to clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CipherFields</name>
     <message>
         <source>Custom fields</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy to clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CipherLabel</name>
+    <message>
+        <source>Copy to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -187,6 +202,10 @@
     </message>
     <message>
         <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

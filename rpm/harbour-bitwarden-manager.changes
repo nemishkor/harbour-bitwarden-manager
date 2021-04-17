@@ -12,20 +12,26 @@
 # * date Author's Name <author's email> version-release
 # - Summary of change
 
-* Wed Thu 15 2021 Koreniev Vitalii <nemish94@gmail.com> 0.6.0
- - add deletedDate field to view
- - add page with deleted ciphers
- - added cipher identity type to view
+* Sun Apr 17 2021 Koreniev Vitalii <nemish94@gmail.com> 0.7.0
+ - Add Swedish translation (thanks to eson57)
+ - Add cipher's revision date field to view
+ - Add password history
+ - Add "copy to clipboard" function
 
-* Wed Thu 15 2021 Koreniev Vitalii <nemish94@gmail.com> 0.4.2
- - add welcome pages
+* Wed Apr 15 2021 Koreniev Vitalii <nemish94@gmail.com> 0.6.0
+ - Add deletedDate field to view
+ - Add page with deleted ciphers
+ - Added cipher identity type to view
+
+* Wed Apr 15 2021 Koreniev Vitalii <nemish94@gmail.com> 0.4.2
+ - Add welcome pages
 
 * Wed Apr 14 2021 Koreniev Vitalii <nemish94@gmail.com> 0.4.1
- - add welcome page
+ - Add welcome page
 
 * Sun Apr 11 2021 Koreniev Vitalii <nemish94@gmail.com> 0.4.0
- - add login totp field to view
- - add card's data to model and view
+ - Add login totp field to view
+ - Add card's data to model and view
 
 * Sat Apr 10 2021 Koreniev Vitalii <nemish94@gmail.com> 0.3.0
  - Application saves API URLs to settings. URLs could be changed in login page (https://github.com/nemishkor/harbour-bitwarden-manager/issues/1)

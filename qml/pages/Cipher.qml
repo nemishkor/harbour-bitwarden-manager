@@ -215,11 +215,18 @@ Page {
                 label: qsTr("Password history") + " (" + cipherPasswordHistoryListModel.count + ")"
             }
 
-            BackgroundItem {
+            ListItem {
                 visible: cipher.revisionDate !== ""
                 width: column.width
-                height: contentItem.childrenRect.height
+                height: revisionDateColumn.height
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("Copy to clipboard")
+                        onClicked: Clipboard.text = cipher.revisionDate
+                    }
+                }
                 Column {
+                    id: revisionDateColumn
                     x: Theme.horizontalPageMargin
                     width: parent.width - 2 * Theme.horizontalPageMargin
                     Label { text: qsTr("Revision date") }

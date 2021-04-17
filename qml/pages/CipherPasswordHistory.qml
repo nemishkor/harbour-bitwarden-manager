@@ -16,19 +16,27 @@ Page {
             title: qsTr("Password history")
             description: cipher.name
         }
-        delegate: ListItem {
+        delegate: Item {
             id: delegate
-            contentHeight: column.height + separator.height + Theme.paddingMedium * 2
+            width: parent.width
+            height: column.height + separator.height + Theme.paddingMedium * 2
 
             Column {
                 id: column
                 width: parent.width
                 spacing: Theme.paddingMedium
 
-                BackgroundItem {
+                ListItem {
                     width: parent.width
-                    height: contentItem.childrenRect.height
+                    contentHeight: lastUsageColumn.height
+                    menu: ContextMenu {
+                        MenuItem {
+                            text: qsTr("Copy to clipboard")
+                            onClicked: Clipboard.text = model.lastUsedDate
+                        }
+                    }
                     Column {
+                        id: lastUsageColumn
                         x: Theme.horizontalPageMargin
                         width: parent.width - 2 * Theme.horizontalPageMargin
                         Label { text: qsTr("Last usage") }
@@ -40,10 +48,17 @@ Page {
                     }
                 }
 
-                BackgroundItem {
+                ListItem {
                     width: parent.width
-                    height: contentItem.childrenRect.height
+                    contentHeight: passwordColumn.height
+                    menu: ContextMenu {
+                        MenuItem {
+                            text: qsTr("Copy to clipboard")
+                            onClicked: Clipboard.text = model.password
+                        }
+                    }
                     Column {
+                        id: passwordColumn
                         x: Theme.horizontalPageMargin
                         width: parent.width - 2 * Theme.horizontalPageMargin
                         Label { text: qsTr("Password") }
