@@ -171,51 +171,69 @@ void SyncService::refreshTokenReplyFinished()
 void SyncService::syncReplyFinished()
 {
     setMessage("Data downloaded. Syncing...", "info");
-    QJsonDocument jsonDocument = QJsonDocument::fromJson(syncReply->readAll());
-    if(!jsonDocument.isObject()){
-        setMessage("Invalid sync API response #1", "error");
+    try {
+
+        QJsonDocument jsonDocument = QJsonDocument::fromJson(syncReply->readAll());
+        if(!jsonDocument.isObject()){
+            setMessage("Invalid sync API response #1", "error");
+            setIsSyncing(false);
+            return;
+        }
+
+        QString userId = user->getUserId();
+        QJsonObject root = jsonDocument.object();
+        if(!isSyncing){
+            return;
+        }
+
+        setMessage("Syncing profile...", "info");
+        syncProfile(root["Profile"].toObject());
+        if(!isSyncing){
+            return;
+        }
+
+        setMessage("Syncing folders...", "info");
+        syncFolders(userId, root["Folders"].toArray());
+        if(!isSyncing){
+            return;
+        }
+
+        setMessage("Syncing collections...", "info");
+        syncCollections();
+        if(!isSyncing){
+            return;
+        }
+
+        setMessage("Syncing ciphers...", "info");
+        syncCiphers(userId, root["Ciphers"].toArray());
+        if(!isSyncing){
+            return;
+        }
+
+        setMessage("Syncing sends...", "info");
+        syncSends();
+        if(!isSyncing){
+            return;
+        }
+
+        setMessage("Syncing settings...", "info");
+        syncSettings();
+        if(!isSyncing){
+            return;
+        }
+
+        setMessage("Syncing policies...", "info");
+        syncPolicies();
+
+        setLastSync(QDateTime::currentDateTime());
+
+    } catch (std::exception &e) {
+        QString errorMessage;
+        errorMessage.append("Failed: ").append(e.what()).append(" on \"").append(message).append("\"");
+        setMessage(errorMessage, "error");
         setIsSyncing(false);
         return;
     }
-    QString userId = user->getUserId();
-    QJsonObject root = jsonDocument.object();
-    if(!isSyncing){
-        return;
-    }
-
-    syncProfile(root["Profile"].toObject());
-    if(!isSyncing){
-        return;
-    }
-
-    syncFolders(userId, root["Folders"].toArray());
-    if(!isSyncing){
-        return;
-    }
-
-    syncCollections();
-    if(!isSyncing){
-        return;
-    }
-
-    syncCiphers(userId, root["Ciphers"].toArray());
-    if(!isSyncing){
-        return;
-    }
-
-    syncSends();
-    if(!isSyncing){
-        return;
-    }
-
-    syncSettings();
-    if(!isSyncing){
-        return;
-    }
-
-    syncPolicies();
-
-    setLastSync(QDateTime::currentDateTime());
 
     setMessage("Done", "info");
     setIsSyncing(false);
