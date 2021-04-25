@@ -84,7 +84,6 @@ void Auth::saveKDFParameters()
     }
 
     QJsonDocument json = QJsonDocument::fromJson(preloginReply->readAll());
-    qDebug() << json.toJson();
     if(!json.isObject()){
         setLoginMessage("Invalid prelogin API response #1", "error");
         reset();

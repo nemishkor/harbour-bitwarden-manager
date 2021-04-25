@@ -172,7 +172,6 @@ void SyncService::syncReplyFinished()
 {
     setMessage("Data downloaded. Syncing...", "info");
     QJsonDocument jsonDocument = QJsonDocument::fromJson(syncReply->readAll());
-    qDebug() << jsonDocument.toJson();
     if(!jsonDocument.isObject()){
         setMessage("Invalid sync API response #1", "error");
         setIsSyncing(false);
