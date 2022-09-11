@@ -45,6 +45,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/vaultmanager.cpp
 
 DISTFILES += qml/harbour-bitwarden-manager.qml \
+    README.md \
     qml/components/BackgroundItemButton.qml \
     qml/components/CipherLabel.qml \
     qml/components/LockBlock.qml \
@@ -73,7 +74,6 @@ SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 # to disable building translations every time, comment out the
 # following CONFIG line
 CONFIG += sailfishapp_i18n
-CONFIG += crypto
 
 # German translation is enabled as an example. If you aren't
 # planning to localize your app, remember to comment out the
@@ -117,19 +117,26 @@ HEADERS += \
 QT += network
 QT += quick
 
-INCLUDEPATH += ../libs/openssl/include
-LIBS += -L$$PWD/../libs -lssl -lcrypto
-#LIBS += -L/usr/lib32 -lcrypto
-#LIBS += -L/usr/lib32 -lssl
-#LIBS += ../libs/openssl/libssl.so
-#LIBS += ../libs/openssl/libcrypto.so
-#LIBS += ../libs/openssl/libssl.so
-#LIBS += ../libs/openssl/libcrypto.a
-#LIBS += ../libs/openssl/libssl.a
-#LIBS += /usr/lib/libssl3.so
-#INCLUDEPATH += /usr/include
-#INCLUDEPATH += /usr/include/openssl
-#LIBS += -L/usr/lib -llibssl3
-#OPENSSL_LIBS='-L/usr/lib -lssl -lcrypto'
+contains(QT_ARCH, arm64) {
+    ARCH_LIBS=lib64
+    OPENSSL_ARCH=aarch64
+    message("Compiling for 64bit ARM system")
+} else {
+    contains(QT_ARCH, arm) {
+        ARCH_LIBS=lib
+        OPENSSL_ARCH=armv7hl
+        message("Compiling for 32bit ARM system")
+    } else {
+        contains(QT_ARCH, i386) {
+            ARCH_LIBS=lib
+            OPENSSL_ARCH=i486
+            message("Compiling for 32bit i386 system")
+        } else {
+            message("Unknown arch type. Unable to select libraries")
+        }
+    }
+}
 
+INCLUDEPATH += ../libs/openssl-1.1.1-$$OPENSSL_ARCH/usr/include/
+LIBS += -L$$PWD/../libs/openssl-1.1.1-$$OPENSSL_ARCH/usr/$$ARCH_LIBS/ -lssl -lcrypto
 
