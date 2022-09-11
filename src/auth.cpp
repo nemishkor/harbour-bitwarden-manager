@@ -114,7 +114,7 @@ void Auth::login(QString password)
     authentication->setKey(crypto->makeKey(password, authentication->getEmail(), authentication->getKdfType(), authentication->getKdfIterations()));
     authentication->setHashedPassword(crypto->hashPassword(authentication->getKey(), password));
     setLoginMessage("Logging in");
-    authenticateReply = api->postIdentityToken(makeIdentityTokenRequestBody());
+    authenticateReply = api->postIdentityToken(makeIdentityTokenRequestBody(), authentication->getEmail());
     connect(authenticateReply, &QNetworkReply::finished, this, &Auth::postAuthenticate);
 }
 

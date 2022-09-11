@@ -62,10 +62,11 @@ QNetworkReply *Api::postPrelogin(QString email)
     return reply;
 }
 
-QNetworkReply *Api::postIdentityToken(QByteArray body)
+QNetworkReply *Api::postIdentityToken(QByteArray body, QString email)
 {
     QNetworkRequest request = buildRequest(getIdentityUrl() + "/connect/token");
     request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
+    request.setRawHeader(QByteArray("Auth-Email"), prepareAuthEmailHeaderValue(email));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=utf-8");
     reply = post(request, body);
     connect(reply, &QNetworkReply::finished, this, &Api::replyFinished);
@@ -124,6 +125,15 @@ QNetworkRequest Api::buildRequest(QUrl url)
     request.setRawHeader(QByteArray("Device-Type"), deviceType);
     request.setHeader(QNetworkRequest::UserAgentHeader, "Bitwarden_CLI/1.15.0 (LINUX)");
     return request;
+}
+
+QByteArray Api::prepareAuthEmailHeaderValue(QString email)
+{
+    email.replace("+", "-").replace("/", "_").replace("=", "");
+    QByteArray value;
+    value.append(email);
+
+    return value.toBase64();
 }
 
 QNetworkReply *Api::get(QNetworkRequest request)

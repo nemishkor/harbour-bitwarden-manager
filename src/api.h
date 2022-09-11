@@ -38,7 +38,7 @@ public:
     QString getLastError();
     bool getRequestRunning();
     QNetworkReply *postPrelogin(QString email);
-    QNetworkReply *postIdentityToken(QByteArray body);
+    QNetworkReply *postIdentityToken(QByteArray body, QString email);
     QNetworkReply *refreshAccessToken(QString userIdFromToken, QString refreshToken);
     QNetworkReply *getSync(QString accessToken);
     QNetworkReply *postAccountVerifyPassword(QString masterPasswordHash, QString accessToken);
@@ -52,6 +52,7 @@ private:
     QString lastError;
 
     QNetworkRequest buildRequest(QUrl url);
+    QByteArray prepareAuthEmailHeaderValue(QString email);
     QNetworkReply *get(QNetworkRequest request);
     QNetworkReply *post(QNetworkRequest request, QByteArray body);
     QNetworkReply *reply;
