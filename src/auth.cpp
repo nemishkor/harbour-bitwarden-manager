@@ -90,12 +90,12 @@ void Auth::saveKDFParameters()
         return;
     }
     QJsonObject root = json.object();
-    if(!root.contains("Kdf")){
+    if(!root.contains("kdf")){
         setLoginMessage("Invalid prelogin API response #2", "error");
         reset();
         return;
     }
-    if(!root.contains("KdfIterations")){
+    if(!root.contains("kdfIterations")){
         setLoginMessage("Invalid prelogin API response #3", "error");
         reset();
         return;
