@@ -161,15 +161,15 @@
     </message>
     <message>
         <source>Revision date</source>
-        <translation type="unfinished"></translation>
+        <translation>Revisionsdatum</translation>
     </message>
     <message>
         <source>Password history</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösenordshistorik</translation>
     </message>
     <message>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiera till urklipp</translation>
     </message>
 </context>
 <context>
@@ -180,33 +180,33 @@
     </message>
     <message>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiera till urklipp</translation>
     </message>
 </context>
 <context>
     <name>CipherLabel</name>
     <message>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiera till urklipp</translation>
     </message>
 </context>
 <context>
     <name>CipherPasswordHistory</name>
     <message>
         <source>Password history</source>
-        <translation type="unfinished"></translation>
+        <translation>Lösenordshistorik</translation>
     </message>
     <message>
         <source>Last usage</source>
-        <translation type="unfinished"></translation>
+        <translation>Senast använd</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Lösenord</translation>
+        <translation>Lösenord</translation>
     </message>
     <message>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiera till urklipp</translation>
     </message>
 </context>
 <context>
