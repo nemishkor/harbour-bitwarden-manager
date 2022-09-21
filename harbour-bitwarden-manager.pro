@@ -38,6 +38,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/decryptparametersarraybuffer.cpp \
     src/folder.cpp \
     src/foldersmodel.cpp \
+    src/models/responses/identitycaptcharesponse.cpp \
     src/symmetriccryptokey.cpp \
     src/syncservice.cpp \
     src/tokenservice.cpp \
@@ -108,6 +109,7 @@ HEADERS += \
     src/folder.h \
     src/foldersmodel.h \
     src/kdftype.h \
+    src/models/responses/identitycaptcharesponse.h \
     src/symmetriccryptokey.h \
     src/syncservice.h \
     src/tokenservice.h \

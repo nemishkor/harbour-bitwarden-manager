@@ -17,6 +17,7 @@
 #include "tokenservice.h"
 #include "user.h"
 #include "symmetriccryptokey.h"
+#include "models/responses/identitycaptcharesponse.h"
 
 class Auth : public QObject
 {

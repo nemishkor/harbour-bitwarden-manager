@@ -170,6 +170,15 @@ void Auth::postAuthenticate()
     }
 
     QJsonObject root = json.object();
+    int httpCode = authenticateReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+    if(httpCode == 400 && root.contains("HCaptcha_SiteKey")){
+        IdentityCaptchaResponse identityCaptchaResponse(root["HCaptcha_SiteKey"].toString());
+        setLoginMessage("Catcha is required. Key: " + identityCaptchaResponse.getKey(), "error");
+        reset();
+        return;
+    }
+
     if(root.contains("ErrorModel")){
         setLoginMessage(root["ErrorModel"].toObject()["Message"].toString(), "error");
         reset();
