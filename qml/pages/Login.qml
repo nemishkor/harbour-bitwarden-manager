@@ -8,12 +8,17 @@ Page {
     allowedOrientations: Orientation.All
 
     function login(){
-        auth.preLogin(emailField.text)
+        auth.login(emailField.text, passwordField.text, apiKeyField.text)
     }
 
     RegExpValidator {
         id: urlValidator
         regExp: /(^https?:\/\/(www\.)?([a-zA-Z0-9]([a-zA-Z0-9\-]*)[a-zA-Z0-9]\.)+)([a-zA-Z0-9]{2,})$/
+    }
+
+    RegExpValidator {
+        id: emailValidator
+        regExp: /^[^\s]+@[^\s]+\.[^\s]+$/
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
@@ -44,16 +49,15 @@ Page {
 
             TextField {
                 id: apiHostField
-                visible: auth.loginStage >= 0
-                readOnly: auth.loginStage !== 0
+                readOnly: auth.loginStage > 0
                 label: qsTr("Api host")
-                text: api.apiUrl
+                text: environmentService.apiUrl
                 width: parent.width
                 validator: urlValidator
                 EnterKey.enabled: acceptableInput
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: auth.preLogin(emailField.text)
-                onTextChanged: api.apiUrl = text
+                onTextChanged: environmentService.apiUrl = text
                 inputMethodHints: Qt.ImhUrlCharactersOnly
             }
 
@@ -62,13 +66,13 @@ Page {
                 visible: auth.loginStage >= 0
                 readOnly: auth.loginStage !== 0
                 label: qsTr("Identity host")
-                text: api.identityUrl
+                text: environmentService.identityUrl
                 width: parent.width
                 validator: urlValidator
                 EnterKey.enabled: acceptableInput
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: auth.preLogin(emailField.text)
-                onTextChanged: api.identityUrl = text
+                onTextChanged: environmentService.identityUrl = text
                 inputMethodHints: Qt.ImhUrlCharactersOnly
             }
 
@@ -78,8 +82,8 @@ Page {
                     visible: auth.loginStage === 0
                     text: qsTr("Set default URLs")
                     onClicked: {
-                        api.apiUrl = "https://api.bitwarden.com"
-                        api.identityUrl = "https://identity.bitwarden.com"
+                        environmentService.apiUrl = "https://api.bitwarden.com"
+                        environmentService.identityUrl = "https://identity.bitwarden.com"
                     }
                 }
             }
@@ -90,51 +94,53 @@ Page {
                 visible: auth.loginStage >= 0
                 readOnly: auth.loginStage !== 0
                 label: qsTr("Email")
+                text: "nemish94@gmail.com"
                 placeholderText: label
                 width: parent.width
-                validator: RegExpValidator { regExp: /^[^\s]+@[^\s]+\.[^\s]+$/ }
+                validator: emailValidator
                 EnterKey.enabled: acceptableInput
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: auth.preLogin(emailField.text)
+                EnterKey.onClicked: passwordField.forceActiveFocus()
                 inputMethodHints: Qt.ImhEmailCharactersOnly
-            }
-
-            ButtonLayout {
-                visible: auth.loginStage === 0 || auth.loginStage === 2
-                preferredWidth: auth.loginStage === 0 ? Theme.buttonWidthMedium : Theme.buttonWidthExtraSmall
-                Button {
-                    visible: auth.loginStage === 0
-                    enabled: emailField.acceptableInput
-                    text: qsTr("Next")
-                    onClicked: auth.preLogin(emailField.text)
-                }
-                Button {
-                    visible: auth.loginStage === 2
-                    text: qsTr("Edit email")
-                    onClicked: auth.reset()
-                }
             }
 
             PasswordField {
                 id: passwordField
-                visible: auth.loginStage >= 2
-                readOnly: auth.loginStage > 2
+                visible: auth.loginStage >= 0
+                readOnly: auth.loginStage !== 0
                 label: qsTr("Master password")
                 width: parent.width
                 validator: RegExpValidator { regExp: /^.+$/ }
                 showEchoModeToggle: true
                 EnterKey.enabled: acceptableInput
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                EnterKey.onClicked: auth.login(passwordField.text)
+                EnterKey.onClicked: auth.apiKeyRequired ? apiKeyField.forceActiveFocus() : login()
+            }
+
+            PasswordField {
+                id: apiKeyField
+                visible: auth.loginStage >= 0 && auth.apiKeyRequired
+                readOnly: auth.loginStage !== 0
+                label: qsTr("API key")
+                width: parent.width
+                validator: auth.apiKeyRequired ? apiKeyFieldValidator : null
+                showEchoModeToggle: true
+                EnterKey.enabled: acceptableInput
+                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                EnterKey.onClicked: login()
+                RegExpValidator {
+                    id: apiKeyFieldValidator
+                    regExp: /^.+$/
+                }
             }
 
             ButtonLayout {
-                visible: auth.loginStage === 2
+                visible: auth.loginStage === 0
                 Button {
                     preferredWidth: Theme.buttonWidthMedium
-                    enabled: passwordField.acceptableInput
+                    enabled: passwordField.acceptableInput && apiKeyField.acceptableInput
                     text: qsTr("Login")
-                    onClicked: auth.login(passwordField.text)
+                    onClicked: login()
                 }
             }
 
@@ -145,7 +151,7 @@ Page {
     }
 
     onStatusChanged: {
-        if (status == PageStatus.Active && auth.loginStage === 4) { // if authorized already
+        if (status == PageStatus.Active && auth.loginStage === 2) { // if authorized already
             pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"), {}, PageStackAction.Immediate)
         }
     }
@@ -155,13 +161,13 @@ Page {
         onLoginStageChanged: {
             console.log("login stage: " + auth.loginStage)
             if(auth.loginStage === 0){
-                emailField.forceActiveFocus()
-                passwordField.text = ""
+                if(auth.apiKeyRequired){
+                    apiKeyField.forceActiveFocus()
+                } else {
+                    passwordField.forceActiveFocus()
+                }
             }
             if(auth.loginStage === 2){
-                passwordField.forceActiveFocus()
-            }
-            if(auth.loginStage === 4){
                 pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"))
             }
         }

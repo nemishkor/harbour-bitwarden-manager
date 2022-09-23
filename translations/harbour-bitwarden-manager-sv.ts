@@ -296,14 +296,6 @@ Manager</translation>
         <translation>Logga in</translation>
     </message>
     <message>
-        <source>Next</source>
-        <translation>Nästa</translation>
-    </message>
-    <message>
-        <source>Edit email</source>
-        <translation>Redigera e-post</translation>
-    </message>
-    <message>
         <source>Master password</source>
         <translation>Huvudlösenord</translation>
     </message>
@@ -318,6 +310,10 @@ Manager</translation>
     <message>
         <source>Set default URLs</source>
         <translation>Ange standard-URL:er</translation>
+    </message>
+    <message>
+        <source>API key</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

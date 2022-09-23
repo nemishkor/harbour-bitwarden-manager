@@ -25,20 +25,24 @@ class Auth : public QObject
     Q_PROPERTY(int loginStage READ getLoginStage NOTIFY loginStageChanged);
     Q_PROPERTY(QString loginMessage READ getLoginMessage NOTIFY loginMessageChanged);
     Q_PROPERTY(QString loginMessageType READ getLoginMessageType NOTIFY loginMessageTypeChanged);
+    Q_PROPERTY(bool apiKeyRequired READ isApiKeyRequired NOTIFY isApiKeyRequiredChanged);
 public:
     Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, CryptoService *crypto, User *user);
     Q_INVOKABLE void reset();
-    Q_INVOKABLE void preLogin(QString email);
-    Q_INVOKABLE void login(QString password);
+    Q_INVOKABLE void login(QString email, QString password, QString apiKey);
     Q_INVOKABLE void logout();
     int getLoginStage();
     QString getLoginMessage();
     QString getLoginMessageType();
 
+    bool isApiKeyRequired() const;
+    void setIsApiKeyRequired(bool newIsApiKeyRequired);
+
 signals:
     void loginStageChanged();
     void loginMessageChanged();
     void loginMessageTypeChanged();
+    void isApiKeyRequiredChanged();
 
 private:
     AppIdService *appIdService;
@@ -46,20 +50,23 @@ private:
     Api *api;
     CryptoService *crypto;
     User *user;
+    bool apiKeyRequired = false;
 
     /*
      * Login stages:
      * -1 = starting. GUI should be blocked
-     * 0 = required email to run preLogin
-     * 1 = GUI must wait. Receiving preLogin response
-     * 2 = required password to hash password and encrypt key
-     * 3 = GUI must wait. Password hashing, key encryption and tokens loading
-     * 4 = tokens saved, successfully authenticated
+     * 0 = required email and password
+     * 1 = GUI must wait. Receiving preLogin response. Password hashing, key encryption and tokens loading
+     * 2 = tokens saved, successfully authenticated
      */
 
     // authenticate related things for GUI
     int loginStage = 0;
     void setLoginStage(int value);
+
+    void preLogin();
+    void getToken();
+
     QString loginMessage;
     QString loginMessageType;
     void setLoginMessage(QString message, QString type = "info");
@@ -69,7 +76,7 @@ private:
 
     QNetworkReply *preloginReply;
     QNetworkReply *authenticateReply;
-    void saveKDFParameters();
+    void preLoginReplyHandler();
     QByteArray makeIdentityTokenRequestBody();
     void postAuthenticate();
 

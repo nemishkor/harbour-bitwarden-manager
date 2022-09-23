@@ -7,6 +7,7 @@
 #include <QList>
 #include <QQuickView>
 #include <QQmlContext>
+#include <QMutex>
 
 #include <sailfishapp.h>
 #include "api.h"
@@ -17,12 +18,35 @@
 #include "cipherservice.h"
 #include "cryptoservice.h"
 #include "syncservice.h"
+#include "services/environmentservice.h"
 #include "tokenservice.h"
 #include "vaultmanager.h"
 #include "user.h"
 
+static QMutex mutex; // global variable
+
+void msgHandler(QtMsgType type, const QMessageLogContext & context, const QString & msg)
+{
+    mutex.lock();
+
+    QDateTime dateTime(QDateTime::currentDateTime());
+
+    QString timeStr(dateTime.toString("dd-MM-yyyy HH:mm:ss:zzz"));
+    QString contextString(QString("(%1, %2)").arg(context.file).arg(context.line));
+
+    QFile outFile("file.log");
+    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
+
+    QTextStream stream(&outFile);
+    stream << timeStr << " " << contextString << ": " << msg << endl;
+
+    mutex.unlock();
+}
+
 int main(int argc, char *argv[])
 {
+//    qInstallMessageHandler(msgHandler);
+
     // SailfishApp::main() will display "qml/harbour-bitwarden-manager.qml", if you need more
     // control over initialization, you can use:
     //
@@ -43,7 +67,10 @@ int main(int argc, char *argv[])
     TokenService tokenService(&settings);
     context->setContextProperty("tokenService", &tokenService);
 
-    Api api(&settings);
+    EnvironmentService environmentService(&settings);
+    context->setContextProperty("environmentService", &environmentService);
+
+    Api api(&settings, &environmentService);
     context->setContextProperty("api", &api);
 
     CryptoService crypto(&settings);

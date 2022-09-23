@@ -295,14 +295,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Next</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit email</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Master password</source>
         <translation type="unfinished"></translation>
     </message>
@@ -316,6 +308,10 @@
     </message>
     <message>
         <source>Set default URLs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>API key</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1,43 +1,10 @@
 #include "api.h"
 
-Api::Api(QSettings *settings):
-    settings(settings)
+Api::Api(QSettings *settings, EnvironmentService *environmentService):
+    settings(settings),
+    environmentService(environmentService)
 {
-    apiUrl = settings->value("apiUrl", "https://api.bitwarden.com").toString();
-    identityUrl = settings->value("identityUrl", "https://identity.bitwarden.com").toString();
     networkManager = new QNetworkAccessManager();
-}
-
-QString Api::getApiUrl()
-{
-    return apiUrl;
-}
-
-void Api::setApiUrl(const QString &value)
-{
-    if(apiUrl == value){
-        return;
-    }
-    apiUrl = value;
-    emit apiUrlChanged();
-    settings->setValue("apiUrl", value);
-    settings->sync();
-}
-
-QString Api::getIdentityUrl()
-{
-    return identityUrl;
-}
-
-void Api::setIdentityUrl(const QString &value)
-{
-    if(identityUrl == value){
-        return;
-    }
-    identityUrl = value;
-    emit identityUrlChanged();
-    settings->setValue("identityUrl", value);
-    settings->sync();
 }
 
 QString Api::getLastError()
@@ -52,7 +19,7 @@ bool Api::getRequestRunning()
 
 QNetworkReply *Api::postPrelogin(QString email)
 {
-    QNetworkRequest request = buildRequest(QUrl(getApiUrl() + "/accounts/prelogin"));
+    QNetworkRequest request = buildRequest(QUrl(environmentService->getIdentityUrl() + "/accounts/prelogin"));
     request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
     QJsonObject jsonBody{ {"email", email} };
@@ -64,7 +31,7 @@ QNetworkReply *Api::postPrelogin(QString email)
 
 QNetworkReply *Api::postIdentityToken(QByteArray body, QString email)
 {
-    QNetworkRequest request = buildRequest(getIdentityUrl() + "/connect/token");
+    QNetworkRequest request = buildRequest(environmentService->getIdentityUrl() + "/connect/token");
     request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
     request.setRawHeader(QByteArray("Auth-Email"), prepareAuthEmailHeaderValue(email));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=utf-8");
@@ -76,7 +43,7 @@ QNetworkReply *Api::postIdentityToken(QByteArray body, QString email)
 
 QNetworkReply *Api::refreshAccessToken(QString userIdFromToken, QString refreshToken)
 {
-    QNetworkRequest request = buildRequest(QUrl(getIdentityUrl() + "/connect/token"));
+    QNetworkRequest request = buildRequest(QUrl(environmentService->getIdentityUrl() + "/connect/token"));
     request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded; charset=utf-8");
 
@@ -96,7 +63,7 @@ QNetworkReply *Api::refreshAccessToken(QString userIdFromToken, QString refreshT
 
 QNetworkReply *Api::getSync(QString accessToken)
 {
-    QNetworkRequest request = buildRequest(QUrl(getApiUrl() + "/sync?excludeDomains=true"));
+    QNetworkRequest request = buildRequest(QUrl(environmentService->getApiUrl() + "/sync?excludeDomains=true"));
     request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
     request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer " + accessToken.toLatin1()));
     reply = get(request);
@@ -107,7 +74,7 @@ QNetworkReply *Api::getSync(QString accessToken)
 
 QNetworkReply *Api::postAccountVerifyPassword(QString masterPasswordHash, QString accessToken)
 {
-    QNetworkRequest request = buildRequest(QUrl(getApiUrl() + "/accounts/verify-password"));
+    QNetworkRequest request = buildRequest(QUrl(environmentService->getApiUrl() + "/accounts/verify-password"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
     request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer " + accessToken.toLatin1()));
     QJsonObject jsonBody{ {"masterPasswordHash", masterPasswordHash} };
@@ -123,7 +90,7 @@ QNetworkRequest Api::buildRequest(QUrl url)
     QByteArray deviceType;
     deviceType.setNum(static_cast<int>(DeviceType::LinuxDesktop));
     request.setRawHeader(QByteArray("Device-Type"), deviceType);
-    request.setHeader(QNetworkRequest::UserAgentHeader, "Bitwarden_CLI/1.15.0 (LINUX)");
+    request.setHeader(QNetworkRequest::UserAgentHeader, "Bitwarden_CLI/1.22.1 (LINUX)");
     return request;
 }
 
@@ -150,11 +117,9 @@ QNetworkReply *Api::get(QNetworkRequest request)
 
 QNetworkReply *Api::post(QNetworkRequest request, QByteArray body)
 {
-    qDebug() << "POST request to: " << request.url().toEncoded();
-//    QList<QByteArray>::const_iterator i;
-//    for (i = request.rawHeaderList().constBegin(); i != request.rawHeaderList().constEnd(); ++i)
-//        qDebug() << "header:" << (*i) << ":" << request.rawHeader((*i));
-//    qDebug() << "body: " << body;
+    request.setRawHeader("Bitwarden-Client-Name", "cli");
+    request.setRawHeader("Bitwarden-Client-Version", "1.22.1");
+    logRequest("POST", &request, &body);
 
     requestRunning = true;
     emit requestRunningChanged();
@@ -166,13 +131,7 @@ QNetworkReply *Api::post(QNetworkRequest request, QByteArray body)
 
 void Api::replyFinished()
 {
-    qDebug() << "Finished request with code"
-             << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString()
-             << "from: "
-             << reply->url().toEncoded();
-//    QList<QPair<QByteArray, QByteArray>>::const_iterator i;
-//    for (i = reply->rawHeaderPairs().begin(); i != reply->rawHeaderPairs().end(); ++i)
-//        qDebug() << "header:" << (*i).first << ":" << (*i).second;
+    logReply(reply);
     requestRunning = false;
     emit requestRunningChanged();
     if(reply->error() != QNetworkReply::NoError){
@@ -181,5 +140,50 @@ void Api::replyFinished()
     }
 }
 
+void Api::logRequest(QString method, QNetworkRequest *request, QByteArray *body)
+{
+    QDebug deb = qDebug();
+    QString message;
+    message.append("Request <<<\r\n")
+           .append(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
+           .append("\r\n")
+           .append(method)
+           .append(" ")
+           .append(request->url().toEncoded())
+           .append("\r\nHeaders:\r\n");
 
+    for (int i = 0; i < request->rawHeaderList().size(); i++)
+        message.append(request->rawHeaderList()[i])
+               .append(":")
+               .append(request->rawHeader(request->rawHeaderList()[i]))
+               .append("\r\n");
+
+    message.append("Body:\r\n")
+           .append(*body)
+           .append("\r\n>>>");
+
+    qDebug().nospace().noquote() << message;
+}
+
+void Api::logReply(QNetworkReply *reply)
+{
+    QString message;
+    message.append("Response <<<\r\n")
+           .append(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
+           .append("\r\n")
+           .append(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString())
+           .append(" ")
+           .append(reply->url().toEncoded())
+           .append("\r\nHeaders:\r\n");
+
+    for (int i = 0; i < reply->rawHeaderList().size(); i++)
+        message.append(reply->rawHeaderList()[i])
+               .append(":")
+               .append(reply->rawHeader(reply->rawHeaderList()[i]))
+               .append("\r\n");
+
+    message.append(">>>");
+
+    qDebug().nospace().noquote() << message;
+}
 

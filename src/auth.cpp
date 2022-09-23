@@ -33,6 +33,19 @@ QString Auth::getLoginMessageType()
     return loginMessageType;
 }
 
+bool Auth::isApiKeyRequired() const
+{
+    return apiKeyRequired;
+}
+
+void Auth::setIsApiKeyRequired(bool newIsApiKeyRequired)
+{
+    if(apiKeyRequired != newIsApiKeyRequired){
+        apiKeyRequired = newIsApiKeyRequired;
+        emit isApiKeyRequiredChanged();
+    }
+}
+
 void Auth::setLoginStage(int value)
 {
     if(value != loginStage){
@@ -57,6 +70,7 @@ void Auth::reset()
 {
     authentication->clear();
     setLoginStage(0);
+    setIsApiKeyRequired(false);
     if(preloginReply && preloginReply->isRunning()){
         preloginReply->abort();
     }
@@ -65,17 +79,25 @@ void Auth::reset()
     }
 }
 
-void Auth::preLogin(QString email)
+void Auth::login(QString email, QString password, QString apiKey)
 {
-    setLoginStage(1);
-    setLoginMessage("Checking encoding settings");
+    authentication->clear();
     authentication->setEmail(email);
-    // send request to load key derivation function parameters
-    preloginReply = api->postPrelogin(email);
-    connect(preloginReply, &QNetworkReply::finished, this, &Auth::saveKDFParameters);
+    authentication->setPassword(password);
+    authentication->setApiKey(apiKey);
+    setLoginStage(1);
+    preLogin();
 }
 
-void Auth::saveKDFParameters()
+void Auth::preLogin()
+{
+    setLoginMessage("Checking encoding settings");
+    // send request to load key derivation function parameters
+    preloginReply = api->postPrelogin(authentication->getEmail());
+    connect(preloginReply, &QNetworkReply::finished, this, &Auth::preLoginReplyHandler);
+}
+
+void Auth::preLoginReplyHandler()
 {
     if(preloginReply->error() != QNetworkReply::NoError){
         setLoginMessage("[" + QString::number(preloginReply->error()) + "]" + preloginReply->errorString(), "error");
@@ -83,36 +105,36 @@ void Auth::saveKDFParameters()
         return;
     }
 
-    QJsonDocument json = QJsonDocument::fromJson(preloginReply->readAll());
+    QByteArray replyBody = preloginReply->readAll();
+    qDebug() << "Prelogin reply body:\n" << replyBody;
+
+    QJsonDocument json = QJsonDocument::fromJson(replyBody);
     if(!json.isObject()){
-        setLoginMessage("Invalid prelogin API response #1", "error");
+        setLoginMessage("Invalid prelogin API response: root item is not a object", "error");
         reset();
         return;
     }
     QJsonObject root = json.object();
     if(!root.contains("kdf")){
-        setLoginMessage("Invalid prelogin API response #2", "error");
+        setLoginMessage("Invalid prelogin API response: root object does not have \"kdf\" key", "error");
         reset();
         return;
     }
     if(!root.contains("kdfIterations")){
-        setLoginMessage("Invalid prelogin API response #3", "error");
+        setLoginMessage("Invalid prelogin API response: root object does not have \"kdfIterations\" key", "error");
         reset();
         return;
     }
-    authentication->setKdfType(static_cast<KdfType>(root["Kdf"].toInt()));
-    authentication->setKdfIterations(root["KdfIterations"].toInt());
-
-    setLoginStage(2);
-    setLoginMessage("");
+    authentication->setKdfType(static_cast<KdfType>(root["kdf"].toInt()));
+    authentication->setKdfIterations(root["kdfIterations"].toInt());
+    getToken();
 }
 
-void Auth::login(QString password)
+void Auth::getToken()
 {
-    setLoginStage(3);
     setLoginMessage("Hashing");
-    authentication->setKey(crypto->makeKey(password, authentication->getEmail(), authentication->getKdfType(), authentication->getKdfIterations()));
-    authentication->setHashedPassword(crypto->hashPassword(authentication->getKey(), password));
+    authentication->setKey(crypto->makeKey(authentication->getPassword(), authentication->getEmail(), authentication->getKdfType(), authentication->getKdfIterations()));
+    authentication->setHashedPassword(crypto->hashPassword(authentication->getKey(), authentication->getPassword()));
     setLoginMessage("Logging in");
     authenticateReply = api->postIdentityToken(makeIdentityTokenRequestBody(), authentication->getEmail());
     connect(authenticateReply, &QNetworkReply::finished, this, &Auth::postAuthenticate);
@@ -146,6 +168,10 @@ QByteArray Auth::makeIdentityTokenRequestBody()
     query.addQueryItem("deviceIdentifier", appIdService->getAppId());
     query.addQueryItem("deviceName", "linux"); // TODO: try to change to real device name
 
+    if(apiKeyRequired){
+        query.addQueryItem("captchaResponse", authentication->getApiKey());
+    }
+
     QByteArray body;
     body.append(query.toString(QUrl::FullyEncoded));
 
@@ -160,7 +186,10 @@ void Auth::postAuthenticate()
         return;
     }
 
-    QJsonDocument json = QJsonDocument::fromJson(authenticateReply->readAll());
+    QByteArray replyBody = authenticateReply->readAll();
+    qDebug() << "Authentication reply body:\n" << replyBody;
+
+    QJsonDocument json = QJsonDocument::fromJson(replyBody);
     qDebug() << "json response:" << json.toJson(QJsonDocument::Compact);
 
     if(!json.isObject()){
@@ -174,8 +203,9 @@ void Auth::postAuthenticate()
 
     if(httpCode == 400 && root.contains("HCaptcha_SiteKey")){
         IdentityCaptchaResponse identityCaptchaResponse(root["HCaptcha_SiteKey"].toString());
-        setLoginMessage("Catcha is required. Key: " + identityCaptchaResponse.getKey(), "error");
-        reset();
+        setLoginMessage("Additional authentication required", "error");
+        setIsApiKeyRequired(true);
+        setLoginStage(0);
         return;
     }
 

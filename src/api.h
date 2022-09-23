@@ -17,23 +17,16 @@
 #include "devicetype.h"
 #include "kdftype.h"
 #include "tokenservice.h"
+#include "services/environmentservice.h"
 
 class Api : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl NOTIFY apiUrlChanged);
-    Q_PROPERTY(QString identityUrl READ getIdentityUrl WRITE setIdentityUrl NOTIFY identityUrlChanged);
     Q_PROPERTY(QString lastError READ getLastError NOTIFY lastErrorChanged);
     Q_PROPERTY(bool requestRunning READ getRequestRunning NOTIFY requestRunningChanged);
 
 public:
-    Api(QSettings *settings);
-
-    QString getApiUrl();
-    void setApiUrl(const QString &value);
-
-    QString getIdentityUrl();
-    void setIdentityUrl(const QString &value);
+    Api(QSettings *settings, EnvironmentService *environmentService);
 
     QString getLastError();
     bool getRequestRunning();
@@ -45,9 +38,8 @@ public:
 
 private:
     QSettings *settings;
+    EnvironmentService *environmentService;
     QNetworkAccessManager *networkManager;
-    QString apiUrl;
-    QString identityUrl;
     bool requestRunning = false;
     QString lastError;
 
@@ -57,10 +49,10 @@ private:
     QNetworkReply *post(QNetworkRequest request, QByteArray body);
     QNetworkReply *reply;
     void replyFinished();
+    void logRequest(QString method, QNetworkRequest *request, QByteArray *body);
+    void logReply(QNetworkReply *reply);
 
 signals:
-    void apiUrlChanged();
-    void identityUrlChanged();
     void lastErrorChanged();
     void requestRunningChanged();
 };

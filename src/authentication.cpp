@@ -12,6 +12,7 @@ void Authentication::clear()
 {
     email.clear();
     password.clear();
+    apiKey.clear();
     hashedPassword.clear();
     key.clear();
 }
@@ -55,6 +56,16 @@ QByteArray Authentication::getKey() const
 void Authentication::setKey(const QByteArray &value)
 {
     key = value;
+}
+
+const QString &Authentication::getApiKey() const
+{
+    return apiKey;
+}
+
+void Authentication::setApiKey(const QString &newApiKey)
+{
+    apiKey = newApiKey;
 }
 
 KdfType Authentication::getKdfType() const

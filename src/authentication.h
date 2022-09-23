@@ -35,11 +35,15 @@ public:
     QByteArray getKey() const;
     void setKey(const QByteArray &value);
 
+    const QString &getApiKey() const;
+    void setApiKey(const QString &newApiKey);
+
 private:
     QString email;
     KdfType kdfType;
     int kdfIterations;
     QString password;
+    QString apiKey;
     QString hashedPassword;
     QByteArray key;
 
