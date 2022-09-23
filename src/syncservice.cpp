@@ -30,14 +30,14 @@ void SyncService::syncAll()
     }
     if(tokenService->tokenNeedsRefresh()){
         if(refreshTokenRun){
-            setMessage("Something went wrong. Token refreshed but needs refresh", "error");
+            setMessage("Oops. Something went wrong. Actual token is outdated", "error");
             setIsSyncing(false);
             return;
         }
-        setMessage("Token refreshing", "info");
+        setMessage("Refreshing token", "info");
         QString refreshToken = tokenService->getRefreshToken();
         if(refreshToken == ""){
-            setMessage("Can not refresh access token. Refresh token is empty", "error");
+            setMessage("Oops. Something went wrong. Can not refresh access token. Refresh token is empty", "error");
             setIsSyncing(false);
             return;
         }
