@@ -18,6 +18,7 @@ void VaultManager::unlock(QString password)
     setUnlockMessage("Encrypting");
 
     key = cryptoService->makeKey(password, user->getEmail(), user->getKdf(), user->getKdfIterations());
+    qDebug() << "key was generated" << key;
     masterPasswordHash = cryptoService->hashPassword(key, password);
     if(masterPasswordHash == cryptoService->getHashedPassword()){
         cryptoService->setKey(SymmetricCryptoKey(key));
@@ -142,6 +143,8 @@ void VaultManager::verifyPasswordFinished()
         cryptoService->setKey(key);
         setUnlockMessage("");
     } else {
+        qDebug() << "Failed verify password request. HTTP code: " << verifyPasswordReply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+        qDebug() << "Failed verify password request body: " << verifyPasswordReply->readAll();
         setUnlockMessage("Invalid password");
     }
     key.clear();
@@ -151,6 +154,7 @@ void VaultManager::verifyPasswordFinished()
 
 void VaultManager::setUnlockMessage(const QString &value)
 {
+    qDebug() << "Unlock message:" << value;
     if(unlockMessage != value) {
         unlockMessage = value;
         emit unlockMessageChanged();

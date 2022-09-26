@@ -21,7 +21,7 @@ public:
     User(QSettings *settings);
 
     // on successfully login
-    void setInformation(QString userId, QString email, KdfType kdf, int kdfIterations);
+    void fillOnAutheticate(QString userId, QString email, KdfType kdf, int kdfIterations);
 
     QString getUserId() const;
     void setUserId(const QString &value);
@@ -58,6 +58,11 @@ private:
     QString stamp;
     QString name;
     bool premium;
+
+    void setInformation(QString userId, QString email, KdfType kdf, int kdfIterations);
+    void setIsAuthenticated(bool newIsAuthenticated);
+    void setKdf(KdfType newKdf);
+    void setKdfIterations(int newKdfIterations);
 
 signals:
     void authenticatedChanged();

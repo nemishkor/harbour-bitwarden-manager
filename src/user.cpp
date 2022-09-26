@@ -2,29 +2,42 @@
 
 User::User(QSettings *settings) : QObject(nullptr), settings(settings)
 {
-    if(settings->contains("userId")){
-        userId = settings->value("userId").toString();
-        email = settings->value("email").toString();
-        kdf = static_cast<KdfType>(settings->value("kdf").toInt());
-        kdfIterations = settings->value("kdfIterations").toInt();
+    setIsAuthenticated(false);
+    if(settings->contains("userId") && settings->contains("email")){
+        QString userId = settings->value("userId").toString();
+        QString email = settings->value("email").toString();
+        KdfType kdf = static_cast<KdfType>(settings->value("kdf").toInt());
+        int kdfIterations = settings->value("kdfIterations").toInt();
+        setInformation(userId, email, kdf, kdfIterations);
         stamp = settings->value("securityStamp").toString();
-        authenticated = true;
-        emit authenticatedChanged();
     }
+}
+
+void User::fillOnAutheticate(QString userId, QString email, KdfType kdf, int kdfIterations)
+{
+    setInformation(userId, email, kdf, kdfIterations);
+    settings->sync();
 }
 
 void User::setInformation(QString userId, QString email, KdfType kdf, int kdfIterations)
 {
-    qDebug() << "Authorized user with id" << userId << "and email" << email;
+    qDebug() << "Authorize user with id" << userId
+             << "and email" << email
+             << "and kdf" << QString::number((int)kdf)
+             << "and kdfIterations" << QString::number(kdfIterations);
+    if(userId.isEmpty()){
+        qWarning() << "Unable to authorize user: userId is empty";
+        return;
+    }
+    if(email.isEmpty()){
+        qWarning() << "Unable to authorize user: email is empty";
+        return;
+    }
     setUserId(userId);
     setEmail(email);
-    this->kdf = kdf;
-    settings->setValue("kdf", (int)kdf);
-    this->kdfIterations = kdfIterations;
-    settings->setValue("kdfIterations", kdfIterations);
-    settings->sync();
-    authenticated = true;
-    emit authenticatedChanged();
+    setKdf(kdf);
+    setKdfIterations(kdfIterations);
+    setIsAuthenticated(true);
 }
 
 QString User::getUserId() const
@@ -89,21 +102,41 @@ void User::clear()
 {
     qDebug() << "clear user's data";
     userId.clear();
-    settings->remove("userId");
     email.clear();
-    settings->remove("email");
     kdfIterations = 0;
     stamp.clear();
-    settings->remove("securityStamp");
     name.clear();
+    settings->remove("userId");
+    settings->remove("email");
+    settings->remove("securityStamp");
     settings->sync();
-    authenticated = false;
-    emit authenticatedChanged();
+    setIsAuthenticated(false);
 }
 
 bool User::isAuthenticated() const
 {
     return authenticated;
+}
+
+void User::setIsAuthenticated(bool newIsAuthenticated)
+{
+    if(authenticated != newIsAuthenticated){
+        qDebug() << "Authorized status:" << (newIsAuthenticated ? "yes" : "no");
+        authenticated = newIsAuthenticated;
+        emit authenticatedChanged();
+    }
+}
+
+void User::setKdf(KdfType newKdf)
+{
+    kdf = newKdf;
+    settings->setValue("kdf", (int)newKdf);
+}
+
+void User::setKdfIterations(int newKdfIterations)
+{
+    kdfIterations = newKdfIterations;
+    settings->setValue("kdfIterations", newKdfIterations);
 }
 
 void User::setEmail(const QString &value)

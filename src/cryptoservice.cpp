@@ -12,6 +12,7 @@ CryptoService::CryptoService(QSettings *settings):
 
 QByteArray CryptoService::makeKey(QString password, QString email, KdfType kdf, int kdfIterations)
 {
+    qDebug() << "making key for" << email << "with kdfIterations" << kdfIterations;
     if (kdfIterations < 5000) {
         qWarning("PBKDF2 iteration minimum is 5000.");
     }

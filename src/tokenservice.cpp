@@ -32,7 +32,7 @@ QString TokenService::getClientIdFromToken()
 
 bool TokenService::exists()
 {
-    return accessToken != "" && refreshToken != "";
+    return !accessToken.isEmpty() && !accessToken.isNull() && !refreshToken.isEmpty() && !refreshToken.isNull();
 }
 
 QString TokenService::getAccessToken() const
@@ -65,6 +65,7 @@ void TokenService::setAccessToken(const QString &value)
 {
     if(accessToken != value){
         accessToken = value;
+        qDebug().nospace().noquote() << "Set accessToken: " << accessToken;
         settings->setValue("accessToken", accessToken);
     }
 }
@@ -78,6 +79,7 @@ void TokenService::setRefreshToken(const QString &value)
 {
     if(refreshToken != value){
         refreshToken = value;
+        qDebug().nospace().noquote() << "Set refreshToken: " << refreshToken;
         settings->setValue("refreshToken", refreshToken);
     }
 }
@@ -89,6 +91,8 @@ QJsonObject TokenService::decodeAccessToken()
     token.append(tokenParts[1]);
     token = QByteArray::fromBase64(token);
     QJsonDocument decodedToken = QJsonDocument::fromJson(token);
+
+    qDebug() << "Decoded access token:" << decodedToken.toJson(QJsonDocument::Compact);
 
     return decodedToken.object();
 }

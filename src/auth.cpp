@@ -11,10 +11,11 @@ Auth::Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, Cry
     preloginReply = nullptr;
     authenticateReply = nullptr;
     if(tokenService->exists()){
-        qDebug() << "tokens is exist";
-    }
-    if(tokenService->exists() && user->isAuthenticated()){
-        setLoginStage(4);
+        qDebug() << "tokens are exist";
+        if(user->isAuthenticated()){
+            qDebug() << "user is authenticated";
+            setLoginStage(4);
+        }
     }
 }
 
@@ -241,8 +242,20 @@ void Auth::postAuthenticate()
         return;
     }
 
+    if(!root.contains("Kdf")){
+        setLoginMessage("Invalid API response #4", "error");
+        reset();
+        return;
+    }
+
+    if(!root.contains("KdfIterations")){
+        setLoginMessage("Invalid API response #5", "error");
+        reset();
+        return;
+    }
+
     tokenService->setTokens(root["access_token"].toString(), root["refresh_token"].toString());
-    user->setInformation(tokenService->getUserIdFromToken(), tokenService->getEmailFromToken(), static_cast<KdfType>(root["Kdf"].toInt()), root["KdfIterations"].toInt());
+    user->fillOnAutheticate(tokenService->getUserIdFromToken(), tokenService->getEmailFromToken(), static_cast<KdfType>(root["Kdf"].toInt()), root["KdfIterations"].toInt());
     crypto->setKey(authentication->getKey());
     crypto->setHashedPassword(authentication->getHashedPassword());
 
