@@ -83,6 +83,7 @@ void SyncService::setMessage(QString message, QNetworkReply *reply)
 
 void SyncService::setMessage(QString value, QString type)
 {
+    qDebug().nospace() << "[" << type << "] Message: " << value;
     if(value != message){
         message = value;
         emit messageChanged();
@@ -170,7 +171,9 @@ void SyncService::refreshTokenReplyFinished()
 
 void SyncService::syncReplyFinished()
 {
-    setMessage("Data downloaded. Syncing...", "info");
+    clear();
+    setMessage("Data is downloaded. Syncing...", "info");
+    apiJsonDumper = new ApiJsonDumper();
     try {
 
         QJsonDocument jsonDocument = QJsonDocument::fromJson(syncReply->readAll());
@@ -186,14 +189,16 @@ void SyncService::syncReplyFinished()
             return;
         }
 
+        apiJsonDumper->dumpSyncFields(&root);
+
         setMessage("Syncing profile...", "info");
-        syncProfile(root["Profile"].toObject());
+        syncProfile(root["profile"].toObject());
         if(!isSyncing){
             return;
         }
 
         setMessage("Syncing folders...", "info");
-        syncFolders(userId, root["Folders"].toArray());
+        syncFolders(userId, root["folders"].toArray());
         if(!isSyncing){
             return;
         }
@@ -205,7 +210,7 @@ void SyncService::syncReplyFinished()
         }
 
         setMessage("Syncing ciphers...", "info");
-        syncCiphers(userId, root["Ciphers"].toArray());
+        syncCiphers(userId, root["ciphers"].toArray());
         if(!isSyncing){
             return;
         }
@@ -239,36 +244,46 @@ void SyncService::syncReplyFinished()
     setIsSyncing(false);
 }
 
+void SyncService::clear()
+{
+    foldersModel->clear();
+    cipherService->clear();
+    setLastSync(QDateTime());
+}
+
 void SyncService::syncProfile(QJsonObject profile)
 {
+    apiJsonDumper->dumpProfileFields(&profile);
     QString stamp = user->getStamp();
-    if(stamp != "" && stamp != profile["SecurityStamp"].toString()){
+    if(stamp != "" && stamp != profile["securityStamp"].toString()){
         setMessage("Stamp has changed. Logout required", "error");
         setIsSyncing(false);
     }
 
-    cryptoService->setEncKey(profile["Key"].toString());
+    cryptoService->setEncKey(profile["key"].toString());
     // TODO: ?
-    cryptoService->setPrivateKey(profile["PrivateKey"].toString());
+    cryptoService->setPrivateKey(profile["privateKey"].toString());
 
-    user->setStamp(profile["SecurityStamp"].toString());
-    user->setEmail(profile["Email"].toString());
-    user->setName(profile["Name"].toString());
-    user->setPremium(profile["Premium"].toBool());
+    user->setStamp(profile["securityStamp"].toString());
+    user->setEmail(profile["email"].toString());
+    user->setName(profile["name"].toString());
+    user->setPremium(profile["premium"].toBool());
 
     // TODO sync user's organizations
 }
 
 void SyncService::syncFolders(QString userId, QJsonArray folders)
 {
-    foldersModel->clear();
+    QJsonObject apiFolder;
     QJsonArray::const_iterator i;
     for (i = folders.constBegin(); i != folders.constEnd(); i++){
+        apiFolder = (*i).toObject();
+        apiJsonDumper->dumpFolderFields(&apiFolder);
         Folder folder;
-        folder.setId((*i).toObject()["Id"].toString());
-        folder.setName((*i).toObject()["Name"].toString());
+        folder.setId(apiFolder["id"].toString());
+        folder.setName(apiFolder["name"].toString());
         folder.setUserId(userId);
-        folder.setRevisionDate((*i).toObject()["RevisionDate"].toString());
+        folder.setRevisionDate(apiFolder["revisionDate"].toString());
         foldersModel->add(folder);
     }
 }
@@ -280,8 +295,6 @@ void SyncService::syncCollections()
 
 void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
 {
-    cipherService->clear();
-
     QJsonArray::const_iterator i, cipherChildArrIt;
     QJsonObject c, l, card, identity, cipherChildArrItem;
     QJsonArray fields, passwordHistory;
@@ -289,141 +302,147 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
     for (i = ciphers.constBegin(); i != ciphers.constEnd(); i++){
         qDebug() << "add cipher";
         c = (*i).toObject();
-        Cipher cipher(CipherString(c["Name"].toString()));
-        cipher.setId(c["Id"].toString());
-        if(c["OrganizationId"].isString()) {
-            cipher.setOrganizationId(c["OrganizationId"].toString());
+        apiJsonDumper->dumpCipherFields(&c);
+        Cipher cipher(CipherString(c["name"].toString()));
+        cipher.setId(c["id"].toString());
+        if(c["organizationId"].isString()) {
+            cipher.setOrganizationId(c["organizationId"].toString());
         }
-        if(c["FolderId"].isString()) {
-            cipher.setFolderId(c["FolderId"].toString());
+        if(c["folderId"].isString()) {
+            cipher.setFolderId(c["folderId"].toString());
         }
         cipher.setUserId(userId);
-        cipher.setEdit(c["Edit"].toBool());
-        cipher.setViewPassword(c["ViewPassword"].toBool());
-        cipher.setOrganizationUseTotp(c["OrganizationUseTotp"].toBool());
-        cipher.setFavorite(c["Favorite"].toBool());
-        cipher.setRevisionDate(c["RevisionDate"].toString());
-        cipher.setType(static_cast<Cipher::CipherType>(c["Type"].toInt()));
-        cipher.setSizeName(c["SizeName"].toString());
-        cipher.setNotes(c["Notes"].toString());
-        if(c["DeletedDate"].isString()) {
-            cipher.setDeletedDate(c["DeletedDate"].toString());
+        cipher.setEdit(c["edit"].toBool());
+        cipher.setViewPassword(c["viewPassword"].toBool());
+        cipher.setOrganizationUseTotp(c["organizationUseTotp"].toBool());
+        cipher.setFavorite(c["favorite"].toBool());
+        cipher.setRevisionDate(c["revisionDate"].toString());
+        cipher.setType(static_cast<Cipher::CipherType>(c["type"].toInt()));
+        cipher.setSizeName(c["sizeName"].toString());
+        cipher.setNotes(c["notes"].toString());
+        if(c["deletedDate"].isString()) {
+            cipher.setDeletedDate(c["deletedDate"].toString());
         }
 
-        if(c.contains("Login") && c["Login"].isObject()){
-            l = c["Login"].toObject();
-            cipher.getLogin()->fillPassword(l["Password"].toString());
-            if(l["PasswordRevisionDate"].isString()){
-                cipher.getLogin()->setPasswordRevisionDate(l["PasswordRevisionDate"].toString());
+        if(c.contains("login") && c["login"].isObject()){
+            l = c["login"].toObject();
+            apiJsonDumper->dumpCipherLoginFields(&l);
+            cipher.getLogin()->fillPassword(l["password"].toString());
+            if(l["passwordRevisionDate"].isString()){
+                cipher.getLogin()->setPasswordRevisionDate(l["passwordRevisionDate"].toString());
             }
-            if(l["Uri"].isString()) {
-                cipher.getLogin()->fillUri(l["Uri"].toString());
+            if(l["uri"].isString()) {
+                cipher.getLogin()->fillUri(l["uri"].toString());
             }
-            if(l["Totp"].isString()) {
-                cipher.getLogin()->fillTotp(l["Totp"].toString());
+            if(l["totp"].isString()) {
+                cipher.getLogin()->fillTotp(l["totp"].toString());
             }
-            cipher.getLogin()->fillUsername(l["Username"].toString());
+            cipher.getLogin()->fillUsername(l["username"].toString());
         }
 
-        if(c.contains("Card") && c["Card"].isObject()){
-            card = c["Card"].toObject();
-            if(card["Brand"].isString()){
-                cipher.getCard()->fillBrand(card["Brand"].toString());
+        if(c.contains("card") && c["card"].isObject()){
+            card = c["card"].toObject();
+            apiJsonDumper->dumpCipherCardFields(&card);
+            if(card["brand"].isString()){
+                cipher.getCard()->fillBrand(card["brand"].toString());
             }
-            if(card["CardholderName"].isString()){
-                cipher.getCard()->fillCardholderName(card["CardholderName"].toString());
+            if(card["cardholderName"].isString()){
+                cipher.getCard()->fillCardholderName(card["cardholderName"].toString());
             }
-            if(card["CardholderName"].isString()){
-                cipher.getCard()->fillCode(card["CardholderName"].toString());
+            if(card["code"].isString()){
+                cipher.getCard()->fillCode(card["code"].toString());
             }
-            if(card["ExpMonth"].isString()){
-                cipher.getCard()->fillExpMonth(card["ExpMonth"].toString());
+            if(card["expMonth"].isString()){
+                cipher.getCard()->fillExpMonth(card["expMonth"].toString());
             }
-            if(card["ExpYear"].isString()){
-                cipher.getCard()->fillExpYear(card["ExpYear"].toString());
+            if(card["expYear"].isString()){
+                cipher.getCard()->fillExpYear(card["expYear"].toString());
             }
-            if(card["Number"].isString()){
-                cipher.getCard()->fillNumber(card["Number"].toString());
+            if(card["number"].isString()){
+                cipher.getCard()->fillNumber(card["number"].toString());
             }
         }
 
-        if(c.contains("Identity") && c["Identity"].isObject()){
+        if(c.contains("identity") && c["identity"].isObject()){
             qDebug() << "Sync identity cipher";
-            identity = c["Identity"].toObject();
-            if(identity["Address1"].isString()){
-                cipher.getIdentity()->fillAddress1(identity["Address1"].toString());
+            identity = c["identity"].toObject();
+            apiJsonDumper->dumpCipherIdentityFields(&identity);
+
+            if(identity["address1"].isString()){
+                cipher.getIdentity()->fillAddress1(identity["address1"].toString());
             }
-            if(identity["Address2"].isString()){
-                cipher.getIdentity()->fillAddress2(identity["Address1"].toString());
+            if(identity["address2"].isString()){
+                cipher.getIdentity()->fillAddress2(identity["address1"].toString());
             }
-            if(identity["Address3"].isString()){
-                cipher.getIdentity()->fillAddress3(identity["Address3"].toString());
+            if(identity["address3"].isString()){
+                cipher.getIdentity()->fillAddress3(identity["address3"].toString());
             }
-            if(identity["City"].isString()){
-                cipher.getIdentity()->fillCity(identity["City"].toString());
+            if(identity["city"].isString()){
+                cipher.getIdentity()->fillCity(identity["city"].toString());
             }
-            if(identity["Company"].isString()){
-                cipher.getIdentity()->fillCompany(identity["Company"].toString());
+            if(identity["company"].isString()){
+                cipher.getIdentity()->fillCompany(identity["company"].toString());
             }
-            if(identity["Country"].isString()){
-                cipher.getIdentity()->fillCountry(identity["Country"].toString());
+            if(identity["country"].isString()){
+                cipher.getIdentity()->fillCountry(identity["country"].toString());
             }
-            if(identity["Email"].isString()){
-                cipher.getIdentity()->fillEmail(identity["Email"].toString());
+            if(identity["email"].isString()){
+                cipher.getIdentity()->fillEmail(identity["email"].toString());
             }
-            if(identity["FirstName"].isString()){
-                cipher.getIdentity()->fillFirstName(identity["FirstName"].toString());
+            if(identity["firstName"].isString()){
+                cipher.getIdentity()->fillFirstName(identity["firstName"].toString());
             }
-            if(identity["LastName"].isString()){
-                cipher.getIdentity()->fillLastName(identity["LastName"].toString());
+            if(identity["lastName"].isString()){
+                cipher.getIdentity()->fillLastName(identity["lastName"].toString());
             }
-            if(identity["LicenseNumber"].isString()){
-                cipher.getIdentity()->fillLicenseNumber(identity["LicenseNumber"].toString());
+            if(identity["licenseNumber"].isString()){
+                cipher.getIdentity()->fillLicenseNumber(identity["licenseNumber"].toString());
             }
-            if(identity["MiddleName"].isString()){
-                cipher.getIdentity()->fillMiddleName(identity["MiddleName"].toString());
+            if(identity["middleName"].isString()){
+                cipher.getIdentity()->fillMiddleName(identity["middleName"].toString());
             }
-            if(identity["PassportNumber"].isString()){
-                cipher.getIdentity()->fillPassportNumber(identity["PassportNumber"].toString());
+            if(identity["passportNumber"].isString()){
+                cipher.getIdentity()->fillPassportNumber(identity["passportNumber"].toString());
             }
-            if(identity["Phone"].isString()){
-                cipher.getIdentity()->fillPhone(identity["Phone"].toString());
+            if(identity["phone"].isString()){
+                cipher.getIdentity()->fillPhone(identity["phone"].toString());
             }
-            if(identity["PostalCode"].isString()){
-                cipher.getIdentity()->fillPostalCode(identity["PostalCode"].toString());
+            if(identity["postalCode"].isString()){
+                cipher.getIdentity()->fillPostalCode(identity["postalCode"].toString());
             }
-            if(identity["SSN"].isString()){
-                cipher.getIdentity()->fillSSN(identity["SSN"].toString());
+            if(identity["ssn"].isString()){
+                cipher.getIdentity()->fillSSN(identity["ssn"].toString());
             }
-            if(identity["State"].isString()){
-                cipher.getIdentity()->fillState(identity["State"].toString());
+            if(identity["state"].isString()){
+                cipher.getIdentity()->fillState(identity["state"].toString());
             }
-            if(identity["Title"].isString()){
-                cipher.getIdentity()->fillTitle(identity["Title"].toString());
+            if(identity["title"].isString()){
+                cipher.getIdentity()->fillTitle(identity["title"].toString());
             }
-            if(identity["Username"].isString()){
-                cipher.getIdentity()->fillUsername(identity["Username"].toString());
+            if(identity["username"].isString()){
+                cipher.getIdentity()->fillUsername(identity["username"].toString());
             }
             qDebug() << "Sync identity cipher finished";
         }
 
-        fields = c["Fields"].toArray();
+        fields = c["fields"].toArray();
         for(cipherChildArrIt = fields.constBegin(); cipherChildArrIt != fields.constEnd(); cipherChildArrIt++){
             cipherChildArrItem = (*cipherChildArrIt).toObject();
             cipher.addField(CipherField(
-                CipherString(cipherChildArrItem["Name"].toString()),
-                static_cast<CipherField::FieldType>(cipherChildArrItem["Type"].toInt()),
-                CipherString(cipherChildArrItem["Value"].toString())
+                CipherString(cipherChildArrItem["name"].toString()),
+                static_cast<CipherField::FieldType>(cipherChildArrItem["type"].toInt()),
+                CipherString(cipherChildArrItem["value"].toString())
             ));
         }
 
-        if(c["PasswordHistory"].isArray()){
-            passwordHistory = c["PasswordHistory"].toArray();
+        if(c["passwordHistory"].isArray()){
+            passwordHistory = c["passwordHistory"].toArray();
             for(cipherChildArrIt = passwordHistory.constBegin(); cipherChildArrIt != passwordHistory.constEnd(); cipherChildArrIt++){
                 cipherChildArrItem = (*cipherChildArrIt).toObject();
+                apiJsonDumper->dumpCipherPasswordHistoryFields(&cipherChildArrItem);
                 cipher.addPasswordHistoryItem(CipherPasswordHistoryItem(
-                    cipherChildArrItem["LastUsedDate"].toString(),
-                    CipherString(cipherChildArrItem["Password"].toString())
+                    cipherChildArrItem["lastUsedDate"].toString(),
+                    CipherString(cipherChildArrItem["password"].toString())
                 ));
             }
         }

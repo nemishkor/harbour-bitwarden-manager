@@ -80,12 +80,6 @@ int main(int argc, char *argv[])
     User user(&settings);
     context->setContextProperty("user", &user);
 
-    Auth auth(&appIdService, &tokenService, &api, &crypto, &user);
-    context->setContextProperty("auth", &auth);
-
-    FoldersModel foldersModel;
-    context->setContextProperty("foldersModel", &foldersModel);
-
     CipherView cipher;
     context->setContextProperty("cipher", &cipher);
 
@@ -95,8 +89,14 @@ int main(int argc, char *argv[])
     context->setContextProperty("cipherFieldsListModel", cipherService.getCipherFieldsListModel());
     context->setContextProperty("cipherPasswordHistoryListModel", cipherService.getCipherPasswordHistoryListModel());
 
+    FoldersModel foldersModel;
+    context->setContextProperty("foldersModel", &foldersModel);
+
     SyncService syncService(&api, &user, &tokenService, &crypto, &foldersModel, &cipherService, &settings);
     context->setContextProperty("syncService", &syncService);
+
+    Auth auth(&appIdService, &tokenService, &api, &crypto, &user, &syncService);
+    context->setContextProperty("auth", &auth);
 
     VaultManager vaultManager(&crypto, &user, &api, &tokenService);
     context->setContextProperty("vaultManager", &vaultManager);

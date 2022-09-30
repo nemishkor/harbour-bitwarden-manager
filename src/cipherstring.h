@@ -2,6 +2,7 @@
 #define CIPHERSTRING_H
 
 #include <QDebug>
+#include <QException>
 #include <QString>
 #include <QStringList>
 

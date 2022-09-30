@@ -1,11 +1,12 @@
 #include "auth.h"
 
-Auth::Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, CryptoService *crypto, User *user) :
+Auth::Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, CryptoService *crypto, User *user, SyncService *syncService) :
     appIdService(appIdService),
     tokenService(tokenService),
     api(api),
     crypto(crypto),
-    user(user)
+    user(user),
+    syncService(syncService)
 {
     authentication = new Authentication();
     preloginReply = nullptr;
@@ -148,6 +149,8 @@ void Auth::logout()
     tokenService->clearTokens();
     crypto->clearKeys();
     user->clear();
+    syncService->clear();
+
 //    this.settingsService.clear(userId),
 //    this.cipherService.clear(userId),
 //    this.folderService.clear(userId),

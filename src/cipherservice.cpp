@@ -166,6 +166,7 @@ void CipherService::add(Cipher &item)
 void CipherService::clear()
 {
     ciphers->clear();
+    ciphersListModel->clear();
     emit countChanged();
 }
 

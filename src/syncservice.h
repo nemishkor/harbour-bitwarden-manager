@@ -19,6 +19,7 @@
 #include "foldersmodel.h"
 #include "tokenservice.h"
 #include "user.h"
+#include "apijsondumper.h"
 
 class SyncService : public QObject
 {
@@ -37,6 +38,7 @@ public:
     QString getMessageType() const;
     bool isSynchronized() const;
     QDateTime getLastSync() const;
+    void clear();
 
 private:
     Api *api;
@@ -46,6 +48,7 @@ private:
     FoldersModel *foldersModel;
     CipherService *cipherService;
     QSettings *settings;
+    ApiJsonDumper *apiJsonDumper;
 
     // For GUI
     bool isSyncing = false;

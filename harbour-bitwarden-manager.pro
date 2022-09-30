@@ -16,6 +16,7 @@ CONFIG += sailfishapp
 
 SOURCES += src/harbour-bitwarden-manager.cpp \
     src/api.cpp \
+    src/apijsondumper.cpp \
     src/appidservice.cpp \
     src/auth.cpp \
     src/authentication.cpp \
@@ -86,6 +87,7 @@ TRANSLATIONS += translations/harbour-bitwarden-manager-de.ts \
 
 HEADERS += \
     src/api.h \
+    src/apijsondumper.h \
     src/appidservice.h \
     src/auth.h \
     src/authentication.h \

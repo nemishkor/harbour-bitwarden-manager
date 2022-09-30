@@ -17,6 +17,7 @@
 #include "tokenservice.h"
 #include "user.h"
 #include "symmetriccryptokey.h"
+#include "syncservice.h"
 #include "models/responses/identitycaptcharesponse.h"
 
 class Auth : public QObject
@@ -27,7 +28,7 @@ class Auth : public QObject
     Q_PROPERTY(QString loginMessageType READ getLoginMessageType NOTIFY loginMessageTypeChanged);
     Q_PROPERTY(bool apiKeyRequired READ isApiKeyRequired NOTIFY isApiKeyRequiredChanged);
 public:
-    Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, CryptoService *crypto, User *user);
+    Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, CryptoService *crypto, User *user, SyncService *syncService);
     Q_INVOKABLE void reset();
     Q_INVOKABLE void login(QString email, QString password, QString apiKey);
     Q_INVOKABLE void logout();
@@ -50,6 +51,7 @@ private:
     Api *api;
     CryptoService *crypto;
     User *user;
+    SyncService *syncService;
     bool apiKeyRequired = false;
 
     /*

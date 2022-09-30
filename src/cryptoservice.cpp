@@ -247,7 +247,7 @@ QString CryptoService::aesDecryptToUtf8(CipherString::EncryptionType encType, co
 //    const theKey = this.resolveLegacyKey(encType, keyForEnc);
 
     if(!keyForEnc.getMacKey().isNull() && mac.isNull()){
-        qWarning() << "mac required";
+        qWarning() << "mac is required";
 //        qDebug() << "data" << data;
 //        qDebug() << "iv" << iv;
 //        qDebug() << "mac" << mac;
