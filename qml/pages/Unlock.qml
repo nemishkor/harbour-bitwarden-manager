@@ -51,13 +51,14 @@ Page {
             ButtonLayout {
                 Button {
                     preferredWidth: Theme.buttonWidthMedium
-                    enabled: vaultManager.isLocked && passwordField.acceptableInput && !vaultManager.unlocking
+                    visible: vaultManager.isLocked
+                    enabled: passwordField.acceptableInput && !vaultManager.unlocking
                     text: qsTr("Unlock vault")
                     onClicked: { vaultManager.unlock(passwordField.text); passwordField.text = "" }
                 }
                 Button {
                     preferredWidth: Theme.buttonWidthMedium
-                    enabled: !vaultManager.isLocked
+                    visible: !vaultManager.isLocked
                     text: qsTr("Lock vault")
                     onClicked: vaultManager.lock()
                 }
@@ -65,7 +66,7 @@ Page {
 
             Label {
                 text: vaultManager.unlockMessage
-                visible: vaultManager.isLocked && vaultManager.unlockMessage != ""
+                visible: vaultManager.isLocked && vaultManager.unlockMessage !== ""
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 x: Theme.horizontalPageMargin
                 wrapMode: "WordWrap"
