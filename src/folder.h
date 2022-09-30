@@ -1,6 +1,8 @@
 #ifndef FOLDER_H
 #define FOLDER_H
 
+#include "cipherstring.h"
+
 #include <QString>
 
 class Folder
@@ -10,7 +12,7 @@ public:
     QString getId() const;
     void setId(const QString &value);
 
-    QString getName() const;
+    CipherString getName() const;
     void setName(const QString &value);
 
     QString getUserId() const;
@@ -21,7 +23,7 @@ public:
 
 private:
     QString id;
-    QString name;
+    CipherString name;
     QString userId;
     QString revisionDate;
 };

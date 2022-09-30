@@ -12,13 +12,15 @@
 
 #include <src/factories/cipherfactory.h>
 
+#include <src/services/folderservice.h>
+#include <src/services/stateservice.h>
+
 #include "api.h"
 #include "cryptoservice.h"
 #include "cipher.h"
 #include "cipherservice.h"
 #include "cipherstring.h"
 #include "folder.h"
-#include "foldersmodel.h"
 #include "tokenservice.h"
 #include "user.h"
 #include "apijsondumper.h"
@@ -32,7 +34,10 @@ class SyncService : public QObject
     Q_PROPERTY(bool synchronized READ isSynchronized NOTIFY synchronizedChanged);
     Q_PROPERTY(QDateTime lastSync READ getLastSync NOTIFY lastSyncChanged);
 public:
-    SyncService(Api *api, User *user, TokenService *tokenService, CryptoService *cryptoService, FoldersModel *foldersModel, CipherService *cipherService, QSettings *settings);
+    SyncService(Api *api, User *user, TokenService *tokenService,
+                CryptoService *cryptoService, StateService *stateService,
+                FolderService *foldersService,
+                CipherService *cipherService, QSettings *settings);
     Q_INVOKABLE void syncAll();
     Q_INVOKABLE void abort();
     bool getIsSyncing() const;
@@ -47,7 +52,8 @@ private:
     User *user;
     TokenService *tokenService;
     CryptoService *cryptoService;
-    FoldersModel *foldersModel;
+    StateService *stateService;
+    FolderService *foldersService;
     CipherService *cipherService;
     QSettings *settings;
     ApiJsonDumper *apiJsonDumper;

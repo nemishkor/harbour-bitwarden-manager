@@ -15,14 +15,14 @@ void Folder::setId(const QString &value)
     id = value;
 }
 
-QString Folder::getName() const
+CipherString Folder::getName() const
 {
     return name;
 }
 
 void Folder::setName(const QString &value)
 {
-    name = value;
+    name.fill(value);
 }
 
 QString Folder::getUserId() const

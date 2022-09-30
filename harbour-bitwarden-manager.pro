@@ -39,14 +39,18 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/decryptparametersarraybuffer.cpp \
     src/factories/cipherfactory.cpp \
     src/folder.cpp \
-    src/foldersmodel.cpp \
+    src/models/folderlistitem.cpp \
+    src/models/folderslistmodel.cpp \
     src/models/responses/identitycaptcharesponse.cpp \
     src/services/environmentservice.cpp \
+    src/services/folderservice.cpp \
+    src/services/stateservice.cpp \
     src/symmetriccryptokey.cpp \
     src/syncservice.cpp \
     src/tokenservice.cpp \
     src/user.cpp \
-    src/vaultmanager.cpp
+    src/vaultmanager.cpp \
+    src/viewmodels/vault.cpp
 
 DISTFILES += qml/harbour-bitwarden-manager.qml \
     README.md \
@@ -112,15 +116,19 @@ HEADERS += \
     src/devicetype.h \
     src/factories/cipherfactory.h \
     src/folder.h \
-    src/foldersmodel.h \
     src/kdftype.h \
+    src/models/folderlistitem.h \
+    src/models/folderslistmodel.h \
     src/models/responses/identitycaptcharesponse.h \
     src/services/environmentservice.h \
+    src/services/folderservice.h \
+    src/services/stateservice.h \
     src/symmetriccryptokey.h \
     src/syncservice.h \
     src/tokenservice.h \
     src/user.h \
-    src/vaultmanager.h
+    src/vaultmanager.h \
+    src/viewmodels/vault.h
 
 QT += network
 QT += quick

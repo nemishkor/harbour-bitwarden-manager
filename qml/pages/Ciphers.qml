@@ -32,6 +32,7 @@ Page {
             LockBlock {}
         }
     }
+
     SilicaFlickable {
         visible: !vaultManager.isLocked && !syncService.synchronized
         contentHeight: syncColumn.height

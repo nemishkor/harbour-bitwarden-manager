@@ -229,6 +229,10 @@
         <source>Folders</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Last revision</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Home</name>

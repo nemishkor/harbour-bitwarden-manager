@@ -1,6 +1,8 @@
 #include "syncservice.h"
 
-SyncService::SyncService(Api *api, User *user, TokenService *tokenService, CryptoService *cryptoService, FoldersModel *foldersModel,
+SyncService::SyncService(Api *api, User *user, TokenService *tokenService,
+                         CryptoService *cryptoService, StateService *stateService,
+                         FolderService *foldersService,
                          CipherService *cipherService,
                          QSettings *settings) :
     QObject(nullptr),
@@ -8,7 +10,8 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService, Crypt
     user(user),
     tokenService(tokenService),
     cryptoService(cryptoService),
-    foldersModel(foldersModel),
+    stateService(stateService),
+    foldersService(foldersService),
     cipherService(cipherService),
     settings(settings)
 {
@@ -248,7 +251,8 @@ void SyncService::syncReplyFinished()
 
 void SyncService::clear()
 {
-    foldersModel->clear();
+    stateService->clear();
+    foldersService->clear();
     cipherService->clear();
     setLastSync(QDateTime());
 }
@@ -286,7 +290,7 @@ void SyncService::syncFolders(QString userId, QJsonArray folders)
         folder.setName(apiFolder["name"].toString());
         folder.setUserId(userId);
         folder.setRevisionDate(apiFolder["revisionDate"].toString());
-        foldersModel->add(folder);
+        stateService->add(folder);
     }
 }
 

@@ -230,6 +230,10 @@ Manager</translation>
         <source>Folders</source>
         <translation>Mappar</translation>
     </message>
+    <message>
+        <source>Last revision</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Home</name>

@@ -1,12 +1,12 @@
-#ifndef FOLDERSMODEL_H
-#define FOLDERSMODEL_H
+#ifndef FOLDERSLISTMODEL_H
+#define FOLDERSLISTMODEL_H
+
+#include "folderlistitem.h"
 
 #include <QAbstractListModel>
-#include <QList>
 
-#include "folder.h"
 
-class FoldersModel : public QAbstractListModel
+class FoldersListModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
@@ -15,13 +15,11 @@ public:
     enum FolderRoles {
         IdRole = Qt::UserRole + 1,
         NameRole,
-        UserIdRole,
         RevisionDateRole
     };
+    explicit FoldersListModel(QObject *parent = nullptr);
 
-    explicit FoldersModel(QObject *parent = nullptr);
-
-    void add(Folder &item);
+    void add(FolderListItem &item);
     void clear();
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -29,10 +27,10 @@ public:
 protected:
     QHash<int, QByteArray> roleNames() const override;
 private:
-    QList<Folder> items;
+    QList<FolderListItem> items;
 
 signals:
     void countChanged();
 };
 
-#endif // FOLDERSMODEL_H
+#endif // FOLDERSLISTMODEL_H

@@ -84,7 +84,7 @@ Page {
             BackgroundItem {
                 width: column.width
                 Label {
-                    text: qsTr("Folders") + " (" + foldersModel.count + ")"
+                    text: qsTr("Folders") + " (" + vault.foldersCount + ")"
                     color: highlighted ? Theme.highlightColor : Theme.primaryColor
                     anchors.verticalCenter: parent.verticalCenter
                     x: Theme.horizontalPageMargin

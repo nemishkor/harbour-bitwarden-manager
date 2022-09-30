@@ -9,11 +9,12 @@
 #include <QQmlContext>
 #include <QMutex>
 
+#include <src/viewmodels/vault.h>
+
 #include <sailfishapp.h>
 #include "api.h"
 #include "auth.h"
 #include "appidservice.h"
-#include "foldersmodel.h"
 #include "cipherview.h"
 #include "cipherservice.h"
 #include "cryptoservice.h"
@@ -89,10 +90,17 @@ int main(int argc, char *argv[])
     context->setContextProperty("cipherFieldsListModel", cipherService.getCipherFieldsListModel());
     context->setContextProperty("cipherPasswordHistoryListModel", cipherService.getCipherPasswordHistoryListModel());
 
-    FoldersModel foldersModel;
-    context->setContextProperty("foldersModel", &foldersModel);
+    StateService stateService;
 
-    SyncService syncService(&api, &user, &tokenService, &crypto, &foldersModel, &cipherService, &settings);
+    Vault vault(&stateService);
+    context->setContextProperty("vault", &vault);
+
+    FolderService foldersService(&stateService, &crypto);
+    context->setContextProperty("foldersService", &foldersService);
+    context->setContextProperty("foldersListModel", foldersService.getListModel());
+
+    SyncService syncService(&api, &user, &tokenService, &crypto, &stateService, &foldersService,
+                            &cipherService, &settings);
     context->setContextProperty("syncService", &syncService);
 
     Auth auth(&appIdService, &tokenService, &api, &crypto, &user, &syncService);
@@ -100,6 +108,13 @@ int main(int argc, char *argv[])
 
     VaultManager vaultManager(&crypto, &user, &api, &tokenService);
     context->setContextProperty("vaultManager", &vaultManager);
+
+    QDateTime UTC(QDateTime::currentDateTimeUtc());
+    QDateTime local(UTC.toLocalTime());
+    qDebug() << "UTC time is:" << UTC;
+    qDebug() << "Local time is:" << local;
+    qDebug() << "No difference between times:" << UTC.secsTo(local);
+
 
     // Start the application.
     view->setSource(SailfishApp::pathTo("qml/harbour-bitwarden-manager.qml"));

@@ -1,11 +1,11 @@
-#include "foldersmodel.h"
+#include "folderslistmodel.h"
 
-FoldersModel::FoldersModel(QObject *parent)
+FoldersListModel::FoldersListModel(QObject *parent)
     : QAbstractListModel(parent)
 {
 }
 
-void FoldersModel::add(Folder &item)
+void FoldersListModel::add(FolderListItem &item)
 {
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
     items << item;
@@ -13,7 +13,7 @@ void FoldersModel::add(Folder &item)
     emit countChanged();
 }
 
-void FoldersModel::clear()
+void FoldersListModel::clear()
 {
     beginRemoveRows(QModelIndex(), 0, rowCount() - 1);
     items.clear();
@@ -21,37 +21,33 @@ void FoldersModel::clear()
     emit countChanged();
 }
 
-int FoldersModel::rowCount(const QModelIndex &parent) const
+int FoldersListModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return items.count();
 }
 
-QVariant FoldersModel::data(const QModelIndex &index, int role) const
+QVariant FoldersListModel::data(const QModelIndex &index, int role) const
 {
     if (index.row() < 0 || index.row() >= items.count())
         return QVariant();
 
-    const Folder &folder = items[index.row()];
+    const FolderListItem &item = items[index.row()];
     if (role == IdRole)
-        return folder.getId();
-    if(role == NameRole)
-        return folder.getName();
-    if(role == UserIdRole)
-        return folder.getUserId();
+        return item.getId();
+    if (role == NameRole)
+        return item.getName();
     if(role == RevisionDateRole)
-        return folder.getRevisionDate();
+        return item.getRevisionDate();
 
     return QVariant();
 }
 
-QHash<int, QByteArray> FoldersModel::roleNames() const
+QHash<int, QByteArray> FoldersListModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
     roles[IdRole] = "id";
     roles[NameRole] = "name";
-    roles[UserIdRole] = "userId";
     roles[RevisionDateRole] = "revisionDate";
-
     return roles;
 }
