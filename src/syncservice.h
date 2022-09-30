@@ -10,6 +10,8 @@
 #include <QJsonDocument>
 #include <QSettings>
 
+#include <src/factories/cipherfactory.h>
+
 #include "api.h"
 #include "cryptoservice.h"
 #include "cipher.h"
@@ -49,6 +51,7 @@ private:
     CipherService *cipherService;
     QSettings *settings;
     ApiJsonDumper *apiJsonDumper;
+    CipherFactory *cipherFactory;
 
     // For GUI
     bool isSyncing = false;

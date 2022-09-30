@@ -18,6 +18,8 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService, Crypt
 //        lastSync = settings->value("last_sync_" + user->getUserId()).toDateTime();
         settings->remove("last_sync_" + user->getUserId());
     }
+    apiJsonDumper = new ApiJsonDumper();
+    cipherFactory = new CipherFactory(apiJsonDumper);
 }
 
 void SyncService::syncAll()
@@ -173,7 +175,7 @@ void SyncService::syncReplyFinished()
 {
     clear();
     setMessage("Data is downloaded. Syncing...", "info");
-    apiJsonDumper = new ApiJsonDumper();
+
     try {
 
         QJsonDocument jsonDocument = QJsonDocument::fromJson(syncReply->readAll());
@@ -295,160 +297,16 @@ void SyncService::syncCollections()
 
 void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
 {
-    QJsonArray::const_iterator i, cipherChildArrIt;
-    QJsonObject c, l, card, identity, cipherChildArrItem;
-    QJsonArray fields, passwordHistory;
+    QJsonArray::const_iterator i;
+    QJsonObject c;
 
     for (i = ciphers.constBegin(); i != ciphers.constEnd(); i++){
-        qDebug() << "add cipher";
+        qDebug() << "Add cipher";
         c = (*i).toObject();
-        apiJsonDumper->dumpCipherFields(&c);
-        Cipher cipher(CipherString(c["name"].toString()));
-        cipher.setId(c["id"].toString());
-        if(c["organizationId"].isString()) {
-            cipher.setOrganizationId(c["organizationId"].toString());
-        }
-        if(c["folderId"].isString()) {
-            cipher.setFolderId(c["folderId"].toString());
-        }
-        cipher.setUserId(userId);
-        cipher.setEdit(c["edit"].toBool());
-        cipher.setViewPassword(c["viewPassword"].toBool());
-        cipher.setOrganizationUseTotp(c["organizationUseTotp"].toBool());
-        cipher.setFavorite(c["favorite"].toBool());
-        cipher.setRevisionDate(c["revisionDate"].toString());
-        cipher.setType(static_cast<Cipher::CipherType>(c["type"].toInt()));
-        cipher.setSizeName(c["sizeName"].toString());
-        cipher.setNotes(c["notes"].toString());
-        if(c["deletedDate"].isString()) {
-            cipher.setDeletedDate(c["deletedDate"].toString());
-        }
-
-        if(c.contains("login") && c["login"].isObject()){
-            l = c["login"].toObject();
-            apiJsonDumper->dumpCipherLoginFields(&l);
-            cipher.getLogin()->fillPassword(l["password"].toString());
-            if(l["passwordRevisionDate"].isString()){
-                cipher.getLogin()->setPasswordRevisionDate(l["passwordRevisionDate"].toString());
-            }
-            if(l["uri"].isString()) {
-                cipher.getLogin()->fillUri(l["uri"].toString());
-            }
-            if(l["totp"].isString()) {
-                cipher.getLogin()->fillTotp(l["totp"].toString());
-            }
-            cipher.getLogin()->fillUsername(l["username"].toString());
-        }
-
-        if(c.contains("card") && c["card"].isObject()){
-            card = c["card"].toObject();
-            apiJsonDumper->dumpCipherCardFields(&card);
-            if(card["brand"].isString()){
-                cipher.getCard()->fillBrand(card["brand"].toString());
-            }
-            if(card["cardholderName"].isString()){
-                cipher.getCard()->fillCardholderName(card["cardholderName"].toString());
-            }
-            if(card["code"].isString()){
-                cipher.getCard()->fillCode(card["code"].toString());
-            }
-            if(card["expMonth"].isString()){
-                cipher.getCard()->fillExpMonth(card["expMonth"].toString());
-            }
-            if(card["expYear"].isString()){
-                cipher.getCard()->fillExpYear(card["expYear"].toString());
-            }
-            if(card["number"].isString()){
-                cipher.getCard()->fillNumber(card["number"].toString());
-            }
-        }
-
-        if(c.contains("identity") && c["identity"].isObject()){
-            qDebug() << "Sync identity cipher";
-            identity = c["identity"].toObject();
-            apiJsonDumper->dumpCipherIdentityFields(&identity);
-
-            if(identity["address1"].isString()){
-                cipher.getIdentity()->fillAddress1(identity["address1"].toString());
-            }
-            if(identity["address2"].isString()){
-                cipher.getIdentity()->fillAddress2(identity["address1"].toString());
-            }
-            if(identity["address3"].isString()){
-                cipher.getIdentity()->fillAddress3(identity["address3"].toString());
-            }
-            if(identity["city"].isString()){
-                cipher.getIdentity()->fillCity(identity["city"].toString());
-            }
-            if(identity["company"].isString()){
-                cipher.getIdentity()->fillCompany(identity["company"].toString());
-            }
-            if(identity["country"].isString()){
-                cipher.getIdentity()->fillCountry(identity["country"].toString());
-            }
-            if(identity["email"].isString()){
-                cipher.getIdentity()->fillEmail(identity["email"].toString());
-            }
-            if(identity["firstName"].isString()){
-                cipher.getIdentity()->fillFirstName(identity["firstName"].toString());
-            }
-            if(identity["lastName"].isString()){
-                cipher.getIdentity()->fillLastName(identity["lastName"].toString());
-            }
-            if(identity["licenseNumber"].isString()){
-                cipher.getIdentity()->fillLicenseNumber(identity["licenseNumber"].toString());
-            }
-            if(identity["middleName"].isString()){
-                cipher.getIdentity()->fillMiddleName(identity["middleName"].toString());
-            }
-            if(identity["passportNumber"].isString()){
-                cipher.getIdentity()->fillPassportNumber(identity["passportNumber"].toString());
-            }
-            if(identity["phone"].isString()){
-                cipher.getIdentity()->fillPhone(identity["phone"].toString());
-            }
-            if(identity["postalCode"].isString()){
-                cipher.getIdentity()->fillPostalCode(identity["postalCode"].toString());
-            }
-            if(identity["ssn"].isString()){
-                cipher.getIdentity()->fillSSN(identity["ssn"].toString());
-            }
-            if(identity["state"].isString()){
-                cipher.getIdentity()->fillState(identity["state"].toString());
-            }
-            if(identity["title"].isString()){
-                cipher.getIdentity()->fillTitle(identity["title"].toString());
-            }
-            if(identity["username"].isString()){
-                cipher.getIdentity()->fillUsername(identity["username"].toString());
-            }
-            qDebug() << "Sync identity cipher finished";
-        }
-
-        fields = c["fields"].toArray();
-        for(cipherChildArrIt = fields.constBegin(); cipherChildArrIt != fields.constEnd(); cipherChildArrIt++){
-            cipherChildArrItem = (*cipherChildArrIt).toObject();
-            cipher.addField(CipherField(
-                CipherString(cipherChildArrItem["name"].toString()),
-                static_cast<CipherField::FieldType>(cipherChildArrItem["type"].toInt()),
-                CipherString(cipherChildArrItem["value"].toString())
-            ));
-        }
-
-        if(c["passwordHistory"].isArray()){
-            passwordHistory = c["passwordHistory"].toArray();
-            for(cipherChildArrIt = passwordHistory.constBegin(); cipherChildArrIt != passwordHistory.constEnd(); cipherChildArrIt++){
-                cipherChildArrItem = (*cipherChildArrIt).toObject();
-                apiJsonDumper->dumpCipherPasswordHistoryFields(&cipherChildArrItem);
-                cipher.addPasswordHistoryItem(CipherPasswordHistoryItem(
-                    cipherChildArrItem["lastUsedDate"].toString(),
-                    CipherString(cipherChildArrItem["password"].toString())
-                ));
-            }
-        }
-
+        Cipher cipher = cipherFactory->create(c, userId);
         cipherService->add(cipher);
     }
+
     qDebug() << "Ciphers were added";
 }
 
