@@ -100,7 +100,7 @@ Page {
                     anchors.verticalCenter: parent.verticalCenter
                     x: Theme.horizontalPageMargin
                 }
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl("Ciphers.qml"), { deleted: false })
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("Ciphers.qml"), { deleted: false, folderId: null })
             }
 
             BackgroundItem {

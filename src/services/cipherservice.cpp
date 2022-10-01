@@ -12,13 +12,16 @@ CipherService::CipherService(StateService *stateService, CryptoService *cryptoSe
     cipherPasswordHistoryListModel = new CipherPasswordHistoryListModel();
 }
 
-void CipherService::decryptAll(bool deletedOnly)
+void CipherService::decryptAll(bool deletedOnly, QString folderId)
 {
     ciphersListModel->clear();
     QList<Cipher> *ciphers = stateService->getCiphers();
     QList<Cipher>::iterator i;
     for(i = ciphers->begin(); i != ciphers->end(); i++){
         if(deletedOnly && i->getDeletedDate().isNull()){
+            continue;
+        }
+        if(!folderId.isNull() && i->getFolderId() != folderId){
             continue;
         }
         CipherListItem cipherListItem;

@@ -61,6 +61,7 @@ Page {
         delegate: ListItem {
             id: delegate
             contentHeight: column.height + separator.height + Theme.paddingMedium * 2
+            onClicked: pageStack.animatorPush(Qt.resolvedUrl("Ciphers.qml"), { deleted: false, folderId: model.id })
 
             Column {
                 id: column

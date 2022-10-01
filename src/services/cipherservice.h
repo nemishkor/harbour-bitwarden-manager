@@ -21,7 +21,7 @@ public:
     explicit CipherService(StateService *stateService, CryptoService *cryptoService,
                            CipherView *cipherView, QObject *parent = nullptr);
 
-    Q_INVOKABLE void decryptAll(bool deletedOnly);
+    Q_INVOKABLE void decryptAll(bool deletedOnly, QString folderId);
     Q_INVOKABLE void display(QString index);
 
     void add(Cipher &item);

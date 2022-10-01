@@ -6,13 +6,14 @@ Page {
     id: page
 
     property bool deleted
+    property string folderId
 
     // The effective value will be restricted by ApplicationWindow.allowedOrientations
     allowedOrientations: Orientation.All
 
     onStatusChanged: {
         if (status == PageStatus.Active && !vaultManager.isLocked && syncService.synchronized) {
-            cipherService.decryptAll(deleted)
+            cipherService.decryptAll(deleted, folderId)
         }
     }
 
