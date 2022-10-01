@@ -38,6 +38,13 @@ void FolderService::decryptAll()
         listModel->add(listItem);
     }
     qDebug() << "Folders were decrypted";
+
+    FolderListItem emptyFolder;
+    emptyFolder.setId("");
+    emptyFolder.setName(tr("None folder"));
+    emptyFolder.setRevisionDate("");
+    listModel->add(emptyFolder);
+
     decrypted = true;
 }
 

@@ -225,6 +225,13 @@ Manager</translation>
     </message>
 </context>
 <context>
+    <name>FolderService</name>
+    <message>
+        <source>None folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Folders</name>
     <message>
         <source>Folders</source>

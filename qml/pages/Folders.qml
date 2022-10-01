@@ -74,6 +74,7 @@ Page {
                 }
                 Label {
                     id: revisionDateLabel
+                    visible: model.revisionDate !== ""
                     x: Theme.paddingLarge
                     text: qsTr("Last revision") + ": " + model.revisionDate
                     color: delegate.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
