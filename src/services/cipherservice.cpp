@@ -1,11 +1,12 @@
 #include "cipherservice.h"
 
-CipherService::CipherService(CryptoService *cryptoService, CipherView *cipherView, QObject *parent) :
+CipherService::CipherService(StateService *stateService, CryptoService *cryptoService,
+                             CipherView *cipherView, QObject *parent) :
     QObject(parent),
+    stateService(stateService),
     cryptoService(cryptoService),
     cipherView(cipherView)
 {
-    ciphers = new QList<Cipher>;
     ciphersListModel = new CiphersListModel();
     cipherFieldsListModel = new CipherFieldsListModel();
     cipherPasswordHistoryListModel = new CipherPasswordHistoryListModel();
@@ -14,6 +15,7 @@ CipherService::CipherService(CryptoService *cryptoService, CipherView *cipherVie
 void CipherService::decryptAll(bool deletedOnly)
 {
     ciphersListModel->clear();
+    QList<Cipher> *ciphers = stateService->getCiphers();
     QList<Cipher>::iterator i;
     for(i = ciphers->begin(); i != ciphers->end(); i++){
         if(deletedOnly && i->getDeletedDate().isNull()){
@@ -33,6 +35,7 @@ void CipherService::decryptAll(bool deletedOnly)
 void CipherService::display(QString id)
 {
     qDebug() << "display cipher" << id;
+    QList<Cipher> *ciphers = stateService->getCiphers();
     QList<Cipher>::iterator i;
     QList<CipherField>::const_iterator fields_i;
     QList<CipherPasswordHistoryItem>::const_iterator passwordHistoryIt;
@@ -140,34 +143,9 @@ void CipherService::display(QString id)
 
 }
 
-int CipherService::getCount()
-{
-    return ciphers->count();
-}
-
-int CipherService::getCountDeleted()
-{
-    int c = ciphers->count();
-    QList<Cipher>::iterator i;
-    for(i = ciphers->begin(); i != ciphers->end(); i++){
-        if(i->getDeletedDate().isEmpty()){
-            c--;
-        }
-    }
-    return c;
-}
-
-void CipherService::add(Cipher &item)
-{
-    ciphers->append(item);
-    emit countChanged();
-}
-
 void CipherService::clear()
 {
-    ciphers->clear();
     ciphersListModel->clear();
-    emit countChanged();
 }
 
 CiphersListModel *CipherService::getCiphersListModel() const

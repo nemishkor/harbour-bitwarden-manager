@@ -65,6 +65,8 @@ int main(int argc, char *argv[])
     QQmlContext *context = view.data()->rootContext();
     QSettings settings("harbour-bitwarden-manager");
 
+    StateService stateService;
+
     TokenService tokenService(&settings);
     context->setContextProperty("tokenService", &tokenService);
 
@@ -84,13 +86,11 @@ int main(int argc, char *argv[])
     CipherView cipher;
     context->setContextProperty("cipher", &cipher);
 
-    CipherService cipherService(&crypto, &cipher);
+    CipherService cipherService(&stateService, &crypto, &cipher);
     context->setContextProperty("cipherService", &cipherService);
     context->setContextProperty("ciphersListModel", cipherService.getCiphersListModel());
     context->setContextProperty("cipherFieldsListModel", cipherService.getCipherFieldsListModel());
     context->setContextProperty("cipherPasswordHistoryListModel", cipherService.getCipherPasswordHistoryListModel());
-
-    StateService stateService;
 
     Vault vault(&stateService);
     context->setContextProperty("vault", &vault);

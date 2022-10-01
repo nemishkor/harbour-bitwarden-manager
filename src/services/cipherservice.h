@@ -12,33 +12,29 @@
 #include "src/cipherpasswordhistoryitem.h"
 #include "src/cipherpasswordhistorylistmodel.h"
 #include "src/cryptoservice.h"
+#include "stateservice.h"
 
 class CipherService : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(int count READ getCount NOTIFY countChanged)
-    Q_PROPERTY(int countDeleted READ getCountDeleted NOTIFY countChanged)
 public:
-    explicit CipherService(CryptoService *cryptoService, CipherView *cipherView, QObject *parent = nullptr);
+    explicit CipherService(StateService *stateService, CryptoService *cryptoService,
+                           CipherView *cipherView, QObject *parent = nullptr);
 
     Q_INVOKABLE void decryptAll(bool deletedOnly);
     Q_INVOKABLE void display(QString index);
 
-    int getCount();
-    int getCountDeleted();
     void add(Cipher &item);
     void clear();
 
     CiphersListModel *getCiphersListModel() const;
-
     CipherFieldsListModel *getCipherFieldsListModel() const;
-
     CipherPasswordHistoryListModel *getCipherPasswordHistoryListModel() const;
 
 private:
+    StateService *stateService;
     CryptoService *cryptoService;
     CipherView *cipherView;
-    QList<Cipher> *ciphers; // all encrypted ciphers
     CiphersListModel *ciphersListModel; // filtered cached decrypted ciphers for list view
     CipherFieldsListModel *cipherFieldsListModel; // filtered cached decrypted fields of specific displayed cipher
     CipherPasswordHistoryListModel *cipherPasswordHistoryListModel; // filtered cached decrypted password history of specific displayed cipher

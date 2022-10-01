@@ -95,7 +95,7 @@ Page {
             BackgroundItem {
                 width: column.width
                 Label {
-                    text: qsTr("All ciphers") + " (" + cipherService.count + ")"
+                    text: qsTr("All ciphers") + " (" + vault.ciphersCount + ")"
                     color: highlighted ? Theme.highlightColor : Theme.primaryColor
                     anchors.verticalCenter: parent.verticalCenter
                     x: Theme.horizontalPageMargin
@@ -106,7 +106,7 @@ Page {
             BackgroundItem {
                 width: column.width
                 Label {
-                    text: qsTr("Trash") + " (" + cipherService.countDeleted + ")"
+                    text: qsTr("Trash") + " (" + vault.ciphersDeletedCount + ")"
                     color: highlighted ? Theme.highlightColor : Theme.primaryColor
                     anchors.verticalCenter: parent.verticalCenter
                     x: Theme.horizontalPageMargin

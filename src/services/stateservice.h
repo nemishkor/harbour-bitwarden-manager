@@ -3,7 +3,8 @@
 
 #include <QList>
 
-#include <src/folder.h>
+#include "src/cipher.h"
+#include "src/folder.h"
 
 class StateService : public QObject
 {
@@ -12,15 +13,20 @@ public:
     explicit StateService(QObject *parent = nullptr);
 
     void add(Folder &item);
+    void add(Cipher &item);
 
     QList<Folder> *getFolders() const;
     void clear();
 
+    QList<Cipher> *getCiphers() const;
+
 private:
     QList<Folder> *folders;
+    QList<Cipher> *ciphers;
 
 signals:
     void foldersWereChanged();
+    void ciphersWereChanged();
 
 };
 

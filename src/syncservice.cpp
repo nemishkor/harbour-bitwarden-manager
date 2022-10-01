@@ -308,7 +308,7 @@ void SyncService::syncCiphers(QString userId, QJsonArray ciphers)
         qDebug() << "Add cipher";
         c = (*i).toObject();
         Cipher cipher = cipherFactory->create(c, userId);
-        cipherService->add(cipher);
+        stateService->add(cipher);
     }
 
     qDebug() << "Ciphers were added";
