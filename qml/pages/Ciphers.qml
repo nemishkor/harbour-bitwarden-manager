@@ -60,12 +60,12 @@ Page {
         }
         delegate: ListItem {
             id: delegate
-            contentHeight: column.height + separator.height + Theme.paddingMedium * 2
+            contentHeight: column.height + separator.height
             onClicked: pageStack.animatorPush(Qt.resolvedUrl("Cipher.qml"), {cipherId: model.id})
 
             Icon {
+                id: cipherIcon
                 source: {
-                    console.log(model.type)
                     if(model.type === 1){
                         return "image://theme/icon-m-keys";
                     }
@@ -80,42 +80,65 @@ Page {
                     }
                     return "image://theme/icon-m-keys";
                 }
-                y: Theme.paddingMedium
+                y: (parent.height - cipherIcon.height) / 2
                 anchors { left: parent.left; leftMargin: Theme.horizontalPageMargin }
             }
 
-            Column {
+            Rectangle {
                 id: column
                 x: Theme.horizontalPageMargin + Theme.paddingMedium + Theme.iconSizeMedium
-                y: Theme.paddingMedium
                 width: parent.width - Theme.horizontalPageMargin - Theme.paddingMedium - Theme.iconSizeMedium
+                height: topMarginRect.height + bottomMarginRect.height + cipherNameLabel.height * 2
+                color: "transparent"
+
+                Rectangle {
+                    id: topMarginRect
+                    anchors.top: parent.top
+                    height: Theme.paddingMedium
+                    width: parent.width
+                    color: "transparent"
+                }
 
                 Label {
+                    id: cipherNameLabel
+                    anchors {
+                        top: topMarginRect.bottom
+                        topMargin: cipherSubtitleLabel.visible ? 0 : cipherNameLabel.height / 2
+                    }
+
                     width: parent.width - 2 * Theme.horizontalPageMargin
                     text: model.name
                     color: Theme.primaryColor
-
                 }
+
                 Label {
+                    id: cipherSubtitleLabel
+                    anchors.top: cipherNameLabel.bottom
                     width: parent.width - 2 * Theme.horizontalPageMargin
+                    visible: model.subtitle !== ""
                     text: model.subtitle
                     color: Theme.secondaryColor
+                }
+
+                Rectangle {
+                    id: bottomMarginRect
+                    anchors.bottom: parent.bottom
+                    height: Theme.paddingMedium
+                    width: parent.width
+                    color: "transparent"
                 }
 
             }
 
             Separator {
                 id: separator
-                anchors {
-                    top: column.bottom
-                    topMargin: Theme.paddingMedium
-                }
-
+                anchors.top: column.bottom
                 width: parent.width
                 color: Theme.primaryColor
                 horizontalAlignment: Qt.AlignHCenter
             }
         }
+
         VerticalScrollDecorator {}
 
     }
