@@ -10,15 +10,13 @@
 #include <QJsonDocument>
 #include <QSettings>
 
-#include <src/factories/cipherfactory.h>
-
-#include <src/services/folderservice.h>
-#include <src/services/stateservice.h>
-
+#include "src/factories/cipherfactory.h"
+#include "src/services/folderservice.h"
+#include "src/services/stateservice.h"
 #include "api.h"
 #include "cryptoservice.h"
 #include "cipher.h"
-#include "cipherservice.h"
+#include "src/services/cipherservice.h"
 #include "cipherstring.h"
 #include "folder.h"
 #include "tokenservice.h"

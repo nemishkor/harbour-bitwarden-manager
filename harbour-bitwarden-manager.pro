@@ -31,7 +31,6 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/cipherpasswordhistoryitem.cpp \
     src/cipherpasswordhistorylistitem.cpp \
     src/cipherpasswordhistorylistmodel.cpp \
-    src/cipherservice.cpp \
     src/cipherslistmodel.cpp \
     src/cipherstring.cpp \
     src/cipherview.cpp \
@@ -42,6 +41,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/models/folderlistitem.cpp \
     src/models/folderslistmodel.cpp \
     src/models/responses/identitycaptcharesponse.cpp \
+    src/services/cipherservice.cpp \
     src/services/environmentservice.cpp \
     src/services/folderservice.cpp \
     src/services/stateservice.cpp \
@@ -107,7 +107,6 @@ HEADERS += \
     src/cipherpasswordhistoryitem.h \
     src/cipherpasswordhistorylistitem.h \
     src/cipherpasswordhistorylistmodel.h \
-    src/cipherservice.h \
     src/cipherslistmodel.h \
     src/cipherstring.h \
     src/cipherview.h \
@@ -120,6 +119,7 @@ HEADERS += \
     src/models/folderlistitem.h \
     src/models/folderslistmodel.h \
     src/models/responses/identitycaptcharesponse.h \
+    src/services/cipherservice.h \
     src/services/environmentservice.h \
     src/services/folderservice.h \
     src/services/stateservice.h \

@@ -4,14 +4,14 @@
 #include <QObject>
 #include <QList>
 
-#include "cipher.h"
-#include "cipherfieldslistmodel.h"
-#include "cipherlistitem.h"
-#include "cipherview.h"
-#include "cipherslistmodel.h"
-#include "cipherpasswordhistoryitem.h"
-#include "cipherpasswordhistorylistmodel.h"
-#include "cryptoservice.h"
+#include "src/cipher.h"
+#include "src/cipherfieldslistmodel.h"
+#include "src/cipherlistitem.h"
+#include "src/cipherview.h"
+#include "src/cipherslistmodel.h"
+#include "src/cipherpasswordhistoryitem.h"
+#include "src/cipherpasswordhistorylistmodel.h"
+#include "src/cryptoservice.h"
 
 class CipherService : public QObject
 {

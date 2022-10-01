@@ -16,7 +16,7 @@
 #include "auth.h"
 #include "appidservice.h"
 #include "cipherview.h"
-#include "cipherservice.h"
+#include "src/services/cipherservice.h"
 #include "cryptoservice.h"
 #include "syncservice.h"
 #include "services/environmentservice.h"
