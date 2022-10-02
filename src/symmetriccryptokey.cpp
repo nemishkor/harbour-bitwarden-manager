@@ -9,19 +9,19 @@ SymmetricCryptoKey::SymmetricCryptoKey(QByteArray key)
     fillWithKey(key);
 }
 
-SymmetricCryptoKey::SymmetricCryptoKey(QByteArray key, CipherString::EncryptionType encType)
+SymmetricCryptoKey::SymmetricCryptoKey(QByteArray key, Enums::EncryptionType encType)
 {
     this->key = key;
     keyB64 = key.toBase64();
     this->encType = encType;
-    if(encType == CipherString::EncryptionType::AesCbc256_B64 && key.length() == 32){
+    if(encType == Enums::EncryptionType::AesCbc256_B64 && key.length() == 32){
         encKey.append(key);
         macKey = nullptr;
-    } else if(encType == CipherString::EncryptionType::AesCbc128_HmacSha256_B64 && key.length() == 32){
+    } else if(encType == Enums::EncryptionType::AesCbc128_HmacSha256_B64 && key.length() == 32){
         encKey.append(key.mid(0, 16));
         macKey.append(key.mid(16, 16));
         macKeyB64 = macKey.toBase64();
-    } else if(encType == CipherString::EncryptionType::AesCbc256_HmacSha256_B64 && key.length() == 64){
+    } else if(encType == Enums::EncryptionType::AesCbc256_HmacSha256_B64 && key.length() == 64){
         encKey.append(key.mid(0, 32));
         macKey.append(key.mid(32, 32));
         macKeyB64 = macKey.toBase64();
@@ -38,11 +38,11 @@ void SymmetricCryptoKey::fillWithKey(QByteArray key)
     keyB64 = key.toBase64();
     qDebug() << "key length" << key.length();
     if(key.length() == 32){
-        encType = CipherString::EncryptionType::AesCbc256_B64;
+        encType = Enums::EncryptionType::AesCbc256_B64;
         encKey = key;
         macKey = nullptr;
     } else if (key.length() == 64){
-        encType = CipherString::EncryptionType::AesCbc256_HmacSha256_B64;
+        encType = Enums::EncryptionType::AesCbc256_HmacSha256_B64;
         encKey.append(key.mid(0, 32));
         macKey.append(key.mid(32, 32));
         macKeyB64 = macKey.toBase64();
@@ -63,7 +63,7 @@ void SymmetricCryptoKey::clear()
     macKeyB64.clear();
 }
 
-CipherString::EncryptionType SymmetricCryptoKey::getEncType() const
+Enums::EncryptionType SymmetricCryptoKey::getEncType() const
 {
     return encType;
 }

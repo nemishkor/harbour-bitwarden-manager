@@ -56,11 +56,11 @@ SymmetricCryptoKey CryptoService::getEncKey()
     QByteArray decryptedEncKey;
     qDebug() << "load enc key from QSettings";
     CipherString encKeyCipher = CipherString(settings->value("encKey").toString());
-    if (encKeyCipher.getEncryptionType() == CipherString::EncryptionType::AesCbc256_B64) {
+    if (encKeyCipher.getEncryptionType() == Enums::EncryptionType::AesCbc256_B64) {
 //        decryptedEncKey = decryptToBytes(encryptedEncKey); // ???
         qWarning() << "Does it heppens?";
         throw new QException();
-    } else if (encKeyCipher.getEncryptionType() == CipherString::EncryptionType::AesCbc256_HmacSha256_B64) {
+    } else if (encKeyCipher.getEncryptionType() == Enums::EncryptionType::AesCbc256_HmacSha256_B64) {
         SymmetricCryptoKey stratchedKey = stretchKey(this->key);
         encKey.fillWithKey(decryptToBytes(encKeyCipher, stratchedKey));
     } else {
@@ -135,6 +135,108 @@ QString CryptoService::decryptToUtf8(const CipherString &encrypted)
     return aesDecryptToUtf8(encrypted.getEncryptionType(), encrypted.getData(), encrypted.getIv(), encrypted.getMac());
 }
 
+QString CryptoService::encrypt(QString plainText)
+{
+    if(plainText.isNull()){
+        return QString();
+    }
+
+    QByteArray plainTextByteArray(plainText.toUtf8());
+    SymmetricCryptoKey keyForEnc = getKeyForEncryption();
+    QByteArray iv = randomBytes(ivLength),
+            data = QAesEncrypt(plainTextByteArray, iv, keyForEnc.getEncKey());
+
+    return CipherString::buildEncryptedString(keyForEnc, iv, data);
+}
+
+QByteArray CryptoService::QAesEncrypt(QByteArray plainText, QByteArray iv, QByteArray key)
+{
+    unsigned char *_iv = reinterpret_cast<unsigned char *>(iv.data());
+    unsigned char *_key = reinterpret_cast<unsigned char *>(key.data());
+    unsigned char *_plainText = reinterpret_cast<unsigned char *>(plainText.data());
+    int plainTextLength = plainText.size();
+    unsigned char *cipherText = (unsigned char*) calloc(sizeof(char), plainTextLength);
+    int encryptedtext_len = aesEncrypt(_plainText, plainTextLength, _key, _iv, cipherText);
+    QByteArray output = QByteArray(reinterpret_cast<char*> (cipherText), encryptedtext_len);
+    free(cipherText);
+
+    return output;
+}
+
+int CryptoService::aesEncrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+                                unsigned char *iv, unsigned char *ciphertext)
+{
+    EVP_CIPHER_CTX *ctx;
+    int len;
+    int ciphertext_len;
+
+    /* Create and initialise the context */
+    if(!(ctx = EVP_CIPHER_CTX_new())){
+        qCritical() << "can not create cipher context";
+        throw new QException();
+    }
+
+    /*
+     * Initialise the encryption operation. IMPORTANT - ensure you use a key
+     * and IV size appropriate for your cipher
+     * In this example we are using 256 bit AES (i.e. a 256 bit key). The
+     * IV size for *most* modes is the same as the block size. For AES this
+     * is 128 bits
+     */
+    if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv)){
+        qCritical() << "Unable to initialise the encryption operation";
+        qCritical() << "EVP_EncryptInit_ex() -- " << ERR_error_string(ERR_get_error(), NULL);
+        EVP_CIPHER_CTX_free(ctx);
+        throw new QException();
+    }
+
+    /*
+     * Provide the message to be encrypted, and obtain the encrypted output.
+     * EVP_EncryptUpdate can be called multiple times if necessary
+     */
+    if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len)){
+        qCritical() << "Unable to provide the message to be encrypted";
+        qCritical() << "EVP_EncryptUpdate() -- " << ERR_error_string(ERR_get_error(), NULL);
+        EVP_CIPHER_CTX_free(ctx);
+        throw new QException();
+    }
+
+    ciphertext_len = len;
+
+    /*
+     * Finalise the encryption. Further ciphertext bytes may be written at
+     * this stage.
+     */
+    if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)){
+        qCritical() << "Unable to finalise the encryption";
+        qCritical() << "EVP_EncryptFinal_ex() -- " << ERR_error_string(ERR_get_error(), NULL);
+        EVP_CIPHER_CTX_free(ctx);
+        throw new QException();
+    }
+
+    ciphertext_len += len;
+
+    /* Clean up */
+    EVP_CIPHER_CTX_free(ctx);
+
+    return ciphertext_len;
+}
+
+QByteArray CryptoService::randomBytes(int length)
+{
+    unsigned char *buffer = (unsigned char*) calloc(sizeof(char), length);
+    qDebug() << "4";
+    int rc = RAND_bytes(buffer, length);
+    qDebug() << "5";
+    if(rc != 1) {
+        unsigned long err = ERR_get_error();
+        qCritical() << "Unable to generate random bytes. Error:" << err;
+        throw new QException();
+    }
+
+    return QByteArray(reinterpret_cast<char*> (buffer), length);
+}
+
 QByteArray CryptoService::pbkdf2(QByteArray passwordByteArray, QString saltString, int iterations)
 {
     qDebug() << "pbkdf2 iterations:" << iterations;
@@ -166,9 +268,10 @@ void CryptoService::PBKDF2_HMAC_SHA_256_string(const char* pass, const unsigned 
     }
 }
 
-SymmetricCryptoKey CryptoService::getKeyForEncryption()
+SymmetricCryptoKey CryptoService::getKeyForEncryption(const SymmetricCryptoKey *key)
 {
-    // TODO
+    // TODO: integrate sailfish secrets here to load key from storage
+    Q_UNUSED(key);
     return getEncKey();
 }
 
@@ -216,59 +319,37 @@ const QByteArray CryptoService::hkdfExpandSHA256(QByteArray prk, QString info, i
     return okm.mid(0, outputByteSize);
 }
 
-DecryptParametersArrayBuffer CryptoService::aesDecryptFastParameters(const QString data, const QString iv, const QString mac, SymmetricCryptoKey key) const
-{
-    DecryptParametersArrayBuffer p;
-
-    p.encKey.append(key.getEncKey());
-    p.data.append(QByteArray::fromBase64(data.toLatin1()));
-    p.iv.append(QByteArray::fromBase64(iv.toLatin1()));
-    for(int i = 0; i < p.iv.length(); i++) {
-        p.macData.append(p.iv.at(i));
-    }
-    for(int i = 0; i < p.data.length(); i++) {
-        p.macData.append(p.data.at(i));
-    }
-
-    if(!key.getMacKey().isNull()){
-        p.macKey.append(key.getMacKey());
-    }
-    if(!mac.isNull()){
-        qDebug() << "mac is not null";
-        p.mac.append(QByteArray::fromBase64(mac.toLatin1()));
-    }
-
-    return p;
-}
-
-QString CryptoService::aesDecryptToUtf8(CipherString::EncryptionType encType, const QString data, const QString iv, const QString mac)
+QString CryptoService::aesDecryptToUtf8(Enums::EncryptionType encType, const QString data, const QString iv, const QString mac)
 {
     SymmetricCryptoKey keyForEnc = getKeyForEncryption();
 //    const theKey = this.resolveLegacyKey(encType, keyForEnc);
-
-    if(!keyForEnc.getMacKey().isNull() && mac.isNull()){
-        qWarning() << "mac is required";
-//        qDebug() << "data" << data;
-//        qDebug() << "iv" << iv;
-//        qDebug() << "mac" << mac;
-        throw new QException();
-    }
 
     if(keyForEnc.getEncType() != encType){
         qWarning() << "encType unavailable";
         throw new QException();
     }
 
-    DecryptParametersArrayBuffer fastParams = aesDecryptFastParameters(data, iv, mac, keyForEnc);
-    if(!fastParams.macKey.isEmpty() && !fastParams.mac.isEmpty()){
-        QByteArray computedMac = QMessageAuthenticationCode::hash(fastParams.macData, fastParams.macKey, QCryptographicHash::Sha256);
-        if(computedMac != fastParams.mac){
-            qWarning() << "mac failed.";
+    QByteArray _data = QByteArray::fromBase64(data.toLatin1());
+    QByteArray _iv = QByteArray::fromBase64(iv.toLatin1());
+
+    if(!keyForEnc.getMacKey().isNull()){
+        if(mac.isNull()){
+            qWarning() << "mac is required";
+            throw new QException();
+        }
+        QByteArray macData;
+        macData.append(_iv).append(_data);
+        QByteArray _mac = QByteArray::fromBase64(mac.toLatin1()),
+                computedMac = QMessageAuthenticationCode::hash(macData, keyForEnc.getMacKey(), QCryptographicHash::Sha256);
+        if(computedMac != _mac){
+            qWarning() << "mac failed!";
+            qDebug() << "computedMac:" << computedMac;
+            qDebug() << "mac:" << _mac;
             return QString();
         }
     }
 
-    return QString(QAesDecrypt(fastParams.data, fastParams.iv, fastParams.encKey));
+    return QString(QAesDecrypt(_data, _iv, keyForEnc.getEncKey()));
 }
 
 QByteArray CryptoService::decryptToBytes(CipherString encryptedEncKey, SymmetricCryptoKey key) const
@@ -288,7 +369,7 @@ QByteArray CryptoService::decryptToBytes(CipherString encryptedEncKey, Symmetric
     return aesDecryptToBytes(encryptedEncKey.getEncryptionType(), data, iv, mac, key);
 }
 
-QByteArray CryptoService::aesDecryptToBytes(CipherString::EncryptionType encryptionType, QByteArray &data, QByteArray &iv, QByteArray &mac, SymmetricCryptoKey key) const
+QByteArray CryptoService::aesDecryptToBytes(Enums::EncryptionType encryptionType, QByteArray &data, QByteArray &iv, QByteArray &mac, SymmetricCryptoKey key) const
 {
     //    const theKey = this.resolveLegacyKey(encType, keyForEnc);
 
@@ -329,7 +410,6 @@ QByteArray CryptoService::QAesDecrypt(QByteArray dataByteArray, QByteArray ivByt
     qDebug() << "aesDecrypt";
     int decryptedtext_len = aesDecrypt(data, dataLength, key, iv, plainText);
 
-
     QByteArray output = QByteArray(reinterpret_cast<char*> (plainText), decryptedtext_len);
     free(plainText);
 
@@ -358,8 +438,9 @@ int CryptoService::aesDecrypt(unsigned char *ciphertext, int ciphertext_len, uns
      * is 128 bits
      */
     if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv)){
-        EVP_CIPHER_CTX_free(ctx);
+        qCritical() << "Unable to initialise the decryption operation";
         qCritical() << "EVP_DecryptInit_ex() -- " << ERR_error_string(ERR_get_error(), NULL);
+        EVP_CIPHER_CTX_free(ctx);
         throw new QException();
     }
 
@@ -368,6 +449,7 @@ int CryptoService::aesDecrypt(unsigned char *ciphertext, int ciphertext_len, uns
      * EVP_DecryptUpdate can be called multiple times if necessary.
      */
     if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len)){
+        qCritical() << "Unable to provide the message to be decrypted";
         qCritical() << "EVP_DecryptUpdate() -- " << ERR_error_string(ERR_get_error(), NULL);
         EVP_CIPHER_CTX_free(ctx);
         throw new QException();
@@ -380,8 +462,9 @@ int CryptoService::aesDecrypt(unsigned char *ciphertext, int ciphertext_len, uns
      * this stage.
      */
     if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)){
+        qCritical() << "Unable to finalise the decryption";
+        qCritical() << "EVP_DecryptFinal_ex() -- " << ERR_error_string(ERR_get_error(), NULL);
         EVP_CIPHER_CTX_free(ctx);
-        qCritical() << "EVP_DecryptInit_ex() -- " << ERR_error_string(ERR_get_error(), NULL);
         throw new QException();
     }
 

@@ -1,25 +1,20 @@
 #ifndef CIPHERSTRING_H
 #define CIPHERSTRING_H
 
+#include "symmetriccryptokey.h"
+#include "enums.h"
+
 #include <QDebug>
 #include <QException>
 #include <QString>
 #include <QStringList>
+#include <QMessageAuthenticationCode>
 
 class CipherString
 {
 public:
     CipherString();
     CipherString(QString encryptedString);
-    enum EncryptionType {
-        AesCbc256_B64 = 0,
-        AesCbc128_HmacSha256_B64 = 1,
-        AesCbc256_HmacSha256_B64 = 2,
-        Rsa2048_OaepSha256_B64 = 3,
-        Rsa2048_OaepSha1_B64 = 4,
-        Rsa2048_OaepSha256_HmacSha256_B64 = 5,
-        Rsa2048_OaepSha1_HmacSha256_B64 = 6,
-    };
     CipherString(const CipherString& c) :
         encryptionType(c.getEncryptionType()),
         data(c.getData()),
@@ -29,9 +24,11 @@ public:
         qDebug() << "copy cipherString";
     }
 
+    static QString buildEncryptedString(SymmetricCryptoKey keyForEnc, QByteArray iv, QByteArray data);
+
     void fill(QString encryptedString);
 
-    EncryptionType getEncryptionType() const;
+    Enums::EncryptionType getEncryptionType() const;
 
     QString getData() const;
 
@@ -40,7 +37,7 @@ public:
     QString getMac() const;
 
 private:
-    EncryptionType encryptionType;
+    Enums::EncryptionType encryptionType;
     QString data;
     QString iv;
     QString mac;

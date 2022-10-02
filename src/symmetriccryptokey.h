@@ -1,25 +1,26 @@
 #ifndef SYMMETRICCRYPTOKEY_H
 #define SYMMETRICCRYPTOKEY_H
 
+#include "enums.h"
+
 #include <QByteArray>
 #include <QString>
 #include <QException>
-
-#include "cipherstring.h"
+#include <QDebug>
 
 class SymmetricCryptoKey
 {
 public:
     SymmetricCryptoKey();
     SymmetricCryptoKey(QByteArray key);
-    SymmetricCryptoKey(QByteArray key, CipherString::EncryptionType encType);
+    SymmetricCryptoKey(QByteArray key, Enums::EncryptionType encType);
 
     void fillWithKey(QByteArray key);
     void clear();
 
     QByteArray getKey() const;
 
-    CipherString::EncryptionType getEncType() const;
+    Enums::EncryptionType getEncType() const;
 
     QByteArray getEncKey() const;
 
@@ -29,7 +30,7 @@ private:
     QByteArray key;
     QByteArray encKey;
     QByteArray macKey;
-    CipherString::EncryptionType encType;
+    Enums::EncryptionType encType;
 
     QString keyB64;
     QString encKeyB64;
