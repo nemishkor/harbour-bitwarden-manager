@@ -13,6 +13,14 @@ void FoldersListModel::add(FolderListItem &item)
     emit countChanged();
 }
 
+void FoldersListModel::removeLast()
+{
+    beginRemoveRows(QModelIndex(), rowCount() - 1, rowCount() - 1);
+    items.removeLast();
+    endRemoveRows();
+    emit countChanged();
+}
+
 void FoldersListModel::clear()
 {
     beginRemoveRows(QModelIndex(), 0, rowCount() - 1);

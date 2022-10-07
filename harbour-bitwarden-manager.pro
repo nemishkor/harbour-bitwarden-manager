@@ -37,6 +37,7 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/cryptoservice.cpp \
     src/enums.cpp \
     src/factories/cipherfactory.cpp \
+    src/factories/folderfactory.cpp \
     src/folder.cpp \
     src/models/folderlistitem.cpp \
     src/models/folderslistmodel.cpp \
@@ -114,6 +115,7 @@ HEADERS += \
     src/devicetype.h \
     src/enums.h \
     src/factories/cipherfactory.h \
+    src/factories/folderfactory.h \
     src/folder.h \
     src/kdftype.h \
     src/models/folderlistitem.h \

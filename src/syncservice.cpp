@@ -4,7 +4,8 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService,
                          CryptoService *cryptoService, StateService *stateService,
                          FolderService *foldersService,
                          CipherService *cipherService,
-                         QSettings *settings) :
+                         QSettings *settings,
+                         ApiJsonDumper *apiJsonDumper) :
     QObject(nullptr),
     api(api),
     user(user),
@@ -13,7 +14,8 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService,
     stateService(stateService),
     foldersService(foldersService),
     cipherService(cipherService),
-    settings(settings)
+    settings(settings),
+    apiJsonDumper(apiJsonDumper)
 {
     syncReply = nullptr;
     refreshTokenReply = nullptr;
@@ -21,8 +23,8 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService,
 //        lastSync = settings->value("last_sync_" + user->getUserId()).toDateTime();
         settings->remove("last_sync_" + user->getUserId());
     }
-    apiJsonDumper = new ApiJsonDumper();
     cipherFactory = new CipherFactory(apiJsonDumper);
+    folderFactory = new FolderFactory(apiJsonDumper);
 }
 
 void SyncService::syncAll()
@@ -284,12 +286,7 @@ void SyncService::syncFolders(QString userId, QJsonArray folders)
     QJsonArray::const_iterator i;
     for (i = folders.constBegin(); i != folders.constEnd(); i++){
         apiFolder = (*i).toObject();
-        apiJsonDumper->dumpFolderFields(&apiFolder);
-        Folder folder;
-        folder.setId(apiFolder["id"].toString());
-        folder.setName(apiFolder["name"].toString());
-        folder.setUserId(userId);
-        folder.setRevisionDate(apiFolder["revisionDate"].toString());
+        Folder folder = folderFactory->create(apiFolder, userId);
         stateService->add(folder);
     }
 }

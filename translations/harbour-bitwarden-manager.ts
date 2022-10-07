@@ -224,6 +224,13 @@
     </message>
 </context>
 <context>
+    <name>Folder</name>
+    <message>
+        <source>New folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FolderService</name>
     <message>
         <source>None folder</source>

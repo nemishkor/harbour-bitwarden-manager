@@ -20,6 +20,7 @@ public:
     explicit FoldersListModel(QObject *parent = nullptr);
 
     void add(FolderListItem &item);
+    void removeLast();
     void clear();
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;

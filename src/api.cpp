@@ -84,6 +84,18 @@ QNetworkReply *Api::postAccountVerifyPassword(QString masterPasswordHash, QStrin
     return reply;
 }
 
+QNetworkReply *Api::postFolder(QString name, QString accessToken)
+{
+    QNetworkRequest request = buildRequest(QUrl(environmentService->getApiUrl() + "/folders"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
+    request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer " + accessToken.toLatin1()));
+    QJsonObject jsonBody{ {"name", name} };
+    reply = post(request, QJsonDocument(jsonBody).toJson(QJsonDocument::Compact));
+    connect(reply, &QNetworkReply::finished, this, &Api::replyFinished);
+
+    return reply;
+}
+
 QNetworkRequest Api::buildRequest(QUrl url)
 {
     QNetworkRequest request(url);
@@ -142,7 +154,6 @@ void Api::replyFinished()
 
 void Api::logRequest(QString method, QNetworkRequest *request, QByteArray *body)
 {
-    QDebug deb = qDebug();
     QString message;
     message.append("Request <<<\r\n")
            .append(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))

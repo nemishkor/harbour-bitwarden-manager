@@ -67,17 +67,18 @@ int main(int argc, char *argv[])
 
     StateService stateService;
 
-    TokenService tokenService(&settings);
-    context->setContextProperty("tokenService", &tokenService);
-
     EnvironmentService environmentService(&settings);
     context->setContextProperty("environmentService", &environmentService);
 
     Api api(&settings, &environmentService);
     context->setContextProperty("api", &api);
 
+    TokenService tokenService(&settings, &api);
+    context->setContextProperty("tokenService", &tokenService);
+
     CryptoService crypto(&settings);
     context->setContextProperty("crypto", &crypto);
+
     AppIdService appIdService(&settings);
 
     User user(&settings);
@@ -95,12 +96,14 @@ int main(int argc, char *argv[])
     Vault vault(&stateService);
     context->setContextProperty("vault", &vault);
 
-    FolderService foldersService(&stateService, &crypto);
+    ApiJsonDumper apiJsonDumper;
+
+    FolderService foldersService(&stateService, &crypto, &tokenService, &apiJsonDumper, &api);
     context->setContextProperty("foldersService", &foldersService);
     context->setContextProperty("foldersListModel", foldersService.getListModel());
 
     SyncService syncService(&api, &user, &tokenService, &crypto, &stateService, &foldersService,
-                            &cipherService, &settings);
+                            &cipherService, &settings, &apiJsonDumper);
     context->setContextProperty("syncService", &syncService);
 
     Auth auth(&appIdService, &tokenService, &api, &crypto, &user, &syncService);

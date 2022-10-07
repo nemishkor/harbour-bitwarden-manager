@@ -10,6 +10,8 @@
 #include <QJsonDocument>
 #include <QSettings>
 
+#include <src/factories/folderfactory.h>
+
 #include "src/factories/cipherfactory.h"
 #include "src/services/folderservice.h"
 #include "src/services/stateservice.h"
@@ -35,7 +37,8 @@ public:
     SyncService(Api *api, User *user, TokenService *tokenService,
                 CryptoService *cryptoService, StateService *stateService,
                 FolderService *foldersService,
-                CipherService *cipherService, QSettings *settings);
+                CipherService *cipherService, QSettings *settings,
+                ApiJsonDumper *apiJsonDumper);
     Q_INVOKABLE void syncAll();
     Q_INVOKABLE void abort();
     bool getIsSyncing() const;
@@ -56,6 +59,7 @@ private:
     QSettings *settings;
     ApiJsonDumper *apiJsonDumper;
     CipherFactory *cipherFactory;
+    FolderFactory *folderFactory;
 
     // For GUI
     bool isSyncing = false;

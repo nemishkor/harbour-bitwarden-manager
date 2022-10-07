@@ -48,16 +48,27 @@ Page {
         }
     }
 
-    // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaListView {
-
         visible: !vaultManager.isLocked && syncService.synchronized
         model: foldersListModel
-        anchors.fill: parent
+        anchors {
+            fill: parent
+            bottomMargin: dockedPanel.visibleSize
+        }
+        clip: dockedPanel.expanded
+
         header: PageHeader {
             title: qsTr("Folders")
             description: "Bitwarden manager"
         }
+
+        PullDownMenu {
+            MenuItem {
+                text: "Add folder"
+                onClicked: pageStack.animatorPush(addFolderPage)
+            }
+        }
+
         delegate: ListItem {
             id: delegate
             contentHeight: column.height + separator.height + Theme.paddingMedium * 2
@@ -67,12 +78,14 @@ Page {
                 id: column
                 y: Theme.paddingMedium
                 spacing: Theme.paddingSmall
+
                 Label {
                     id: nameLabel
                     x: Theme.paddingLarge
                     text: model.name
                     color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
                 }
+
                 Label {
                     id: revisionDateLabel
                     visible: model.revisionDate !== ""
@@ -94,7 +107,71 @@ Page {
                 horizontalAlignment: Qt.AlignHCenter
             }
         }
+
         VerticalScrollDecorator {}
+    }
+
+    Component {
+        id: addFolderPage
+
+        Dialog {
+            canAccept: folderNameInput.text.trim() !== ""
+            onAccepted: {
+                foldersService.create(folderNameInput.text)
+            }
+
+            Column {
+                width: parent.width
+
+                DialogHeader {
+                    title: "Add folder"
+                }
+
+                TextField {
+                    id: folderNameInput
+                    focus: true
+                    label: "Name"
+                    placeholderText: label
+                    width: parent.width
+                }
+            }
+
+        }
+    }
+
+    DockedPanel {
+        id: dockedPanel
+
+        height: Theme.itemSizeExtraLarge + Theme.paddingLarge
+        width: parent.width
+        open: foldersService.creating
+        dock: Dock.Bottom
+        modal: true
+
+        ProgressCircle {
+            id: circle
+            anchors { left: parent.left; leftMargin: Theme.horizontalPageMargin; verticalCenter: parent.verticalCenter }
+
+            NumberAnimation on value {
+                from: 0
+                to: 1
+                duration: 1000
+                running: dockedPanel.expanded
+                loops: Animation.Infinite
+            }
+        }
+
+        Label {
+            anchors {
+                left: circle.right
+                leftMargin: Theme.paddingMedium
+            }
+            width: parent.width - 2 * Theme.horizontalPageMargin - circle.width
+            padding: Theme.paddingMedium
+            text: "Saving folder..."
+            color: Theme.primaryColor
+            wrapMode: "WrapAnywhere"
+        }
 
     }
 

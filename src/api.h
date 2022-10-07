@@ -16,7 +16,6 @@
 
 #include "devicetype.h"
 #include "kdftype.h"
-#include "tokenservice.h"
 #include "services/environmentservice.h"
 
 class Api : public QObject
@@ -35,6 +34,7 @@ public:
     QNetworkReply *refreshAccessToken(QString userIdFromToken, QString refreshToken);
     QNetworkReply *getSync(QString accessToken);
     QNetworkReply *postAccountVerifyPassword(QString masterPasswordHash, QString accessToken);
+    QNetworkReply *postFolder(QString name, QString accessToken);
 
 private:
     QSettings *settings;
@@ -51,6 +51,7 @@ private:
     void replyFinished();
     void logRequest(QString method, QNetworkRequest *request, QByteArray *body);
     void logReply(QNetworkReply *reply);
+
 
 signals:
     void lastErrorChanged();

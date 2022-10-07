@@ -1,20 +1,24 @@
 #ifndef TOKENSERVICE_H
 #define TOKENSERVICE_H
 
+#include "api.h"
+
 #include <QByteArray>
 #include <QDateTime>
 #include <QDebug>
+#include <QException>
 #include <QtGlobal>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QObject>
 #include <QSettings>
+#include <QNetworkReply>
 
 class TokenService : public QObject
 {
     Q_OBJECT
 public:
-    explicit TokenService(QSettings *settings);
+    explicit TokenService(QSettings *settings, Api *api);
     void setTokens(QString accessToken, QString refreshToken);
     QString getUserIdFromToken();
     QString getEmailFromToken();
@@ -24,6 +28,7 @@ public:
     QString getRefreshToken() const;
     bool tokenNeedsRefresh(int minutes = 5);
     void clearTokens();
+    void validateToken();
 
 private:
     QString accessToken;
@@ -31,11 +36,17 @@ private:
     QString refreshToken;
     void setRefreshToken(const QString &value);
     QSettings *settings;
+    Api *api;
     void persistTokens();
     QJsonObject decodeAccessToken();
     quint32 getTokenExpirationSec();
+    bool tokenIsRefreshing = false;
+    QNetworkReply *refreshTokenReply;
+    void refreshTokenReplyFinished();
 
 signals:
+    void refreshTokenSuccess();
+    void refreshTokenFail(QString reason);
 
 };
 
