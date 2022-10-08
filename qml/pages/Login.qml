@@ -159,7 +159,6 @@ Page {
     Connections {
         target: auth
         onLoginStageChanged: {
-            console.log("login stage: " + auth.loginStage)
             if(auth.loginStage === 0){
                 if(auth.apiKeyRequired){
                     apiKeyField.forceActiveFocus()
@@ -171,43 +170,6 @@ Page {
                 pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"))
             }
         }
-    }
-
-    DockedPanel {
-        id: progressPanel
-
-        open: auth.loginProcessing || auth.loginMessage !== ""
-        width: page.isPortrait ? parent.width : Theme.itemSizeExtraLarge + Theme.paddingLarge
-        height: page.isPortrait ? Theme.itemSizeExtraLarge + Theme.paddingLarge : parent.height
-
-        dock: page.isPortrait ? Dock.Bottom : Dock.Right
-
-        ProgressCircle {
-            id: circle
-            visible: [-1, 1, 3].indexOf(auth.loginStage) !== -1
-            anchors { left: parent.left; leftMargin: Theme.horizontalPageMargin; verticalCenter: parent.verticalCenter }
-
-            NumberAnimation on value {
-                from: 0
-                to: 1
-                duration: 1000
-                running: progressPanel.expanded
-                loops: Animation.Infinite
-            }
-        }
-
-        Label {
-            anchors {
-                left: circle.visible ? circle.right : parent.left
-                leftMargin: circle.visible ? Theme.paddingMedium : Theme.horizontalPageMargin
-            }
-            width: parent.width - 2 * Theme.horizontalPageMargin - (circle.visible ? circle.width : 0)
-            padding: Theme.paddingMedium
-            text: auth.loginMessage
-            color: auth.loginMessageType === "error" ? Theme.errorColor : Theme.primaryColor
-            wrapMode: "WrapAnywhere"
-        }
-
     }
 
 }

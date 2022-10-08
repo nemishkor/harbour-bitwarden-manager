@@ -8,6 +8,7 @@
 #include <QList>
 #include <QUrlQuery>
 
+
 #include "kdftype.h"
 #include "api.h"
 #include "authentication.h"
@@ -19,30 +20,32 @@
 #include "symmetriccryptokey.h"
 #include "syncservice.h"
 #include "models/responses/identitycaptcharesponse.h"
+#include "src/models/tasklistitem.h"
+#include "src/models/taskslistmodel.h"
 
 class Auth : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int loginStage READ getLoginStage NOTIFY loginStageChanged);
-    Q_PROPERTY(QString loginMessage READ getLoginMessage NOTIFY loginMessageChanged);
-    Q_PROPERTY(QString loginMessageType READ getLoginMessageType NOTIFY loginMessageTypeChanged);
     Q_PROPERTY(bool apiKeyRequired READ isApiKeyRequired NOTIFY isApiKeyRequiredChanged);
 public:
-    Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, CryptoService *crypto, User *user, SyncService *syncService);
+    Auth(AppIdService *appIdService,
+         TokenService *tokenService,
+         Api *api,
+         CryptoService *crypto,
+         User *user,
+         SyncService *syncService,
+         TasksListModel *tasksListModel);
     Q_INVOKABLE void reset();
     Q_INVOKABLE void login(QString email, QString password, QString apiKey);
     Q_INVOKABLE void logout();
     int getLoginStage();
-    QString getLoginMessage();
-    QString getLoginMessageType();
 
     bool isApiKeyRequired() const;
     void setIsApiKeyRequired(bool newIsApiKeyRequired);
 
 signals:
     void loginStageChanged();
-    void loginMessageChanged();
-    void loginMessageTypeChanged();
     void isApiKeyRequiredChanged();
 
 private:
@@ -52,6 +55,8 @@ private:
     CryptoService *crypto;
     User *user;
     SyncService *syncService;
+    TasksListModel *tasksListModel;
+    TaskListItem *loginTask;
     bool apiKeyRequired = false;
 
     /*
@@ -68,10 +73,6 @@ private:
 
     void preLogin();
     void getToken();
-
-    QString loginMessage;
-    QString loginMessageType;
-    void setLoginMessage(QString message, QString type = "info");
 
     // data required for authentication process
     Authentication *authentication;

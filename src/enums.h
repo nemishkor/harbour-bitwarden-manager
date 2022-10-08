@@ -15,6 +15,11 @@ public:
         Rsa2048_OaepSha256_HmacSha256_B64 = 5,
         Rsa2048_OaepSha1_HmacSha256_B64 = 6,
     };
+    enum TaskStatus {
+        Fail = -1,
+        InProgress = 0,
+        Success = 1,
+    };
 };
 
 #endif // ENUMS_H

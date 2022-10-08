@@ -11,6 +11,8 @@
 
 #include <src/viewmodels/vault.h>
 
+#include <src/models/taskslistmodel.h>
+
 #include <sailfishapp.h>
 #include "api.h"
 #include "auth.h"
@@ -67,6 +69,9 @@ int main(int argc, char *argv[])
 
     StateService stateService;
 
+    TasksListModel tasks;
+    context->setContextProperty("tasks", &tasks);
+
     EnvironmentService environmentService(&settings);
     context->setContextProperty("environmentService", &environmentService);
 
@@ -106,7 +111,7 @@ int main(int argc, char *argv[])
                             &cipherService, &settings, &apiJsonDumper);
     context->setContextProperty("syncService", &syncService);
 
-    Auth auth(&appIdService, &tokenService, &api, &crypto, &user, &syncService);
+    Auth auth(&appIdService, &tokenService, &api, &crypto, &user, &syncService, &tasks);
     context->setContextProperty("auth", &auth);
 
     VaultManager vaultManager(&crypto, &user, &api, &tokenService);

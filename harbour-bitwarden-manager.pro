@@ -42,6 +42,8 @@ SOURCES += src/harbour-bitwarden-manager.cpp \
     src/models/folderlistitem.cpp \
     src/models/folderslistmodel.cpp \
     src/models/responses/identitycaptcharesponse.cpp \
+    src/models/tasklistitem.cpp \
+    src/models/taskslistmodel.cpp \
     src/services/cipherservice.cpp \
     src/services/environmentservice.cpp \
     src/services/folderservice.cpp \
@@ -59,6 +61,7 @@ DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/components/CipherLabel.qml \
     qml/components/LockBlock.qml \
     qml/components/SyncBlock.qml \
+    qml/components/Tasks.qml \
     qml/cover/CoverPage.qml \
     qml/pages/Cipher.qml \
     qml/pages/CipherFields.qml \
@@ -121,6 +124,8 @@ HEADERS += \
     src/models/folderlistitem.h \
     src/models/folderslistmodel.h \
     src/models/responses/identitycaptcharesponse.h \
+    src/models/tasklistitem.h \
+    src/models/taskslistmodel.h \
     src/services/cipherservice.h \
     src/services/environmentservice.h \
     src/services/folderservice.h \

@@ -1,16 +1,24 @@
 #include "auth.h"
 
-Auth::Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, CryptoService *crypto, User *user, SyncService *syncService) :
+Auth::Auth(AppIdService *appIdService,
+           TokenService *tokenService,
+           Api *api,
+           CryptoService *crypto,
+           User *user,
+           SyncService *syncService,
+           TasksListModel *tasksListModel) :
     appIdService(appIdService),
     tokenService(tokenService),
     api(api),
     crypto(crypto),
     user(user),
-    syncService(syncService)
+    syncService(syncService),
+    tasksListModel(tasksListModel)
 {
     authentication = new Authentication();
     preloginReply = nullptr;
     authenticateReply = nullptr;
+    loginTask = nullptr;
     if(tokenService->exists()){
         qDebug() << "tokens are exist";
         if(user->isAuthenticated()){
@@ -23,16 +31,6 @@ Auth::Auth(AppIdService *appIdService, TokenService *tokenService, Api *api, Cry
 int Auth::getLoginStage()
 {
     return loginStage;
-}
-
-QString Auth::getLoginMessage()
-{
-    return loginMessage;
-}
-
-QString Auth::getLoginMessageType()
-{
-    return loginMessageType;
 }
 
 bool Auth::isApiKeyRequired() const
@@ -56,18 +54,6 @@ void Auth::setLoginStage(int value)
     }
 }
 
-void Auth::setLoginMessage(QString message, QString type)
-{
-    if(this->loginMessage != message){
-        this->loginMessage = message;
-        emit loginMessageChanged();
-    }
-    if(this->loginMessageType != type){
-        this->loginMessageType = type;
-        emit loginMessageTypeChanged();
-    }
-}
-
 void Auth::reset()
 {
     authentication->clear();
@@ -83,6 +69,12 @@ void Auth::reset()
 
 void Auth::login(QString email, QString password, QString apiKey)
 {
+    if(loginTask == nullptr){
+        TaskListItem task("Login");
+        loginTask = tasksListModel->add(task);
+    } else {
+        loginTask->startOver();
+    }
     authentication->clear();
     authentication->setEmail(email);
     authentication->setPassword(password);
@@ -93,7 +85,7 @@ void Auth::login(QString email, QString password, QString apiKey)
 
 void Auth::preLogin()
 {
-    setLoginMessage("Checking encoding settings");
+    loginTask->setMessage("Checking encoding settings");
     // send request to load key derivation function parameters
     preloginReply = api->postPrelogin(authentication->getEmail());
     connect(preloginReply, &QNetworkReply::finished, this, &Auth::preLoginReplyHandler);
@@ -102,7 +94,8 @@ void Auth::preLogin()
 void Auth::preLoginReplyHandler()
 {
     if(preloginReply->error() != QNetworkReply::NoError){
-        setLoginMessage("[" + QString::number(preloginReply->error()) + "]" + preloginReply->errorString(), "error");
+        loginTask->setMessage("[" + QString::number(preloginReply->error()) + "]" + preloginReply->errorString());
+        loginTask->fail();
         reset();
         return;
     }
@@ -112,18 +105,21 @@ void Auth::preLoginReplyHandler()
 
     QJsonDocument json = QJsonDocument::fromJson(replyBody);
     if(!json.isObject()){
-        setLoginMessage("Invalid prelogin API response: root item is not a object", "error");
+        loginTask->setMessage("Invalid prelogin API response: root item is not a object");
+        loginTask->fail();
         reset();
         return;
     }
     QJsonObject root = json.object();
     if(!root.contains("kdf")){
-        setLoginMessage("Invalid prelogin API response: root object does not have \"kdf\" key", "error");
+        loginTask->setMessage("Invalid prelogin API response: root object does not have \"kdf\" key");
+        loginTask->fail();
         reset();
         return;
     }
     if(!root.contains("kdfIterations")){
-        setLoginMessage("Invalid prelogin API response: root object does not have \"kdfIterations\" key", "error");
+        loginTask->setMessage("Invalid prelogin API response: root object does not have \"kdfIterations\" key");
+        loginTask->fail();
         reset();
         return;
     }
@@ -134,10 +130,10 @@ void Auth::preLoginReplyHandler()
 
 void Auth::getToken()
 {
-    setLoginMessage("Hashing");
+    loginTask->setMessage("Hashing");
     authentication->setKey(crypto->makeKey(authentication->getPassword(), authentication->getEmail(), authentication->getKdfType(), authentication->getKdfIterations()));
     authentication->setHashedPassword(crypto->hashPassword(authentication->getKey(), authentication->getPassword()));
-    setLoginMessage("Logging in");
+    loginTask->setMessage("Authentication");
     authenticateReply = api->postIdentityToken(makeIdentityTokenRequestBody(), authentication->getEmail());
     connect(authenticateReply, &QNetworkReply::finished, this, &Auth::postAuthenticate);
 }
@@ -185,7 +181,8 @@ QByteArray Auth::makeIdentityTokenRequestBody()
 void Auth::postAuthenticate()
 {
     if(authenticateReply->error() != QNetworkReply::NoError && authenticateReply->error() != QNetworkReply::ProtocolInvalidOperationError){
-        setLoginMessage("[" + QString::number(authenticateReply->error()) + "]" + authenticateReply->errorString(), "error");
+        loginTask->setMessage("[" + QString::number(authenticateReply->error()) + "]" + authenticateReply->errorString());
+        loginTask->fail();
         reset();
         return;
     }
@@ -197,7 +194,8 @@ void Auth::postAuthenticate()
     qDebug() << "json response:" << json.toJson(QJsonDocument::Compact);
 
     if(!json.isObject()){
-        setLoginMessage("Invalid API response", "error");
+        loginTask->setMessage("Invalid API response");
+        loginTask->fail();
         reset();
         return;
     }
@@ -207,52 +205,61 @@ void Auth::postAuthenticate()
 
     if(httpCode == 400 && root.contains("HCaptcha_SiteKey")){
         IdentityCaptchaResponse identityCaptchaResponse(root["HCaptcha_SiteKey"].toString());
-        setLoginMessage("Additional authentication required", "error");
+        loginTask->setMessage("Additional authentication required");
         setIsApiKeyRequired(true);
         setLoginStage(0);
+        loginTask->fail();
         return;
     }
 
     if(root.contains("ErrorModel")){
-        setLoginMessage(root["ErrorModel"].toObject()["Message"].toString(), "error");
+        loginTask->setMessage(root["ErrorModel"].toObject()["Message"].toString());
+        loginTask->fail();
         reset();
         return;
     }
     if(root.contains("error_description")) {
-        setLoginMessage(root["error_description"].toString(), "error");
+        loginTask->setMessage(root["error_description"].toString());
+        loginTask->fail();
         reset();
         return;
     }
     if(root.contains("error")) {
-        setLoginMessage(root["error"].toString(), "error");
+        loginTask->setMessage(root["error"].toString());
+        loginTask->fail();
         reset();
         return;
     }
     if(!root.contains("access_token")){
-        setLoginMessage("Invalid API response #2", "error");
+        loginTask->setMessage("Invalid API response #2");
+        loginTask->fail();
         reset();
         return;
     }
     if(!root.contains("refresh_token")){
-        setLoginMessage("Invalid API response #3", "error");
+        loginTask->setMessage("Invalid API response #3");
+        loginTask->fail();
         reset();
         return;
     }
 
     if(authenticateReply->error() == QNetworkReply::ProtocolInvalidOperationError){
-        setLoginMessage("[" + QString::number(authenticateReply->error()) + "]" + authenticateReply->errorString(), "error");
+        loginTask->setMessage("[" + QString::number(authenticateReply->error()) + "]" + authenticateReply->errorString());
+        loginTask->fail();
         reset();
         return;
     }
 
     if(!root.contains("Kdf")){
-        setLoginMessage("Invalid API response #4", "error");
+        loginTask->setMessage("Invalid API response #4");
+        loginTask->fail();
         reset();
         return;
     }
 
     if(!root.contains("KdfIterations")){
-        setLoginMessage("Invalid API response #5", "error");
+        loginTask->setMessage("Invalid API response #5");
+        loginTask->fail();
         reset();
         return;
     }
@@ -264,5 +271,6 @@ void Auth::postAuthenticate()
 
     authentication->clear();
     setLoginStage(4);
-    setLoginMessage("");
+    loginTask->setMessage("success");
+    loginTask->success();
 }
