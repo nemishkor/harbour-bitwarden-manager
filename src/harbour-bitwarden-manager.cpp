@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     context->setContextProperty("foldersListModel", foldersService.getListModel());
 
     SyncService syncService(&api, &user, &tokenService, &crypto, &stateService, &foldersService,
-                            &cipherService, &settings, &apiJsonDumper);
+                            &cipherService, &settings, &apiJsonDumper, &tasks);
     context->setContextProperty("syncService", &syncService);
 
     Auth auth(&appIdService, &tokenService, &api, &crypto, &user, &syncService, &tasks);

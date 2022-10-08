@@ -18,17 +18,6 @@ DockedPanel {
     dock: Dock.Bottom
     clip: true
 
-    Connections {
-        target: tasks
-        onCountChanged: {
-           setTimeout(function(){
-               console.log('root.visibleHeight', root.visibleSize.toString());
-               console.log('root.open', root.open ? '+' : '-');
-               console.log('root.expanded', root.expanded ? '+' : '-');
-           }, 1000)
-        }
-    }
-
     Behavior on height {
         NumberAnimation {
             duration: 500

@@ -5,7 +5,8 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService,
                          FolderService *foldersService,
                          CipherService *cipherService,
                          QSettings *settings,
-                         ApiJsonDumper *apiJsonDumper) :
+                         ApiJsonDumper *apiJsonDumper,
+                         TasksListModel *tasksListModel) :
     QObject(nullptr),
     api(api),
     user(user),
@@ -15,10 +16,12 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService,
     foldersService(foldersService),
     cipherService(cipherService),
     settings(settings),
-    apiJsonDumper(apiJsonDumper)
+    apiJsonDumper(apiJsonDumper),
+    tasksListModel(tasksListModel)
 {
     syncReply = nullptr;
     refreshTokenReply = nullptr;
+    syncingTask = nullptr;
     if(settings->contains("last_sync_" + user->getUserId())){
 //        lastSync = settings->value("last_sync_" + user->getUserId()).toDateTime();
         settings->remove("last_sync_" + user->getUserId());
@@ -29,23 +32,28 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService,
 
 void SyncService::syncAll()
 {
-    setIsSyncing(true);
+    if(syncingTask != nullptr){
+        tasksListModel->remove(syncingTask);
+    }
+
+    TaskListItem task("Syncing");
+    syncingTask = tasksListModel->add(task);
+    connect(syncingTask, &TaskListItem::updated, this, &SyncService::syncingTaskWasUpdated);
+
     if(user->getUserId() == "" || !tokenService->exists()){
-        setMessage("Can not sync. Not authorized!", "error");
-        setIsSyncing(false);
+        syncingTask->fail("Can not sync. Not authorized!");
         return;
     }
+
     if(tokenService->tokenNeedsRefresh()){
         if(refreshTokenRun){
-            setMessage("Oops. Something went wrong. Actual token is outdated", "error");
-            setIsSyncing(false);
+            syncingTask->fail("Oops. Something went wrong. Actual token is outdated");
             return;
         }
-        setMessage("Refreshing token", "info");
+        syncingTask->setMessage("Refreshing token");
         QString refreshToken = tokenService->getRefreshToken();
         if(refreshToken == ""){
-            setMessage("Oops. Something went wrong. Can not refresh access token. Refresh token is empty", "error");
-            setIsSyncing(false);
+            syncingTask->fail("Oops. Something went wrong. Can not refresh access token. Refresh token is empty");
             return;
         }
         refreshTokenRun = true;
@@ -53,7 +61,8 @@ void SyncService::syncAll()
         connect(refreshTokenReply, &QNetworkReply::finished, this, &SyncService::refreshTokenReplyFinished);
         return;
     }
-    setMessage("Syncing", "info");
+
+    syncingTask->setMessage("Downloading");
     syncReply = api->getSync(tokenService->getAccessToken());
     connect(syncReply, &QNetworkReply::finished, this, &SyncService::syncReplyFinished);
 }
@@ -66,39 +75,12 @@ void SyncService::abort()
     if(syncReply && syncReply->isRunning()){
         syncReply->abort();
     }
-    setMessage("Aborted");
-    setIsSyncing(false);
+    syncingTask->success("Aborted");
 }
 
 bool SyncService::getIsSyncing() const
 {
-    return isSyncing;
-}
-
-void SyncService::setIsSyncing(bool value)
-{
-    if(isSyncing != value){
-        isSyncing = value;
-        emit isSyncingChanged();
-    }
-}
-
-void SyncService::setMessage(QString message, QNetworkReply *reply)
-{
-    setMessage((message == "" ? "" : message + ". ") + "[" + QString::number(reply->error()) + "]" + reply->errorString(), "error");
-}
-
-void SyncService::setMessage(QString value, QString type)
-{
-    qDebug().nospace() << "[" << type << "] Message: " << value;
-    if(value != message){
-        message = value;
-        emit messageChanged();
-    }
-    if(messageType != type){
-        messageType = type;
-        emit messageTypeChanged();
-    }
+    return syncingTask != nullptr && syncingTask->getStatus() == Enums::TaskStatus::InProgress;
 }
 
 bool SyncService::isSynchronized() const
@@ -122,53 +104,39 @@ void SyncService::setLastSync(const QDateTime &value)
     }
 }
 
-QString SyncService::getMessageType() const
-{
-    return messageType;
-}
-
-QString SyncService::getMessage() const
-{
-    return message;
-}
-
 void SyncService::refreshTokenReplyFinished()
 {
     if(refreshTokenReply->error() != QNetworkReply::NoError && refreshTokenReply->error() != QNetworkReply::ProtocolInvalidOperationError){
-        setMessage("Token refreshing failed", refreshTokenReply);
-//        QList<QPair<QByteArray, QByteArray>>::const_iterator i;
-//        for (i = refreshTokenReply->rawHeaderPairs().begin(); i != refreshTokenReply->rawHeaderPairs().end(); ++i)
-//            qDebug() << "header:" << (*i).first << ":" << (*i).second;
-//        qDebug() << "body: " << refreshTokenReply->readAll();
-        return;
-    }
-    QJsonDocument json = QJsonDocument::fromJson(refreshTokenReply->readAll());
-    if(!json.isObject()){
-        setMessage("Invalid refresh token API response #1", "error");
-        setIsSyncing(false);
-        return;
-    }
-    QJsonObject root = json.object();
-    if(refreshTokenReply->error() == QNetworkReply::ProtocolInvalidOperationError && root.contains("error")){
-        setMessage("Token refreshing failed. " + root["error"].toString(), "error");
-        setIsSyncing(false);
-        return;
-    }
-    if(!root.contains("access_token")){
-        setMessage("Token refreshing failed. API response does not contain access_token field", "error");
-        setIsSyncing(false);
-        return;
-    }
-    if(!root.contains("refresh_token")){
-        setMessage("Token refreshing failed. API response does not contain access_token field", "error");
-        setIsSyncing(false);
+        syncingTask->fail("Token refreshing failed", refreshTokenReply);
         return;
     }
 
+    QJsonDocument json = QJsonDocument::fromJson(refreshTokenReply->readAll());
+
+    if(!json.isObject()){
+        syncingTask->fail("Invalid refresh token API response #1");
+        return;
+    }
+
+    QJsonObject root = json.object();
+
+    if(refreshTokenReply->error() == QNetworkReply::ProtocolInvalidOperationError && root.contains("error")){
+        syncingTask->fail("Token refreshing failed. " + root["error"].toString());
+        return;
+    }
+
+    if(!root.contains("access_token")){
+        syncingTask->fail("Token refreshing failed. API response does not contain access_token field");
+        return;
+    }
+
+    if(!root.contains("refresh_token")){
+        syncingTask->fail("Token refreshing failed. API response does not contain access_token field");
+        return;
+    }
 
     if(refreshTokenReply->error() == QNetworkReply::ProtocolInvalidOperationError){
-        setMessage("", refreshTokenReply);
-        setIsSyncing(false);
+        syncingTask->fail(refreshTokenReply);
         return;
     }
 
@@ -179,83 +147,84 @@ void SyncService::refreshTokenReplyFinished()
 void SyncService::syncReplyFinished()
 {
     clear();
-    setMessage("Data is downloaded. Syncing...", "info");
+    syncingTask->setMessage("Processing downloaded data");
 
     try {
 
         QJsonDocument jsonDocument = QJsonDocument::fromJson(syncReply->readAll());
+
         if(!jsonDocument.isObject()){
-            setMessage("Invalid sync API response #1", "error");
-            setIsSyncing(false);
+            syncingTask->fail("Invalid sync API response #1");
             return;
         }
 
         QString userId = user->getUserId();
         QJsonObject root = jsonDocument.object();
-        if(!isSyncing){
-            return;
-        }
-
         apiJsonDumper->dumpSyncFields(&root);
 
-        setMessage("Syncing profile...", "info");
+        syncingTask->setMessage("profile");
         syncProfile(root["profile"].toObject());
-        if(!isSyncing){
+
+        if(!getIsSyncing()){
             return;
         }
 
-        setMessage("Syncing folders...", "info");
+        syncingTask->setMessage("folders");
         syncFolders(userId, root["folders"].toArray());
-        if(!isSyncing){
+        if(!getIsSyncing()){
             return;
         }
 
-        setMessage("Syncing collections...", "info");
+        syncingTask->setMessage("collections");
         syncCollections();
-        if(!isSyncing){
+        if(!getIsSyncing()){
             return;
         }
 
-        setMessage("Syncing ciphers...", "info");
+        syncingTask->setMessage("ciphers");
         syncCiphers(userId, root["ciphers"].toArray());
-        if(!isSyncing){
+        if(!getIsSyncing()){
             return;
         }
 
-        setMessage("Syncing sends...", "info");
+        syncingTask->setMessage("sends");
         syncSends();
-        if(!isSyncing){
+        if(!getIsSyncing()){
             return;
         }
 
-        setMessage("Syncing settings...", "info");
+        syncingTask->setMessage("settings");
         syncSettings();
-        if(!isSyncing){
+        if(!getIsSyncing()){
             return;
         }
 
-        setMessage("Syncing policies...", "info");
+        syncingTask->setMessage("policies");
         syncPolicies();
 
         setLastSync(QDateTime::currentDateTime());
 
+        syncingTask->setMessage("");
+
     } catch (std::exception &e) {
         QString errorMessage;
-        errorMessage.append("Failed: ").append(e.what()).append(" on \"").append(message).append("\"");
-        setMessage(errorMessage, "error");
-        setIsSyncing(false);
+        errorMessage.append("Failed: ").append(e.what()).append(" on \"").append(syncingTask->getMessage()).append("\"");
+        syncingTask->fail(errorMessage);
         return;
     }
 
-    setMessage("Done", "info");
-    setIsSyncing(false);
+    syncingTask->success();
 }
 
 void SyncService::clear()
 {
+    qDebug() << "clear state";
     stateService->clear();
+    qDebug() << "clear folders";
     foldersService->clear();
+    qDebug() << "clear ciphers";
     cipherService->clear();
+    qDebug() << "reset last sync";
     setLastSync(QDateTime());
 }
 
@@ -264,8 +233,7 @@ void SyncService::syncProfile(QJsonObject profile)
     apiJsonDumper->dumpProfileFields(&profile);
     QString stamp = user->getStamp();
     if(stamp != "" && stamp != profile["securityStamp"].toString()){
-        setMessage("Stamp has changed. Logout required", "error");
-        setIsSyncing(false);
+        syncingTask->fail("Stamp has changed. Logout is required");
     }
 
     cryptoService->setEncKey(profile["key"].toString());
@@ -324,4 +292,9 @@ void SyncService::syncSettings()
 void SyncService::syncPolicies()
 {
 
+}
+
+void SyncService::syncingTaskWasUpdated()
+{
+    emit isSyncingChanged();
 }

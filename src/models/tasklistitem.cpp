@@ -37,10 +37,34 @@ void TaskListItem::success()
     QTimer::singleShot(pauseMsBeforeRemove, this, &TaskListItem::terminate);
 }
 
+void TaskListItem::success(QString newMessage)
+{
+    message = newMessage;
+    success();
+}
+
 void TaskListItem::fail()
 {
     status = Enums::TaskStatus::Fail;
     emit updated(this);
+}
+
+void TaskListItem::fail(QString newMessage)
+{
+    message = newMessage;
+    fail();
+}
+
+void TaskListItem::fail(QNetworkReply *failedReply)
+{
+    setMessage(getFailedReplyMessage(failedReply));
+    fail();
+}
+
+void TaskListItem::fail(QString newMessage, QNetworkReply *failedReply)
+{
+    setMessage(newMessage + ". " + getFailedReplyMessage(failedReply));
+    fail();
 }
 
 const QString &TaskListItem::getMessage() const
@@ -52,6 +76,11 @@ void TaskListItem::setMessage(const QString &newMessage)
 {
     message = newMessage;
     emit updated(this);
+}
+
+QString TaskListItem::getFailedReplyMessage(QNetworkReply *failedReply)
+{
+    return "API: [" + QString::number(failedReply->error()) + "]" + failedReply->errorString();
 }
 
 void TaskListItem::terminate()

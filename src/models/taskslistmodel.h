@@ -21,6 +21,7 @@ public:
     explicit TasksListModel(QObject *parent = nullptr);
 
     TaskListItem* add(TaskListItem &item);
+    void remove(TaskListItem *item);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
@@ -34,7 +35,7 @@ signals:
     void countChanged();
 
 private slots:
-    void remove(TaskListItem *item);
+    void itemWasFinished(TaskListItem *item);
     void itemWasUpdated(TaskListItem *item);
 };
 

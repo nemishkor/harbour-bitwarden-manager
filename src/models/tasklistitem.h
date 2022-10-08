@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QObject>
 #include <QDebug>
+#include <QNetworkReply>
 
 #include <src/enums.h>
 
@@ -21,7 +22,11 @@ public:
     Enums::TaskStatus getStatus() const;
     void startOver();
     void success();
+    void success(QString newMessage);
     void fail();
+    void fail(QString newMessage);
+    void fail(QNetworkReply *failedReply);
+    void fail(QString newMessage, QNetworkReply *failedReply);
 
     const QString &getMessage() const;
     void setMessage(const QString &newMessage);
@@ -31,6 +36,7 @@ private:
     Enums::TaskStatus status;
     QString message;
     const int pauseMsBeforeRemove = 4000;
+    QString getFailedReplyMessage(QNetworkReply *failedReply);
 
 signals:
     void finished(TaskListItem*);

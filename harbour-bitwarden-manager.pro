@@ -71,8 +71,6 @@ DISTFILES += qml/harbour-bitwarden-manager.qml \
     qml/pages/Login.qml \
     qml/pages/Home.qml \
     qml/pages/Profile.qml \
-    qml/pages/Sync.qml \
-    qml/pages/Sync.qml \
     qml/pages/Unlock.qml \
     rpm/harbour-bitwarden-manager.changes \
     rpm/harbour-bitwarden-manager.changes.run.in \

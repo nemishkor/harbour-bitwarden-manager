@@ -9,7 +9,7 @@ TaskListItem* TasksListModel::add(TaskListItem &item)
     beginInsertRows(QModelIndex(), items.count(), items.count());
     items.append(item);
     TaskListItem *added = &items.last();
-    connect(added, &TaskListItem::finished, this, &TasksListModel::remove);
+    connect(added, &TaskListItem::finished, this, &TasksListModel::itemWasFinished);
     connect(added, &TaskListItem::updated, this, &TasksListModel::itemWasUpdated);
     endInsertRows();
     emit countChanged();
@@ -58,6 +58,11 @@ QModelIndex TasksListModel::findByRef(TaskListItem *item)
         }
     }
     return createIndex(-1, 0);
+}
+
+void TasksListModel::itemWasFinished(TaskListItem *item)
+{
+    remove(item);
 }
 
 void TasksListModel::remove(TaskListItem *item)

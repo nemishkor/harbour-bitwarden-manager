@@ -354,17 +354,6 @@ Manager</translation>
     </message>
 </context>
 <context>
-    <name>Sync</name>
-    <message>
-        <source>Sync</source>
-        <translation>Synkronisering</translation>
-    </message>
-    <message>
-        <source>Sync now</source>
-        <translation>Synkronisera nu</translation>
-    </message>
-</context>
-<context>
     <name>SyncBlock</name>
     <message>
         <source>Data is not synchronized</source>

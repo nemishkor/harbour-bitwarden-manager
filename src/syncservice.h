@@ -10,14 +10,14 @@
 #include <QJsonDocument>
 #include <QSettings>
 
-#include <src/factories/folderfactory.h>
-
 #include "src/factories/cipherfactory.h"
+#include "src/factories/folderfactory.h"
 #include "src/services/folderservice.h"
 #include "src/services/stateservice.h"
 #include "api.h"
 #include "cryptoservice.h"
 #include "cipher.h"
+#include "src/models/taskslistmodel.h"
 #include "src/services/cipherservice.h"
 #include "cipherstring.h"
 #include "folder.h"
@@ -29,8 +29,6 @@ class SyncService : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(bool isSyncing READ getIsSyncing NOTIFY isSyncingChanged)
-    Q_PROPERTY(QString message READ getMessage NOTIFY messageChanged);
-    Q_PROPERTY(QString messageType READ getMessageType NOTIFY messageTypeChanged);
     Q_PROPERTY(bool synchronized READ isSynchronized NOTIFY synchronizedChanged);
     Q_PROPERTY(QDateTime lastSync READ getLastSync NOTIFY lastSyncChanged);
 public:
@@ -38,7 +36,8 @@ public:
                 CryptoService *cryptoService, StateService *stateService,
                 FolderService *foldersService,
                 CipherService *cipherService, QSettings *settings,
-                ApiJsonDumper *apiJsonDumper);
+                ApiJsonDumper *apiJsonDumper,
+                TasksListModel *tasksListModel);
     Q_INVOKABLE void syncAll();
     Q_INVOKABLE void abort();
     bool getIsSyncing() const;
@@ -60,14 +59,10 @@ private:
     ApiJsonDumper *apiJsonDumper;
     CipherFactory *cipherFactory;
     FolderFactory *folderFactory;
+    TasksListModel *tasksListModel;
+    TaskListItem *syncingTask;
 
     // For GUI
-    bool isSyncing = false;
-    void setIsSyncing(bool value);
-    QString message;
-    QString messageType;
-    void setMessage(QString message, QNetworkReply *reply);
-    void setMessage(QString value, QString type = "info");
     QDateTime lastSync;
     void setLastSync(const QDateTime &value);
 
@@ -91,6 +86,9 @@ signals:
     void messageTypeChanged();
     void synchronizedChanged();
     void lastSyncChanged();
+
+private slots:
+    void syncingTaskWasUpdated();
 
 };
 

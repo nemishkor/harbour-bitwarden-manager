@@ -353,17 +353,6 @@
     </message>
 </context>
 <context>
-    <name>Sync</name>
-    <message>
-        <source>Sync</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sync now</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>SyncBlock</name>
     <message>
         <source>Data is not synchronized</source>
