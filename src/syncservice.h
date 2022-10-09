@@ -66,10 +66,7 @@ private:
     QDateTime lastSync;
     void setLastSync(const QDateTime &value);
 
-    bool refreshTokenRun = false;
-    QNetworkReply *refreshTokenReply;
     QNetworkReply *syncReply;
-    void refreshTokenReplyFinished();
     void syncReplyFinished();
 
     void syncProfile(QJsonObject profile);
@@ -89,6 +86,8 @@ signals:
 
 private slots:
     void syncingTaskWasUpdated();
+    void refreshTokenSuccess();
+    void refreshTokenFail(QString reason);
 
 };
 

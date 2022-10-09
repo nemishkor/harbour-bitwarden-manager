@@ -75,6 +75,7 @@ const QString &TaskListItem::getMessage() const
 void TaskListItem::setMessage(const QString &newMessage)
 {
     message = newMessage;
+    qDebug().nospace().noquote() << "Task \"" << name << "\": " << message;
     emit updated(this);
 }
 

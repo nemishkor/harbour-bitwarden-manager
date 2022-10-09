@@ -21,7 +21,7 @@ public:
         iv(c.getIv()),
         mac(c.getMac())
     {
-        qDebug() << "copy cipherString";
+//        qDebug() << "copy cipherString";
     }
 
     static QString buildEncryptedString(SymmetricCryptoKey keyForEnc, QByteArray iv, QByteArray data);

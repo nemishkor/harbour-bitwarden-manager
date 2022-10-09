@@ -20,7 +20,6 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService,
     tasksListModel(tasksListModel)
 {
     syncReply = nullptr;
-    refreshTokenReply = nullptr;
     syncingTask = nullptr;
     if(settings->contains("last_sync_" + user->getUserId())){
 //        lastSync = settings->value("last_sync_" + user->getUserId()).toDateTime();
@@ -32,10 +31,7 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService,
 
 void SyncService::syncAll()
 {
-    if(syncingTask != nullptr){
-        tasksListModel->remove(syncingTask);
-    }
-
+    tasksListModel->remove(syncingTask);
     TaskListItem task("Syncing");
     syncingTask = tasksListModel->add(task);
     connect(syncingTask, &TaskListItem::updated, this, &SyncService::syncingTaskWasUpdated);
@@ -45,33 +41,30 @@ void SyncService::syncAll()
         return;
     }
 
-    if(tokenService->tokenNeedsRefresh()){
-        if(refreshTokenRun){
-            syncingTask->fail("Oops. Something went wrong. Actual token is outdated");
-            return;
-        }
-        syncingTask->setMessage("Refreshing token");
-        QString refreshToken = tokenService->getRefreshToken();
-        if(refreshToken == ""){
-            syncingTask->fail("Oops. Something went wrong. Can not refresh access token. Refresh token is empty");
-            return;
-        }
-        refreshTokenRun = true;
-        refreshTokenReply = api->refreshAccessToken(tokenService->getClientIdFromToken(), refreshToken);
-        connect(refreshTokenReply, &QNetworkReply::finished, this, &SyncService::refreshTokenReplyFinished);
-        return;
-    }
+    connect(tokenService, &TokenService::refreshTokenSuccess, this, &SyncService::refreshTokenSuccess);
+    connect(tokenService, &TokenService::refreshTokenFail, this, &SyncService::refreshTokenFail);
+    tokenService->validateToken();
+}
 
+void SyncService::refreshTokenSuccess()
+{
+    disconnect(tokenService, &TokenService::refreshTokenSuccess, this, &SyncService::refreshTokenSuccess);
+    disconnect(tokenService, &TokenService::refreshTokenFail, this, &SyncService::refreshTokenFail);
     syncingTask->setMessage("Downloading");
     syncReply = api->getSync(tokenService->getAccessToken());
     connect(syncReply, &QNetworkReply::finished, this, &SyncService::syncReplyFinished);
 }
 
+void SyncService::refreshTokenFail(QString reason)
+{
+    disconnect(tokenService, &TokenService::refreshTokenSuccess, this, &SyncService::refreshTokenSuccess);
+    disconnect(tokenService, &TokenService::refreshTokenFail, this, &SyncService::refreshTokenFail);
+    syncingTask->fail(reason);
+}
+
 void SyncService::abort()
 {
-    if(refreshTokenReply && refreshTokenReply->isRunning()){
-        refreshTokenReply->abort();
-    }
+    tokenService->abort();
     if(syncReply && syncReply->isRunning()){
         syncReply->abort();
     }
@@ -80,7 +73,9 @@ void SyncService::abort()
 
 bool SyncService::getIsSyncing() const
 {
-    return syncingTask != nullptr && syncingTask->getStatus() == Enums::TaskStatus::InProgress;
+    return syncingTask != nullptr &&
+            tasksListModel->contains(syncingTask) &&
+            syncingTask->getStatus() == Enums::TaskStatus::InProgress;
 }
 
 bool SyncService::isSynchronized() const
@@ -104,53 +99,12 @@ void SyncService::setLastSync(const QDateTime &value)
     }
 }
 
-void SyncService::refreshTokenReplyFinished()
-{
-    if(refreshTokenReply->error() != QNetworkReply::NoError && refreshTokenReply->error() != QNetworkReply::ProtocolInvalidOperationError){
-        syncingTask->fail("Token refreshing failed", refreshTokenReply);
-        return;
-    }
-
-    QJsonDocument json = QJsonDocument::fromJson(refreshTokenReply->readAll());
-
-    if(!json.isObject()){
-        syncingTask->fail("Invalid refresh token API response #1");
-        return;
-    }
-
-    QJsonObject root = json.object();
-
-    if(refreshTokenReply->error() == QNetworkReply::ProtocolInvalidOperationError && root.contains("error")){
-        syncingTask->fail("Token refreshing failed. " + root["error"].toString());
-        return;
-    }
-
-    if(!root.contains("access_token")){
-        syncingTask->fail("Token refreshing failed. API response does not contain access_token field");
-        return;
-    }
-
-    if(!root.contains("refresh_token")){
-        syncingTask->fail("Token refreshing failed. API response does not contain access_token field");
-        return;
-    }
-
-    if(refreshTokenReply->error() == QNetworkReply::ProtocolInvalidOperationError){
-        syncingTask->fail(refreshTokenReply);
-        return;
-    }
-
-    tokenService->setTokens(root["access_token"].toString(), root["refresh_token"].toString());
-    syncAll();
-}
-
 void SyncService::syncReplyFinished()
 {
     clear();
     syncingTask->setMessage("Processing downloaded data");
 
     try {
-
         QJsonDocument jsonDocument = QJsonDocument::fromJson(syncReply->readAll());
 
         if(!jsonDocument.isObject()){
@@ -298,3 +252,4 @@ void SyncService::syncingTaskWasUpdated()
 {
     emit isSyncingChanged();
 }
+

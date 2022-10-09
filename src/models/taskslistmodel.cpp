@@ -78,6 +78,11 @@ void TasksListModel::remove(TaskListItem *item)
     qWarning() << "Unable to find item to remove. Probably it's removed already";
 }
 
+bool TasksListModel::contains(TaskListItem *item)
+{
+    return findByRef(item).isValid();
+}
+
 void TasksListModel::itemWasUpdated(TaskListItem *item)
 {
     QModelIndex i = findByRef(item);

@@ -61,13 +61,13 @@ void CipherString::fill(QString encryptedString)
     }
     QStringList headerPieses = encryptedString.split(".");
     QStringList encPieses;
-    qDebug() << "header pieses length" << headerPieses.length();
+//    qDebug() << "header pieses length" << headerPieses.length();
     if(headerPieses.count() == 2){
         encryptionType = static_cast<Enums::EncryptionType>(headerPieses[0].toInt());
         encPieses = headerPieses[1].split("|");
     } else {
         encPieses = encryptedString.split("|");
-        qDebug() << "enc pieses length" << encPieses.length();
+//        qDebug() << "enc pieses length" << encPieses.length();
         encryptionType = encPieses.length() == 3
                 ? Enums::EncryptionType::AesCbc128_HmacSha256_B64
                 : Enums::EncryptionType::AesCbc256_B64;
@@ -91,6 +91,6 @@ void CipherString::fill(QString encryptedString)
     default:
         break;
     }
-    qDebug() << "encryption type" << encryptionType;
+//    qDebug() << "encryption type" << encryptionType;
 }
 

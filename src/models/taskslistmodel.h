@@ -22,6 +22,7 @@ public:
 
     TaskListItem* add(TaskListItem &item);
     void remove(TaskListItem *item);
+    bool contains(TaskListItem *item);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 

@@ -29,6 +29,7 @@ public:
     bool tokenNeedsRefresh(int minutes = 5);
     void clearTokens();
     void validateToken();
+    void abort();
 
 private:
     QString accessToken;
@@ -43,6 +44,7 @@ private:
     bool tokenIsRefreshing = false;
     QNetworkReply *refreshTokenReply;
     void refreshTokenReplyFinished();
+    QString getFailedReplyMessage(QNetworkReply *failedReply);
 
 signals:
     void refreshTokenSuccess();

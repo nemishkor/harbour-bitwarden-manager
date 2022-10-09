@@ -64,8 +64,6 @@ void TokenService::clearTokens()
 
 void TokenService::validateToken()
 {
-    tokenIsRefreshing = true;
-
     if(!tokenNeedsRefresh()){
         qDebug() << "Token doesn't need refreshing";
         emit refreshTokenSuccess();
@@ -78,6 +76,8 @@ void TokenService::validateToken()
         return;
     }
 
+    tokenIsRefreshing = true;
+
     if(refreshToken == ""){
         tokenIsRefreshing = false;
         qCritical() << "Oops. Something went wrong. Can not refresh access token. Refresh token is empty";
@@ -87,6 +87,13 @@ void TokenService::validateToken()
     qDebug() << "Refreshing token...";
     refreshTokenReply = api->refreshAccessToken(getClientIdFromToken(), refreshToken);
     connect(refreshTokenReply, &QNetworkReply::finished, this, &TokenService::refreshTokenReplyFinished);
+}
+
+void TokenService::abort()
+{
+    if(refreshTokenReply && refreshTokenReply->isRunning()){
+        refreshTokenReply->abort();
+    }
 }
 
 void TokenService::setAccessToken(const QString &value)
@@ -136,7 +143,7 @@ void TokenService::refreshTokenReplyFinished()
 {
     if(refreshTokenReply->error() != QNetworkReply::NoError &&
             refreshTokenReply->error() != QNetworkReply::ProtocolInvalidOperationError){
-        emit refreshTokenFail("Token refreshing failed");
+        emit refreshTokenFail("Token refreshing failed. " + getFailedReplyMessage(refreshTokenReply));
         return;
     }
 
@@ -165,10 +172,15 @@ void TokenService::refreshTokenReplyFinished()
     }
 
     if(refreshTokenReply->error() == QNetworkReply::ProtocolInvalidOperationError){
-        emit refreshTokenFail("Invalid protocol error");
+        emit refreshTokenFail(getFailedReplyMessage(refreshTokenReply));
         return;
     }
 
     setTokens(root["access_token"].toString(), root["refresh_token"].toString());
     emit refreshTokenSuccess();
+}
+
+QString TokenService::getFailedReplyMessage(QNetworkReply *failedReply)
+{
+    return "API: [" + QString::number(failedReply->error()) + "]" + failedReply->errorString();
 }
