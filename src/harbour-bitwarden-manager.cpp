@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
 
     ApiJsonDumper apiJsonDumper;
 
-    FolderService foldersService(&stateService, &crypto, &tokenService, &apiJsonDumper, &api);
+    FolderService foldersService(&stateService, &crypto, &tokenService, &apiJsonDumper, &tasks, &api);
     context->setContextProperty("foldersService", &foldersService);
     context->setContextProperty("foldersListModel", foldersService.getListModel());
 

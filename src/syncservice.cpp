@@ -31,9 +31,7 @@ SyncService::SyncService(Api *api, User *user, TokenService *tokenService,
 
 void SyncService::syncAll()
 {
-    tasksListModel->remove(syncingTask);
-    TaskListItem task("Syncing");
-    syncingTask = tasksListModel->add(task);
+    syncingTask = tasksListModel->create("Syncing", syncingTask);
     connect(syncingTask, &TaskListItem::updated, this, &SyncService::syncingTaskWasUpdated);
 
     if(user->getUserId() == "" || !tokenService->exists()){

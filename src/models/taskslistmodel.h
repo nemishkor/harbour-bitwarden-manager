@@ -21,6 +21,7 @@ public:
     explicit TasksListModel(QObject *parent = nullptr);
 
     TaskListItem* add(TaskListItem &item);
+    TaskListItem *create(QString name, TaskListItem *oldTask);
     void remove(TaskListItem *item);
     bool contains(TaskListItem *item);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;

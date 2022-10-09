@@ -20,7 +20,6 @@ public:
 
     const QString &getName() const;
     Enums::TaskStatus getStatus() const;
-    void startOver();
     void success();
     void success(QString newMessage);
     void fail();

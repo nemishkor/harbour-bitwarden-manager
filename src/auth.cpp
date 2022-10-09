@@ -69,11 +69,7 @@ void Auth::reset()
 
 void Auth::login(QString email, QString password, QString apiKey)
 {
-    if(loginTask != nullptr){
-        tasksListModel->remove(loginTask);
-    }
-    TaskListItem task("Login");
-    loginTask = tasksListModel->add(task);
+    loginTask = tasksListModel->create("Login", loginTask);
     authentication->clear();
     authentication->setEmail(email);
     authentication->setPassword(password);

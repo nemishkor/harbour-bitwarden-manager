@@ -63,8 +63,10 @@ Page {
         }
 
         PullDownMenu {
+            busy: foldersService.creating
             MenuItem {
                 text: "Add folder"
+                enabled: !foldersService.creating
                 onClicked: pageStack.animatorPush(addFolderPage)
             }
         }
@@ -137,42 +139,6 @@ Page {
             }
 
         }
-    }
-
-    DockedPanel {
-        id: dockedPanel
-
-        height: Theme.itemSizeExtraLarge + Theme.paddingLarge
-        width: parent.width
-        open: foldersService.creating
-        dock: Dock.Bottom
-        modal: true
-
-        ProgressCircle {
-            id: circle
-            anchors { left: parent.left; leftMargin: Theme.horizontalPageMargin; verticalCenter: parent.verticalCenter }
-
-            NumberAnimation on value {
-                from: 0
-                to: 1
-                duration: 1000
-                running: dockedPanel.expanded
-                loops: Animation.Infinite
-            }
-        }
-
-        Label {
-            anchors {
-                left: circle.right
-                leftMargin: Theme.paddingMedium
-            }
-            width: parent.width - 2 * Theme.horizontalPageMargin - circle.width
-            padding: Theme.paddingMedium
-            text: "Saving folder..."
-            color: Theme.primaryColor
-            wrapMode: "WrapAnywhere"
-        }
-
     }
 
 }

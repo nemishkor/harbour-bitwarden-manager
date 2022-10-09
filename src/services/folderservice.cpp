@@ -3,16 +3,19 @@
 FolderService::FolderService(StateService *stateService, CryptoService *cryptoService,
                              TokenService *tokenService,
                              ApiJsonDumper *apiJsonDumper,
+                             TasksListModel *tasksListModel,
                              Api *api, QObject *parent):
     QObject(parent),
     stateService(stateService),
     cryptoService(cryptoService),
     tokenService(tokenService),
-    api(api)
+    api(api),
+    tasksListModel(tasksListModel)
 {
     listModel = new FoldersListModel();
     locale = QLocale::system();
     savingListItemFolder = nullptr;
+    createFolderTask = nullptr;
     folderFactory = new FolderFactory(apiJsonDumper);
 }
 
@@ -34,6 +37,11 @@ void FolderService::addListItemToModel(Folder *folder)
     revisionDate.setTimeSpec(Qt::UTC);
     listItem.setRevisionDate(revisionDate.toLocalTime().toString(dateTimeFormat));
     listModel->add(listItem);
+}
+
+void FolderService::createFolderTaskWasUpdated()
+{
+    emit creatingChanged();
 }
 
 void FolderService::decryptAll()
@@ -60,19 +68,25 @@ void FolderService::decryptAll()
 
 void FolderService::create(QString name)
 {
+    createFolderTask = tasksListModel->create("Add folder", createFolderTask);
+    connect(createFolderTask, &TaskListItem::updated, this, &FolderService::createFolderTaskWasUpdated);
+    emit creatingChanged();
     FolderListItem folderListItem;
     folderListItem.setName(name);
     listModel->add(folderListItem);
     setSavingListItemFolder(&folderListItem);
 
+    createFolderTask->setMessage("Validating token");
     connect(tokenService, &TokenService::refreshTokenSuccess, this, &FolderService::postFolderRefreshTokenSuccess);
     connect(tokenService, &TokenService::refreshTokenFail, this, &FolderService::postFolderRefreshTokenFailed);
     tokenService->validateToken();
 }
 
-bool FolderService::getCreating()
+bool FolderService::isCreating()
 {
-    return savingListItemFolder != nullptr;
+    return createFolderTask != nullptr
+            && tasksListModel->contains(createFolderTask)
+            && createFolderTask->getStatus() == Enums::TaskStatus::InProgress;
 }
 
 FoldersListModel *FolderService::getListModel() const
@@ -85,7 +99,7 @@ void FolderService::clear()
     qDebug() << "Clear decrypted folders list";
     decrypted = false;
     listModel->clear();
-    if(getCreating()){
+    if(isCreating()){
         disconnect(tokenService, &TokenService::refreshTokenSuccess, this, &FolderService::postFolderRefreshTokenSuccess);
         disconnect(tokenService, &TokenService::refreshTokenFail, this, &FolderService::postFolderRefreshTokenFailed);
         setSavingListItemFolder(nullptr);
@@ -96,7 +110,6 @@ void FolderService::setSavingListItemFolder(FolderListItem *newSavingListItemFol
 {
     if(newSavingListItemFolder != savingListItemFolder){
         savingListItemFolder = newSavingListItemFolder;
-        emit creatingChanged();
     }
 }
 
@@ -111,16 +124,17 @@ void FolderService::postFolderRefreshTokenSuccess()
 {
     disconnect(tokenService, &TokenService::refreshTokenSuccess, this, &FolderService::postFolderRefreshTokenSuccess);
     disconnect(tokenService, &TokenService::refreshTokenFail, this, &FolderService::postFolderRefreshTokenFailed);
+    createFolderTask->setMessage("Saving");
     postFolderReply = api->postFolder(cryptoService->encrypt(savingListItemFolder->getName()), tokenService->getAccessToken());
     connect(postFolderReply, &QNetworkReply::finished, this, &FolderService::postFolderSuccess);
 }
 
 void FolderService::postFolderRefreshTokenFailed(QString reason)
 {
+    createFolderTask->fail(reason);
     disconnect(tokenService, &TokenService::refreshTokenSuccess, this, &FolderService::postFolderRefreshTokenSuccess);
     disconnect(tokenService, &TokenService::refreshTokenFail, this, &FolderService::postFolderRefreshTokenFailed);
     cancelSavingListItemFolder();
-    qWarning() << "Unable to POST folder: unable to refresh token:" << reason;
 }
 
 void FolderService::postFolderSuccess()
@@ -128,7 +142,7 @@ void FolderService::postFolderSuccess()
     setSavingListItemFolder(nullptr);
 
     if(postFolderReply->error() != QNetworkReply::NoError && postFolderReply->error() != QNetworkReply::ProtocolInvalidOperationError){
-        qCritical() << "Post folder request failed. Error:" << postFolderReply->error();
+        createFolderTask->fail(postFolderReply);
         cancelSavingListItemFolder();
         return;
     }
@@ -136,7 +150,7 @@ void FolderService::postFolderSuccess()
     int httpCode = postFolderReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
     if(httpCode != 200 && httpCode != 400){
-        qCritical() << "Unexpected http response code on POST folder:" << httpCode;
+        createFolderTask->fail(QString("Unexpected http response code on POST folder: ").append(httpCode));
         cancelSavingListItemFolder();
         return;
     }
@@ -144,13 +158,14 @@ void FolderService::postFolderSuccess()
     QJsonDocument json = QJsonDocument::fromJson(postFolderReply->readAll());
 
     if(!json.isObject()){
-        qCritical() << "Root JSON item in POST folder response body is not object";
+        createFolderTask->fail("Root JSON item in POST folder response body is not object");
         cancelSavingListItemFolder();
         return;
     }
 
     if(httpCode == 400){
         qWarning() << json.toJson(QJsonDocument::Compact);
+        createFolderTask->fail("Bad request");
         cancelSavingListItemFolder();
         return;
     }
@@ -159,4 +174,5 @@ void FolderService::postFolderSuccess()
     stateService->add(folder);
     listModel->removeLast();
     addListItemToModel(&folder);
+    createFolderTask->success();
 }

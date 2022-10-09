@@ -24,12 +24,6 @@ Enums::TaskStatus TaskListItem::getStatus() const
     return status;
 }
 
-void TaskListItem::startOver()
-{
-    status = Enums::TaskStatus::InProgress;
-    emit updated(this);
-}
-
 void TaskListItem::success()
 {
     status = Enums::TaskStatus::Success;

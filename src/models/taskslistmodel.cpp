@@ -17,6 +17,15 @@ TaskListItem* TasksListModel::add(TaskListItem &item)
     return added;
 }
 
+TaskListItem *TasksListModel::create(QString name, TaskListItem *oldTask)
+{
+    if(oldTask != nullptr){
+        remove(oldTask);
+    }
+    TaskListItem task(name);
+    return add(task);
+}
+
 int TasksListModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
