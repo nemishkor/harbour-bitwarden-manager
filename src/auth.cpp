@@ -6,7 +6,9 @@ Auth::Auth(AppIdService *appIdService,
            CryptoService *crypto,
            User *user,
            SyncService *syncService,
-           TasksListModel *tasksListModel) :
+           TasksListModel *tasksListModel,
+           QObject* parent) :
+    QObject(parent),
     appIdService(appIdService),
     tokenService(tokenService),
     api(api),
@@ -15,7 +17,7 @@ Auth::Auth(AppIdService *appIdService,
     syncService(syncService),
     tasksListModel(tasksListModel)
 {
-    authentication = new Authentication();
+    authentication = new Authentication(this);
     preloginReply = nullptr;
     authenticateReply = nullptr;
     loginTask = nullptr;
@@ -23,7 +25,7 @@ Auth::Auth(AppIdService *appIdService,
         qDebug() << "tokens are exist";
         if(user->isAuthenticated()){
             qDebug() << "user is authenticated";
-            setLoginStage(4);
+            setLoginStage(2);
         }
     }
 }
@@ -59,17 +61,24 @@ void Auth::reset()
     authentication->clear();
     setLoginStage(0);
     setIsApiKeyRequired(false);
-    if(preloginReply && preloginReply->isRunning()){
+    if(preloginReply != nullptr && preloginReply->isRunning()){
         preloginReply->abort();
     }
-    if(authenticateReply && authenticateReply->isRunning()){
+    if(authenticateReply != nullptr && authenticateReply->isRunning()){
         authenticateReply->abort();
     }
 }
 
 void Auth::login(QString email, QString password, QString apiKey)
 {
-    loginTask = tasksListModel->create("Login", loginTask);
+    qDebug() << "login";
+    if(loginTask != nullptr){
+        qWarning() << "Login task is exist already. Unable to create another one";
+        return;
+    }
+    loginTask = tasksListModel->create("Login");
+    connect(loginTask, &TaskListItem::finished, this, &Auth::loginTaskWasFinished);
+    loginTask->start();
     authentication->clear();
     authentication->setEmail(email);
     authentication->setPassword(password);
@@ -96,6 +105,8 @@ void Auth::preLoginReplyHandler()
     }
 
     QByteArray replyBody = preloginReply->readAll();
+    delete preloginReply;
+    preloginReply = nullptr;
     qDebug() << "Prelogin reply body:\n" << replyBody;
 
     QJsonDocument json = QJsonDocument::fromJson(replyBody);
@@ -135,12 +146,14 @@ void Auth::getToken()
 
 void Auth::logout()
 {
+    qDebug() << "logout";
     reset();
 //    this.syncService.setLastSync(new Date(0)),
     tokenService->clearTokens();
     crypto->clearKeys();
     user->clear();
     syncService->clear();
+    setLoginStage(0);
 
 //    this.settingsService.clear(userId),
 //    this.cipherService.clear(userId),
@@ -183,6 +196,9 @@ void Auth::postAuthenticate()
     }
 
     QByteArray replyBody = authenticateReply->readAll();
+    int httpCode = authenticateReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    delete authenticateReply;
+    authenticateReply = nullptr;
     qDebug() << "Authentication reply body:\n" << replyBody;
 
     QJsonDocument json = QJsonDocument::fromJson(replyBody);
@@ -196,7 +212,6 @@ void Auth::postAuthenticate()
     }
 
     QJsonObject root = json.object();
-    int httpCode = authenticateReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
     if(httpCode == 400 && root.contains("HCaptcha_SiteKey")){
         IdentityCaptchaResponse identityCaptchaResponse(root["HCaptcha_SiteKey"].toString());
@@ -238,13 +253,6 @@ void Auth::postAuthenticate()
         return;
     }
 
-    if(authenticateReply->error() == QNetworkReply::ProtocolInvalidOperationError){
-        loginTask->setMessage("[" + QString::number(authenticateReply->error()) + "]" + authenticateReply->errorString());
-        loginTask->fail();
-        reset();
-        return;
-    }
-
     if(!root.contains("Kdf")){
         loginTask->setMessage("Invalid API response #4");
         loginTask->fail();
@@ -265,7 +273,11 @@ void Auth::postAuthenticate()
     crypto->setHashedPassword(authentication->getHashedPassword());
 
     authentication->clear();
-    setLoginStage(4);
-    loginTask->setMessage("success");
-    loginTask->success();
+    setLoginStage(2);
+    loginTask->success("success");
+}
+
+void Auth::loginTaskWasFinished()
+{
+    loginTask = nullptr;
 }

@@ -1,18 +1,17 @@
 #ifndef CIPHERFACTORY_H
 #define CIPHERFACTORY_H
 
-#include <src/apijsondumper.h>
-#include <src/cipher.h>
-
 #include <QJsonObject>
 #include <QJsonArray>
 
+#include "src/apijsondumper.h"
+#include "src/models/cipher.h"
 
-
-class CipherFactory
+class CipherFactory : QObject
 {
+    Q_OBJECT
 public:
-    CipherFactory(ApiJsonDumper *apiJsonDumper);
+    CipherFactory(ApiJsonDumper *apiJsonDumper, QObject* parent = nullptr);
     Cipher create(QJsonObject apiObject, QString userId);
 
 private:

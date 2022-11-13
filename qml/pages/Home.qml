@@ -162,78 +162,11 @@ Page {
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl("Ciphers.qml"), { deleted: true })
             }
 
-            /*
-            ExpandingSection {
-                id: section
-
-                title: "Lists"
-
-                content.sourceComponent: Column {
-                    width: section.width
-
-                    BackgroundItem {
-                        width: section.width
-                        Label {
-                            text: "Items"
-                            color: highlighted ? Theme.highlightColor : Theme.primaryColor
-                            anchors.verticalCenter: parent.verticalCenter
-                            x: Theme.horizontalPageMargin
-                        }
-                        onClicked: pageStack.animatorPush(Qt.resolvedUrl("Items.qml"))
-                    }
-                    BackgroundItem {
-                        width: section.width
-                        Label {
-                            text: "Folders"
-                            color: highlighted ? Theme.highlightColor : Theme.primaryColor
-                            anchors.verticalCenter: parent.verticalCenter
-                            x: Theme.horizontalPageMargin
-                        }
-                    }
-                    BackgroundItem {
-                        width: section.width
-                        Label {
-                            text: "Collections"
-                            color: highlighted ? Theme.highlightColor : Theme.primaryColor
-                            anchors.verticalCenter: parent.verticalCenter
-                            x: Theme.horizontalPageMargin
-                        }
-                    }
-                    BackgroundItem {
-                        width: section.width
-                        Label {
-                            text: "Organizations"
-                            color: highlighted ? Theme.highlightColor : Theme.primaryColor
-                            anchors.verticalCenter: parent.verticalCenter
-                            x: Theme.horizontalPageMargin
-                        }
-                    }
-                    BackgroundItem {
-                        width: section.width
-                        Label {
-                            text: "Organizations collections"
-                            color: highlighted ? Theme.highlightColor : Theme.primaryColor
-                            anchors.verticalCenter: parent.verticalCenter
-                            x: Theme.horizontalPageMargin
-                        }
-                    }
-                    BackgroundItem {
-                        width: section.width
-                        Label {
-                            text: "Organizations members"
-                            color: highlighted ? Theme.highlightColor : Theme.primaryColor
-                            anchors.verticalCenter: parent.verticalCenter
-                            x: Theme.horizontalPageMargin
-                        }
-                    }
-                }
-            }
-            */
-
             Button {
                 text: "Logout"
                 // see harbour-bitwarden-manager.qml
                 onClicked: auth.logout()
+                enabled: tasks.count === 0
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 

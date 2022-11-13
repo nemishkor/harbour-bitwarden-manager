@@ -12,60 +12,92 @@ Page {
     allowedOrientations: Orientation.All
 
     onStatusChanged: {
-        if (status == PageStatus.Active && !vaultManager.isLocked && syncService.synchronized) {
+        if (status == PageStatus.Active) {
+            decryptAllIfAllowed()
+        }
+    }
+
+    function decryptAllIfAllowed(){
+        if(!vaultManager.isLocked && syncService.synchronized){
             cipherService.decryptAll(deleted, folderId)
         }
     }
 
     SilicaFlickable {
-        visible: vaultManager.isLocked
-        contentHeight: unlockColumn.height
-
+        visible: vaultManager.isLocked || !syncService.synchronized
+        contentHeight: syncLockColumn.height
         Column {
-            id: unlockColumn
+            id: syncLockColumn
             width: page.width
-
             PageHeader {
                 title: qsTr("Ciphers")
                 description: "Bitwarden manager"
             }
-
-            LockBlock {}
+            LockBlock { id: lockBlock }
+            Spacer { visible: lockBlock.visible }
+            SyncBlock {}
         }
     }
 
-    SilicaFlickable {
-        visible: !vaultManager.isLocked && !syncService.synchronized
-        contentHeight: syncColumn.height
-        Column {
-            id: syncColumn
-            width: page.width
-            PageHeader {
-                title: qsTr("Ciphers")
-                description: "Bitwarden manager"
-            }
-            SyncBlock {}
+    Connections {
+        target: vaultManager
+        onIsLockedChanged: {
+            decryptAllIfAllowed()
+        }
+    }
+
+    Connections {
+        target: syncService
+        onSynchronizedChanged: {
+            decryptAllIfAllowed()
         }
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaListView {
+        id: listView
 
         visible: !vaultManager.isLocked && syncService.synchronized
         model: ciphersListModel
-        anchors.fill: parent
+        anchors {
+            fill: parent
+            bottomMargin: selections.visibleSize
+        }
+        clip: selections.expanded
         header: PageHeader {
+            id: pageHeader
             title: qsTr("Ciphers")
             description: "Bitwarden manager"
         }
         delegate: ListItem {
             id: delegate
             contentHeight: column.height + separator.height
-            onClicked: pageStack.animatorPush(Qt.resolvedUrl("Cipher.qml"), {cipherId: model.id})
+            menu: contextMenu
+            property int itemIndex: index
+            property bool isChecked: model.checked
+            function toggleCheck(){
+                model.checked = !model.checked
+            }
+
+            Component {
+                id: contextMenu
+                ContextMenu {
+                    MenuItem {
+                        text: qsTr("Remove")
+                        onClicked: ciphersListModel.remove(index)
+                    }
+                }
+            }
 
             Icon {
                 id: cipherIcon
                 source: {
+                    if(model.checked){
+                        return "image://theme/icon-m-certificates";
+                    }
+                    if(ciphersListModel.checkedCount > 0){
+                        return "image://theme/icon-m-tabs";
+                    }
                     if(model.type === 1){
                         return "image://theme/icon-m-keys";
                     }
@@ -132,6 +164,7 @@ Page {
 
             Separator {
                 id: separator
+                visible: (index + 1) < listView.count
                 anchors.top: column.bottom
                 width: parent.width
                 color: Theme.primaryColor
@@ -141,6 +174,80 @@ Page {
 
         VerticalScrollDecorator {}
 
+    }
+
+    MouseArea {
+        z: 1
+        visible: !vaultManager.isLocked && syncService.synchronized
+        anchors {
+            top: parent.top
+            bottom: parent.bottom
+            bottomMargin: selections.visibleSize
+            left: parent.left;
+            leftMargin: Theme.horizontalPageMargin
+        }
+        width: Theme.iconSizeMedium
+        hoverEnabled: false
+
+        /*
+          First pressed list item check state
+          if `true` than moving finger up or down marks items as checked
+          if `false` than moving finger up or down marks items as unchecked
+         */
+        property bool checkMode: true
+
+        function getYInList(mouseY){
+            // header fix
+            return Math.round(mouseY) + (listView.contentY < 0 ? listView.contentY : selections.height);
+        }
+
+        onPressed: {
+            listView.interactive = false
+            var item = listView.itemAt(mouseX, getYInList(mouseY))
+            item.toggleCheck()
+            checkMode = item.isChecked
+        }
+        onPositionChanged: {
+            var item = listView.itemAt(mouseX, getYInList(mouseY))
+            if((checkMode && item.isChecked) || (!checkMode && !item.isChecked)){
+                return
+            }
+            item.toggleCheck()
+        }
+        onReleased: {
+            listView.interactive = true
+        }
+        onCanceled: {
+            listView.interactive = true
+        }
+    }
+
+    DockedPanel {
+        id: selections
+        width: parent.width
+        height: Theme.itemSizeExtraSmall * 2 + Theme.paddingLarge * 3
+        open: ciphersListModel.checkedCount > 0
+        ButtonLayout {
+            anchors {
+                verticalCenter: parent.verticalCenter
+            }
+
+            Button {
+                preferredWidth: Theme.buttonWidthTiny
+                text: qsTr("Select all")
+                onClicked: ciphersListModel.selectAll()
+            }
+            Button {
+                preferredWidth: Theme.buttonWidthTiny
+                text: qsTr("Unselect all")
+                onClicked: ciphersListModel.unselectAll()
+            }
+            Button {
+                preferredWidth: Theme.buttonWidthTiny
+                text: qsTr("Delete")
+                onClicked: entitiesService.removeSelectedCiphers()
+            }
+        }
     }
 
 }

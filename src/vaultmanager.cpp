@@ -1,7 +1,7 @@
 #include "vaultmanager.h"
 
-VaultManager::VaultManager(CryptoService *cryptoService, User *user, Api *api, TokenService *tokenService) :
-    QObject(nullptr),
+VaultManager::VaultManager(CryptoService *cryptoService, User *user, Api *api, TokenService *tokenService, QObject* parent) :
+    QObject(parent),
     cryptoService(cryptoService),
     user(user),
     api(api),
@@ -18,7 +18,6 @@ void VaultManager::unlock(QString password)
     setUnlockMessage("Encrypting");
 
     key = cryptoService->makeKey(password, user->getEmail(), user->getKdf(), user->getKdfIterations());
-    qDebug() << "key was generated" << key;
     masterPasswordHash = cryptoService->hashPassword(key, password);
     if(masterPasswordHash == cryptoService->getHashedPassword()){
         cryptoService->setKey(SymmetricCryptoKey(key));
@@ -135,10 +134,6 @@ void VaultManager::verifyPasswordOnline()
 
 void VaultManager::verifyPasswordFinished()
 {
-//    QList<QPair<QByteArray, QByteArray>>::const_iterator i;
-//    for (i = verifyPasswordReply->rawHeaderPairs().begin(); i != verifyPasswordReply->rawHeaderPairs().end(); ++i)
-//        qDebug() << "header:" << (*i).first << ":" << (*i).second;
-//    qDebug() << verifyPasswordReply->readAll();
     if(verifyPasswordReply->error() == QNetworkReply::NoError) {
         cryptoService->setKey(key);
         setUnlockMessage("");

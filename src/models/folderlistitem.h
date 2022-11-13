@@ -1,8 +1,6 @@
 #ifndef FOLDERLISTITEM_H
 #define FOLDERLISTITEM_H
 
-#include "src/folder.h"
-
 #include <QString>
 
 class FolderListItem

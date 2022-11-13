@@ -17,8 +17,9 @@ public:
     };
     enum TaskStatus {
         Fail = -1,
-        InProgress = 0,
-        Success = 1,
+        Waiting = 0,
+        InProgress = 1,
+        Success = 2,
     };
 };
 

@@ -1,17 +1,33 @@
 #include "tasklistitem.h"
 
-TaskListItem::TaskListItem(QString name, QObject *parent):
+TaskListItem::TaskListItem(QString name, ApiTask *apiTask, QObject *parent):
     QObject(parent),
+    apiTask(apiTask),
     name(name)
 {
-    status = Enums::TaskStatus::InProgress;
+    if(apiTask != nullptr){
+        apiTask->setParent(this);
+    }
+    status = Enums::TaskStatus::Waiting;
 }
 
-TaskListItem::TaskListItem(const TaskListItem &item):
-    QObject(item.parent())
+TaskListItem::~TaskListItem()
 {
-    name = item.name;
-    status = item.status;
+    if(apiTask != nullptr){
+        delete apiTask;
+    }
+}
+
+void TaskListItem::start()
+{
+    status = Enums::TaskStatus::InProgress;
+    if(apiTask != nullptr){
+        connect(apiTask, &ApiTask::success, this, &TaskListItem::apiTaskSuccessfullyFinished);
+        connect(apiTask, &ApiTask::fail, this, &TaskListItem::apiTaskFailed);
+        connect(apiTask, &ApiTask::newStage, this, &TaskListItem::apiTaskNewStage);
+        qDebug() << "starting apiTask";
+        apiTask->exec();
+    }
 }
 
 const QString &TaskListItem::getName() const
@@ -27,37 +43,31 @@ Enums::TaskStatus TaskListItem::getStatus() const
 void TaskListItem::success()
 {
     status = Enums::TaskStatus::Success;
+    qDebug().nospace().noquote() << "Task \"" << name << "\" successfuly finished";
     emit updated(this);
+    emit finished(this);
     QTimer::singleShot(pauseMsBeforeRemove, this, &TaskListItem::terminate);
 }
 
 void TaskListItem::success(QString newMessage)
 {
     message = newMessage;
+    qDebug().nospace().noquote() << "Task \"" << name << "\" successfuly finished: " << message;
     success();
 }
 
 void TaskListItem::fail()
 {
     status = Enums::TaskStatus::Fail;
+    qWarning().nospace().noquote() << "Task \"" << name << "\" failed";
     emit updated(this);
+    emit finished(this);
 }
 
 void TaskListItem::fail(QString newMessage)
 {
     message = newMessage;
-    fail();
-}
-
-void TaskListItem::fail(QNetworkReply *failedReply)
-{
-    setMessage(getFailedReplyMessage(failedReply));
-    fail();
-}
-
-void TaskListItem::fail(QString newMessage, QNetworkReply *failedReply)
-{
-    setMessage(newMessage + ". " + getFailedReplyMessage(failedReply));
+    qWarning().nospace().noquote() << "Task \"" << name << "\" failed: " << message;
     fail();
 }
 
@@ -73,12 +83,28 @@ void TaskListItem::setMessage(const QString &newMessage)
     emit updated(this);
 }
 
-QString TaskListItem::getFailedReplyMessage(QNetworkReply *failedReply)
+void TaskListItem::setStatus(Enums::TaskStatus newStatus)
 {
-    return "API: [" + QString::number(failedReply->error()) + "]" + failedReply->errorString();
+    status = newStatus;
+    emit updated(this);
 }
 
 void TaskListItem::terminate()
 {
-    emit finished(this);
+    emit readyToDestroy(this);
+}
+
+void TaskListItem::apiTaskSuccessfullyFinished()
+{
+    success();
+}
+
+void TaskListItem::apiTaskFailed(const QString& reason)
+{
+    fail(reason);
+}
+
+void TaskListItem::apiTaskNewStage(const QString &message)
+{
+    setMessage(message);
 }

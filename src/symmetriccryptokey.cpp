@@ -36,7 +36,6 @@ void SymmetricCryptoKey::fillWithKey(QByteArray key)
 {
     this->key = key;
     keyB64 = key.toBase64();
-    qDebug() << "key length" << key.length();
     if(key.length() == 32){
         encType = Enums::EncryptionType::AesCbc256_B64;
         encKey = key;

@@ -1,38 +1,52 @@
 #include "cipherservice.h"
 
-CipherService::CipherService(StateService *stateService, CryptoService *cryptoService,
-                             CipherView *cipherView, QObject *parent) :
+CipherService::CipherService(StateService *stateService,
+                             CryptoService *cryptoService,
+                             CipherView *cipherView,
+                             QObject *parent) :
     QObject(parent),
     stateService(stateService),
     cryptoService(cryptoService),
     cipherView(cipherView)
 {
-    ciphersListModel = new CiphersListModel();
-    cipherFieldsListModel = new CipherFieldsListModel();
-    cipherPasswordHistoryListModel = new CipherPasswordHistoryListModel();
+    ciphersListModel = new CiphersListModel(this);
+    cipherFieldsListModel = new CipherFieldsListModel(this);
+    cipherPasswordHistoryListModel = new CipherPasswordHistoryListModel(this);
 }
 
 void CipherService::decryptAll(bool deletedOnly, QString folderId)
 {
+    filters = CipherFilters(deletedOnly, folderId);
     ciphersListModel->clear();
     QList<Cipher> *ciphers = stateService->getCiphers();
     QList<Cipher>::iterator i;
     for(i = ciphers->begin(); i != ciphers->end(); i++){
-        if(deletedOnly && i->getDeletedDate().isNull()){
+        if(!filters.filter(&*i)){
             continue;
         }
-        if(!folderId.isNull() && i->getFolderId() != folderId){
-            continue;
-        }
-        CipherListItem cipherListItem;
-        cipherListItem.setId(i->getId());
-        cipherListItem.setName(cryptoService->decryptToUtf8((*i).getName()));
-        cipherListItem.setType((*i).getType());
-        if(cipherListItem.getType() == Cipher::CipherType::Login){
-            cipherListItem.setSubtitle(cryptoService->decryptToUtf8((*i).getLogin()->getUsername()));
-        }
-        ciphersListModel->add(cipherListItem);
+        ciphersListModel->add(decrypt(&*i));
     }
+}
+
+bool CipherService::decryptOne(const QString id, const QModelIndex index)
+{
+    QList<Cipher> *ciphers = stateService->getCiphers();
+    QList<Cipher>::iterator i;
+    for(i = ciphers->begin(); i != ciphers->end(); i++){
+        if(!filters.filter(&*i) || i->getId() != id){
+            continue;
+        }
+
+        if(index.isValid()){
+            ciphersListModel->insert(decrypt(&*i), index.row());
+        } else {
+            ciphersListModel->add(decrypt(&*i));
+        }
+
+        return true;
+    }
+
+    return false;
 }
 
 void CipherService::display(QString id)
@@ -151,6 +165,38 @@ void CipherService::clear()
     ciphersListModel->clear();
 }
 
+QModelIndex CipherService::removeFromView(QString id)
+{
+    QModelIndexList list = ciphersListModel->match(ciphersListModel->index(0,0), CiphersListModel::IdRole, id);
+    qDebug() << "Found" << list.count() << "ciphers in the model by id";
+    if(list.count() != 1){
+        qWarning() << "Expected exactly one cipher with id" << id << "but found" << list.count();
+        return QModelIndex();
+    }
+    for(QModelIndex i : list){
+        qDebug() << "Remove cipher at row" << i.row();
+        bool removed = ciphersListModel->removeRow(i.row());
+        if(!removed)
+            qWarning() << "Unable to remove cipher at row" << i.row();
+        return i;
+    }
+    return QModelIndex();
+}
+
+bool CipherService::removeFromState(QString id)
+{
+    QList<Cipher> *ciphers = stateService->getCiphers();
+    int count = ciphers->count();
+    for(int i = 0; i < count; i++){
+        if(ciphers->at(i).getId() != id){
+            continue;
+        }
+        ciphers->removeAt(i);
+        return true;
+    }
+    return false;
+}
+
 CiphersListModel *CipherService::getCiphersListModel() const
 {
     return ciphersListModel;
@@ -164,4 +210,16 @@ CipherFieldsListModel *CipherService::getCipherFieldsListModel() const
 CipherPasswordHistoryListModel *CipherService::getCipherPasswordHistoryListModel() const
 {
     return cipherPasswordHistoryListModel;
+}
+
+CipherListItem CipherService::decrypt(Cipher *cipher)
+{
+    CipherListItem cipherListItem;
+    cipherListItem.setId(cipher->getId());
+    cipherListItem.setName(cryptoService->decryptToUtf8(cipher->getName()));
+    cipherListItem.setType(cipher->getType());
+    if(cipherListItem.getType() == Cipher::CipherType::Login){
+        cipherListItem.setSubtitle(cryptoService->decryptToUtf8(cipher->getLogin()->getUsername()));
+    }
+    return cipherListItem;
 }

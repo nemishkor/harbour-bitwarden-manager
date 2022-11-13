@@ -1,10 +1,11 @@
 #include "api.h"
 
-Api::Api(QSettings *settings, EnvironmentService *environmentService):
+Api::Api(QSettings *settings, EnvironmentService *environmentService, QObject* parent):
+    QObject(parent),
     settings(settings),
     environmentService(environmentService)
 {
-    networkManager = new QNetworkAccessManager();
+    networkManager = new QNetworkAccessManager(this);
 }
 
 QString Api::getLastError()
@@ -96,6 +97,22 @@ QNetworkReply *Api::postFolder(QString name, QString accessToken)
     return reply;
 }
 
+QNetworkReply *Api::removeCipher(QString id, QString accessToken)
+{
+    QNetworkRequest request = buildRequest(QUrl(environmentService->getApiUrl() + "/ciphers/" + id));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
+    request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer " + accessToken.toLatin1()));
+    reply = deleteResource(request);
+    connect(reply, &QNetworkReply::finished, this, &Api::replyFinished);
+
+    return reply;
+}
+
+QString Api::getFailedReplyMessage(QNetworkReply *failedReply)
+{
+    return "API: [" + QString::number(failedReply->error()) + "]" + failedReply->errorString();
+}
+
 QNetworkRequest Api::buildRequest(QUrl url)
 {
     QNetworkRequest request(url);
@@ -141,6 +158,18 @@ QNetworkReply *Api::post(QNetworkRequest request, QByteArray body)
     return networkManager->post(request, body);
 }
 
+QNetworkReply *Api::deleteResource(QNetworkRequest request)
+{
+    logRequest("DELETE", &request);
+
+    requestRunning = true;
+    emit requestRunningChanged();
+    lastError = "";
+    emit lastErrorChanged();
+
+    return networkManager->deleteResource(request);
+}
+
 void Api::replyFinished()
 {
     logReply(reply);
@@ -169,9 +198,11 @@ void Api::logRequest(QString method, QNetworkRequest *request, QByteArray *body)
                .append(request->rawHeader(request->rawHeaderList()[i]))
                .append("\r\n");
 
-    message.append("Body:\r\n")
-           .append(*body)
-           .append("\r\n>>>");
+    if(body != nullptr){
+        message.append("Body:\r\n")
+               .append(*body)
+               .append("\r\n>>>");
+    }
 
     qDebug().nospace().noquote() << message;
 }

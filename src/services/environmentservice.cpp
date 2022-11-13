@@ -1,6 +1,7 @@
 #include "environmentservice.h"
 
-EnvironmentService::EnvironmentService(QSettings *settings):
+EnvironmentService::EnvironmentService(QSettings *settings, QObject* parent):
+    QObject(parent),
     settings(settings)
 {
     apiUrl = settings->value("apiUrl", "https://api.bitwarden.com").toString();

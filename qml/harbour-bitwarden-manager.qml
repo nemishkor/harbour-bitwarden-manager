@@ -5,15 +5,26 @@ import "components"
 
 ApplicationWindow
 {
-    initialPage: Component { Welcome { } }
+
+    function isAuthorized(){
+        return auth.loginStage === 2;
+    }
+
+    initialPage: Qt.resolvedUrl(isAuthorized() ? "pages/Home.qml" : "pages/Welcome.qml")
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
     bottomMargin: statusBar.height
 
     Connections {
-        target: user
-        onAuthenticatedChanged: {
-            pageStack.replaceAbove(null, Qt.resolvedUrl("pages/Welcome.qml"))
+        target: auth
+        onLoginStageChanged: {
+            if(auth.loginStage === 2) {
+                console.log("Open Home page")
+                pageStack.replaceAbove(null, Qt.resolvedUrl("pages/Home.qml"))
+            } else if(auth.loginStage === 0) {
+                console.log("Open Welcome page")
+                pageStack.replaceAbove(null, Qt.resolvedUrl("pages/Welcome.qml"))
+            }
         }
     }
 

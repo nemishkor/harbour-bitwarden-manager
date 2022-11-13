@@ -7,6 +7,12 @@ StateService::StateService(QObject *parent) :
     ciphers = new QList<Cipher>();
 }
 
+StateService::~StateService()
+{
+    delete folders;
+    delete ciphers;
+}
+
 void StateService::add(Folder &item)
 {
     folders->append(item);
@@ -15,6 +21,7 @@ void StateService::add(Folder &item)
 
 void StateService::add(Cipher &item)
 {
+    qDebug() << "Add cipher to state";
     ciphers->append(item);
     emit ciphersWereChanged();
 }

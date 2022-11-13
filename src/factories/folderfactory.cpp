@@ -1,6 +1,7 @@
 #include "folderfactory.h"
 
-FolderFactory::FolderFactory(ApiJsonDumper *apiJsonDumper):
+FolderFactory::FolderFactory(ApiJsonDumper *apiJsonDumper, QObject* parent) :
+    QObject(parent),
     apiJsonDumper(apiJsonDumper)
 {
 

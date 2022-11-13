@@ -4,26 +4,23 @@ TasksListModel::TasksListModel(QObject *parent) : QAbstractListModel(parent)
 {
 }
 
-TaskListItem* TasksListModel::add(TaskListItem &item)
+void TasksListModel::add(TaskListItem *item)
 {
     beginInsertRows(QModelIndex(), items.count(), items.count());
     items.append(item);
-    TaskListItem *added = &items.last();
-    connect(added, &TaskListItem::finished, this, &TasksListModel::itemWasFinished);
-    connect(added, &TaskListItem::updated, this, &TasksListModel::itemWasUpdated);
+    // TODO: run limited number of tasks at the same time
+    connect(item, &TaskListItem::readyToDestroy, this, &TasksListModel::itemIsReadyToDestroy);
+    connect(item, &TaskListItem::updated, this, &TasksListModel::itemWasUpdated);
     endInsertRows();
     emit countChanged();
-
-    return added;
 }
 
-TaskListItem *TasksListModel::create(QString name, TaskListItem *oldTask)
+TaskListItem* TasksListModel::create(QString name, ApiTask *apiTask)
 {
-    if(oldTask != nullptr){
-        remove(oldTask);
-    }
-    TaskListItem task(name);
-    return add(task);
+    TaskListItem* task = new TaskListItem(name, apiTask, this);
+    add(task);
+
+    return task;
 }
 
 int TasksListModel::rowCount(const QModelIndex &parent) const
@@ -37,13 +34,13 @@ QVariant TasksListModel::data(const QModelIndex &index, int role) const
     if (index.row() < 0 || index.row() >= items.count())
         return QVariant();
 
-    const TaskListItem &item = items[index.row()];
+    TaskListItem* item = items[index.row()];
     if (role == NameRole)
-        return item.getName();
+        return item->getName();
     if (role == StatusRole)
-        return (int)item.getStatus();
+        return (int)item->getStatus();
     if (role == MessageRole)
-        return item.getMessage();
+        return item->getMessage();
 
     return QVariant();
 }
@@ -59,9 +56,9 @@ QHash<int, QByteArray> TasksListModel::roleNames() const
 
 QModelIndex TasksListModel::findByRef(TaskListItem *item)
 {
-    QList<TaskListItem>::const_iterator it;
+    QList<TaskListItem*>::const_iterator it;
     for(it = items.constBegin(); it != items.constEnd(); it++){
-        if(&(*it) == item){
+        if((*it) == item){
             int pos = it - items.begin();
             return createIndex(pos, 0);
         }
@@ -69,7 +66,7 @@ QModelIndex TasksListModel::findByRef(TaskListItem *item)
     return createIndex(-1, 0);
 }
 
-void TasksListModel::itemWasFinished(TaskListItem *item)
+void TasksListModel::itemIsReadyToDestroy(TaskListItem *item)
 {
     remove(item);
 }
@@ -82,6 +79,7 @@ void TasksListModel::remove(TaskListItem *item)
         items.removeAt(i.row());
         endRemoveRows();
         emit countChanged();
+        delete item;
         return;
     }
     qWarning() << "Unable to find item to remove. Probably it's removed already";

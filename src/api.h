@@ -25,7 +25,7 @@ class Api : public QObject
     Q_PROPERTY(bool requestRunning READ getRequestRunning NOTIFY requestRunningChanged);
 
 public:
-    Api(QSettings *settings, EnvironmentService *environmentService);
+    Api(QSettings *settings, EnvironmentService *environmentService, QObject* parent = nullptr);
 
     QString getLastError();
     bool getRequestRunning();
@@ -35,6 +35,8 @@ public:
     QNetworkReply *getSync(QString accessToken);
     QNetworkReply *postAccountVerifyPassword(QString masterPasswordHash, QString accessToken);
     QNetworkReply *postFolder(QString name, QString accessToken);
+    QNetworkReply *removeCipher(QString id, QString accessToken);
+    static QString getFailedReplyMessage(QNetworkReply *failedReply);
 
 private:
     QSettings *settings;
@@ -47,9 +49,10 @@ private:
     QByteArray prepareAuthEmailHeaderValue(QString email);
     QNetworkReply *get(QNetworkRequest request);
     QNetworkReply *post(QNetworkRequest request, QByteArray body);
+    QNetworkReply *deleteResource(QNetworkRequest request);
     QNetworkReply *reply;
     void replyFinished();
-    void logRequest(QString method, QNetworkRequest *request, QByteArray *body);
+    void logRequest(QString method, QNetworkRequest *request, QByteArray *body = nullptr);
     void logReply(QNetworkReply *reply);
 
 

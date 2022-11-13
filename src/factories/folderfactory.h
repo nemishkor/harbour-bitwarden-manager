@@ -1,15 +1,16 @@
 #ifndef FOLDERFACTORY_H
 #define FOLDERFACTORY_H
 
-#include <src/apijsondumper.h>
-#include <src/folder.h>
-
 #include <QJsonObject>
 
-class FolderFactory
+#include "src/apijsondumper.h"
+#include "src/models/folder.h"
+
+class FolderFactory : QObject
 {
+    Q_OBJECT
 public:
-    FolderFactory(ApiJsonDumper *apiJsonDumper);
+    FolderFactory(ApiJsonDumper *apiJsonDumper, QObject* parent = nullptr);
     Folder create(QJsonObject apiObject, QString userId);
 
 private:

@@ -17,42 +17,49 @@ CONFIG += sailfishapp
 SOURCES += src/harbour-bitwarden-manager.cpp \
     src/api.cpp \
     src/apijsondumper.cpp \
-    src/appidservice.cpp \
+    src/app.cpp \
     src/auth.cpp \
-    src/authentication.cpp \
-    src/cipher.cpp \
-    src/ciphercard.cpp \
-    src/cipherfield.cpp \
-    src/cipherfieldlistitem.cpp \
-    src/cipherfieldslistmodel.cpp \
-    src/cipheridentity.cpp \
-    src/cipherlistitem.cpp \
-    src/cipherlogin.cpp \
-    src/cipherpasswordhistoryitem.cpp \
-    src/cipherpasswordhistorylistitem.cpp \
-    src/cipherpasswordhistorylistmodel.cpp \
-    src/cipherslistmodel.cpp \
     src/cipherstring.cpp \
-    src/cipherview.cpp \
-    src/cryptoservice.cpp \
     src/enums.cpp \
     src/factories/cipherfactory.cpp \
     src/factories/folderfactory.cpp \
-    src/folder.cpp \
+    src/models/authentication.cpp \
+    src/models/cipher.cpp \
+    src/models/ciphercard.cpp \
+    src/models/cipherfield.cpp \
+    src/models/cipherfilters.cpp \
+    src/models/cipheridentity.cpp \
+    src/models/cipherlogin.cpp \
+    src/models/cipherpasswordhistoryitem.cpp \
+    src/models/folder.cpp \
     src/models/folderlistitem.cpp \
     src/models/folderslistmodel.cpp \
     src/models/responses/identitycaptcharesponse.cpp \
     src/models/tasklistitem.cpp \
     src/models/taskslistmodel.cpp \
+    src/services/appidservice.cpp \
     src/services/cipherservice.cpp \
+    src/services/cryptoservice.cpp \
+    src/services/entitiesservice.cpp \
     src/services/environmentservice.cpp \
     src/services/folderservice.cpp \
     src/services/stateservice.cpp \
+    src/services/syncservice.cpp \
+    src/services/tokenservice.cpp \
     src/symmetriccryptokey.cpp \
-    src/syncservice.cpp \
-    src/tokenservice.cpp \
+    src/tasks/apiauthtask.cpp \
+    src/tasks/apitask.cpp \
+    src/tasks/removeciphertask.cpp \
+    src/tasks/synctask.cpp \
     src/user.cpp \
     src/vaultmanager.cpp \
+    src/viewmodels/cipherfieldlistitem.cpp \
+    src/viewmodels/cipherfieldslistmodel.cpp \
+    src/viewmodels/cipherlistitem.cpp \
+    src/viewmodels/cipherpasswordhistorylistitem.cpp \
+    src/viewmodels/cipherpasswordhistorylistmodel.cpp \
+    src/viewmodels/cipherslistmodel.cpp \
+    src/viewmodels/cipherview.cpp \
     src/viewmodels/vault.cpp
 
 DISTFILES += qml/harbour-bitwarden-manager.qml \
@@ -95,44 +102,51 @@ TRANSLATIONS += translations/harbour-bitwarden-manager-de.ts \
 HEADERS += \
     src/api.h \
     src/apijsondumper.h \
-    src/appidservice.h \
+    src/app.h \
     src/auth.h \
-    src/authentication.h \
-    src/cipher.h \
-    src/ciphercard.h \
-    src/cipherfield.h \
-    src/cipherfieldlistitem.h \
-    src/cipherfieldslistmodel.h \
-    src/cipheridentity.h \
-    src/cipherlistitem.h \
-    src/cipherlogin.h \
-    src/cipherpasswordhistoryitem.h \
-    src/cipherpasswordhistorylistitem.h \
-    src/cipherpasswordhistorylistmodel.h \
-    src/cipherslistmodel.h \
     src/cipherstring.h \
-    src/cipherview.h \
-    src/cryptoservice.h \
     src/devicetype.h \
     src/enums.h \
     src/factories/cipherfactory.h \
     src/factories/folderfactory.h \
-    src/folder.h \
     src/kdftype.h \
+    src/models/authentication.h \
+    src/models/cipher.h \
+    src/models/ciphercard.h \
+    src/models/cipherfield.h \
+    src/models/cipherfilters.h \
+    src/models/cipheridentity.h \
+    src/models/cipherlogin.h \
+    src/models/cipherpasswordhistoryitem.h \
+    src/models/folder.h \
     src/models/folderlistitem.h \
     src/models/folderslistmodel.h \
     src/models/responses/identitycaptcharesponse.h \
     src/models/tasklistitem.h \
     src/models/taskslistmodel.h \
+    src/services/appidservice.h \
     src/services/cipherservice.h \
+    src/services/cryptoservice.h \
+    src/services/entitiesservice.h \
     src/services/environmentservice.h \
     src/services/folderservice.h \
     src/services/stateservice.h \
+    src/services/syncservice.h \
+    src/services/tokenservice.h \
     src/symmetriccryptokey.h \
-    src/syncservice.h \
-    src/tokenservice.h \
+    src/tasks/apiauthtask.h \
+    src/tasks/apitask.h \
+    src/tasks/removeciphertask.h \
+    src/tasks/synctask.h \
     src/user.h \
     src/vaultmanager.h \
+    src/viewmodels/cipherfieldlistitem.h \
+    src/viewmodels/cipherfieldslistmodel.h \
+    src/viewmodels/cipherlistitem.h \
+    src/viewmodels/cipherpasswordhistorylistitem.h \
+    src/viewmodels/cipherpasswordhistorylistmodel.h \
+    src/viewmodels/cipherslistmodel.h \
+    src/viewmodels/cipherview.h \
     src/viewmodels/vault.h
 
 QT += network

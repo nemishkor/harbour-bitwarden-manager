@@ -1,11 +1,13 @@
 #ifndef TASKSLISTMODEL_H
 #define TASKSLISTMODEL_H
 
-#include "tasklistitem.h"
 
 #include <QAbstractListModel>
 #include <QDebug>
 #include <QTimer>
+
+#include "tasklistitem.h"
+#include "src/tasks/apitask.h"
 
 class TasksListModel : public QAbstractListModel
 {
@@ -20,8 +22,8 @@ public:
     };
     explicit TasksListModel(QObject *parent = nullptr);
 
-    TaskListItem* add(TaskListItem &item);
-    TaskListItem *create(QString name, TaskListItem *oldTask);
+    void add(TaskListItem *item);
+    TaskListItem* create(QString name, ApiTask *apiTask = nullptr);
     void remove(TaskListItem *item);
     bool contains(TaskListItem *item);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -30,14 +32,14 @@ public:
 protected:
     QHash<int, QByteArray> roleNames() const override;
 private:
-    QList<TaskListItem> items;
+    QList<TaskListItem*> items;
     QModelIndex findByRef(TaskListItem *item);
 
 signals:
     void countChanged();
 
 private slots:
-    void itemWasFinished(TaskListItem *item);
+    void itemIsReadyToDestroy(TaskListItem *item);
     void itemWasUpdated(TaskListItem *item);
 };
 

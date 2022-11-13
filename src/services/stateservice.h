@@ -3,14 +3,15 @@
 
 #include <QList>
 
-#include "src/cipher.h"
-#include "src/folder.h"
+#include "src/models/cipher.h"
+#include "src/models/folder.h"
 
 class StateService : public QObject
 {
     Q_OBJECT
 public:
     explicit StateService(QObject *parent = nullptr);
+    ~StateService();
 
     void add(Folder &item);
     void add(Cipher &item);

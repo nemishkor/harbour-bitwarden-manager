@@ -7,31 +7,35 @@
 #include <QLocale>
 #include <QTimeZone>
 
+#include "cryptoservice.h"
+#include "tokenservice.h"
+#include "stateservice.h"
 #include "src/api.h"
-#include "src/cryptoservice.h"
 #include "src/factories/folderfactory.h"
-#include "src/folder.h"
+#include "src/models/folder.h"
 #include "src/models/folderlistitem.h"
 #include "src/models/folderslistmodel.h"
 #include "src/models/taskslistmodel.h"
-#include "src/tokenservice.h"
-#include "stateservice.h"
 
 class FolderService : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(int creating READ isCreating NOTIFY creatingChanged)
+    Q_PROPERTY(bool creating READ isCreating NOTIFY creatingChanged)
+    Q_PROPERTY(bool removing READ isRemoving NOTIFY removingChanged)
 public:
-    FolderService(StateService *stateService, CryptoService *cryptoService,
+    FolderService(FolderFactory *folderService,
+                  StateService *stateService,
+                  CryptoService *cryptoService,
                   TokenService *tokenService,
-                  ApiJsonDumper *apiJsonDumper,
                   TasksListModel *tasksListModel,
                   Api *api, QObject *parent = nullptr);
 
     Q_INVOKABLE void decryptAll();
     Q_INVOKABLE void create(QString name);
+    Q_INVOKABLE void removeSelected();
 
     bool isCreating();
+    bool isRemoving();
 
     FoldersListModel *getListModel() const;
     void clear();
@@ -40,6 +44,7 @@ public:
 
 private:
     bool decrypted = false;
+    FolderFactory *folderFactory;
     StateService *stateService;
     CryptoService *cryptoService;
     TokenService *tokenService;
@@ -48,15 +53,20 @@ private:
     QLocale locale;
     FolderListItem *savingListItemFolder;
     QNetworkReply *postFolderReply;
-    FolderFactory *folderFactory;
     TasksListModel *tasksListModel;
     TaskListItem *createFolderTask;
     void cancelSavingListItemFolder();
 
     void addListItemToModel(Folder *folder);
 
+    QStringList removingFolders;
+    TaskListItem *removeFoldersTask;
+    void setRemoveFoldersTask(TaskListItem *removeFoldersTask);
+
 public slots:
+    void createFolderTaskWasFinished();
     void createFolderTaskWasUpdated();
+    void removeFolderTaskWasUpdated();
 
 private slots:
     void postFolderRefreshTokenSuccess();
@@ -65,6 +75,7 @@ private slots:
 
 signals:
     void creatingChanged();
+    void removingChanged();
 };
 
 #endif // FOLDERSERVICE_H

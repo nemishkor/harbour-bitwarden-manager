@@ -1,6 +1,7 @@
 #include "cipherfactory.h"
 
-CipherFactory::CipherFactory(ApiJsonDumper *apiJsonDumper):
+CipherFactory::CipherFactory(ApiJsonDumper *apiJsonDumper, QObject* parent) :
+    QObject(parent),
     apiJsonDumper(apiJsonDumper)
 {
 
@@ -8,6 +9,7 @@ CipherFactory::CipherFactory(ApiJsonDumper *apiJsonDumper):
 
 Cipher CipherFactory::create(QJsonObject apiCipher, QString userId)
 {
+    qDebug() << "Begin";
     apiJsonDumper->dumpCipherFields(&apiCipher);
 
     QJsonArray::const_iterator i, cipherChildArrIt;
@@ -15,6 +17,7 @@ Cipher CipherFactory::create(QJsonObject apiCipher, QString userId)
     QJsonArray fields, passwordHistory;
 
     Cipher cipher(CipherString(apiCipher["name"].toString()));
+    qDebug() << "Set base fields";
     cipher.setId(apiCipher["id"].toString());
     if(apiCipher["organizationId"].isString()) {
         cipher.setOrganizationId(apiCipher["organizationId"].toString());
@@ -36,9 +39,12 @@ Cipher CipherFactory::create(QJsonObject apiCipher, QString userId)
     }
 
     if(apiCipher.contains("login") && apiCipher["login"].isObject()){
+        qDebug() << "Set login fields";
         l = apiCipher["login"].toObject();
         apiJsonDumper->dumpCipherLoginFields(&l);
-        cipher.getLogin()->fillPassword(l["password"].toString());
+        if(l["password"].isString()){
+            cipher.getLogin()->fillPassword(l["password"].toString());
+        }
         if(l["passwordRevisionDate"].isString()){
             cipher.getLogin()->setPasswordRevisionDate(l["passwordRevisionDate"].toString());
         }
@@ -48,10 +54,13 @@ Cipher CipherFactory::create(QJsonObject apiCipher, QString userId)
         if(l["totp"].isString()) {
             cipher.getLogin()->fillTotp(l["totp"].toString());
         }
-        cipher.getLogin()->fillUsername(l["username"].toString());
+        if(l["username"].isString()){
+            cipher.getLogin()->fillUsername(l["username"].toString());
+        }
     }
 
     if(apiCipher.contains("card") && apiCipher["card"].isObject()){
+        qDebug() << "Set card fields";
         card = apiCipher["card"].toObject();
         apiJsonDumper->dumpCipherCardFields(&card);
         if(card["brand"].isString()){
@@ -75,7 +84,7 @@ Cipher CipherFactory::create(QJsonObject apiCipher, QString userId)
     }
 
     if(apiCipher.contains("identity") && apiCipher["identity"].isObject()){
-        qDebug() << "Sync identity cipher";
+        qDebug() << "Set identity fields";
         identity = apiCipher["identity"].toObject();
         apiJsonDumper->dumpCipherIdentityFields(&identity);
 
@@ -138,6 +147,7 @@ Cipher CipherFactory::create(QJsonObject apiCipher, QString userId)
 
     fields = c["fields"].toArray();
     for(cipherChildArrIt = fields.constBegin(); cipherChildArrIt != fields.constEnd(); cipherChildArrIt++){
+        qDebug() << "Add additional field";
         cipherChildArrItem = (*cipherChildArrIt).toObject();
         cipher.addField(CipherField(
             CipherString(cipherChildArrItem["name"].toString()),
@@ -149,6 +159,7 @@ Cipher CipherFactory::create(QJsonObject apiCipher, QString userId)
     if(apiCipher["passwordHistory"].isArray()){
         passwordHistory = c["passwordHistory"].toArray();
         for(cipherChildArrIt = passwordHistory.constBegin(); cipherChildArrIt != passwordHistory.constEnd(); cipherChildArrIt++){
+            qDebug() << "Add password history item";
             cipherChildArrItem = (*cipherChildArrIt).toObject();
             apiJsonDumper->dumpCipherPasswordHistoryFields(&cipherChildArrItem);
             cipher.addPasswordHistoryItem(CipherPasswordHistoryItem(

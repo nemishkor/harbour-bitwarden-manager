@@ -3,7 +3,8 @@
 
 #include <QObject>
 
-#include <src/services/stateservice.h>
+#include "src/services/stateservice.h"
+#include "src/models/cipher.h"
 
 class Vault : public QObject
 {

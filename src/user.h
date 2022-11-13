@@ -18,7 +18,7 @@ class User : public QObject
     Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
     Q_PROPERTY(QString premium READ getPremium NOTIFY premiumChanged)
 public:
-    User(QSettings *settings);
+    User(QSettings *settings, QObject* parent = nullptr);
 
     // on successfully login
     void fillOnAutheticate(QString userId, QString email, KdfType kdf, int kdfIterations);

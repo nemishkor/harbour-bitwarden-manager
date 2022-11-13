@@ -25,11 +25,9 @@ Page {
     SilicaFlickable {
         anchors {
             fill: parent
-            rightMargin: page.isPortrait ? 0 : progressPanel.visibleSize
-            bottomMargin: page.isPortrait ? progressPanel.visibleSize : 0
         }
 
-        clip: isPortrait && progressPanel.expanded
+        clip: isPortrait
 
         // Tell SilicaFlickable the height of its content.
         contentHeight: column.height
@@ -151,7 +149,8 @@ Page {
     }
 
     onStatusChanged: {
-        if (status == PageStatus.Active && auth.loginStage === 2) { // if authorized already
+        if (status == PageStatus.Active && auth.loginStage === 2) {
+            console.log("User is authorized already")
             pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"), {}, PageStackAction.Immediate)
         }
     }
@@ -165,9 +164,6 @@ Page {
                 } else {
                     passwordField.forceActiveFocus()
                 }
-            }
-            if(auth.loginStage === 2){
-                pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"))
             }
         }
     }

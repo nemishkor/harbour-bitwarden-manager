@@ -5,12 +5,11 @@
 #include <QJsonObject>
 #include <QString>
 
-
-
-class ApiJsonDumper
+class ApiJsonDumper : public QObject
 {
+    Q_OBJECT
 public:
-    ApiJsonDumper();
+    explicit ApiJsonDumper(QObject* parent = nullptr);
 
     void dumpSyncFields(QJsonObject *object);
     void dumpProfileFields(QJsonObject *object);

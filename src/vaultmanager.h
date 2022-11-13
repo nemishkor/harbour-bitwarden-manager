@@ -7,8 +7,8 @@
 #include <QString>
 
 #include "api.h"
-#include "cryptoservice.h"
-#include "tokenservice.h"
+#include "src/services/cryptoservice.h"
+#include "src/services/tokenservice.h"
 #include "user.h"
 
 class VaultManager : public QObject
@@ -19,7 +19,7 @@ class VaultManager : public QObject
     Q_PROPERTY(QString unlockMessage READ getUnlockMessage NOTIFY unlockMessageChanged)
 
 public:
-    explicit VaultManager(CryptoService *cryptoService, User *user, Api *api, TokenService *tokenService);
+    explicit VaultManager(CryptoService *cryptoService, User *user, Api *api, TokenService *tokenService, QObject* parent = nullptr);
     Q_INVOKABLE void unlock(QString password);
     Q_INVOKABLE void lock();
     bool isLocked();

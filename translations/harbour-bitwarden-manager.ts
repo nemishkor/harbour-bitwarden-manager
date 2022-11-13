@@ -215,18 +215,27 @@
         <source>Ciphers</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unselect all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CoverPage</name>
     <message>
         <source>My Cover</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Folder</name>
-    <message>
-        <source>New folder</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -355,11 +364,15 @@
 <context>
     <name>SyncBlock</name>
     <message>
+        <source>Sync</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Data is not synchronized</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sync</source>
+        <source>Syncing...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

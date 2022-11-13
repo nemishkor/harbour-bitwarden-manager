@@ -104,10 +104,4 @@ Page {
 
     }
 
-    onStatusChanged: {
-        if (status == PageStatus.Active && auth.loginStage === 4) { // if authorized already
-            pageStack.animatorReplace(Qt.resolvedUrl("Home.qml"), {}, PageStackAction.Immediate)
-        }
-    }
-
 }

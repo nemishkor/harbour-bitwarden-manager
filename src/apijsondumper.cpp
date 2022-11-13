@@ -1,6 +1,6 @@
 #include "apijsondumper.h"
 
-ApiJsonDumper::ApiJsonDumper()
+ApiJsonDumper::ApiJsonDumper(QObject *parent) : QObject(parent)
 {
 
 }

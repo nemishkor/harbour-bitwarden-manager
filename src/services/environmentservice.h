@@ -11,7 +11,7 @@ class EnvironmentService : public QObject
     Q_PROPERTY(QString identityUrl READ getIdentityUrl WRITE setIdentityUrl NOTIFY identityUrlChanged);
 
 public:
-    EnvironmentService(QSettings *settings);
+    EnvironmentService(QSettings *settings, QObject* parent = nullptr);
 
     QString getApiUrl();
     void setApiUrl(const QString &value);

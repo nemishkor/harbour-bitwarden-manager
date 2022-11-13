@@ -8,21 +8,20 @@
 #include <QQuickView>
 #include <QQmlContext>
 #include <QMutex>
-
-#include <src/viewmodels/vault.h>
-
-#include <src/models/taskslistmodel.h>
-
 #include <sailfishapp.h>
+
 #include "api.h"
+#include "app.h"
 #include "auth.h"
-#include "appidservice.h"
-#include "cipherview.h"
+#include "src/models/taskslistmodel.h"
+#include "src/viewmodels/vault.h"
+#include "src/viewmodels/cipherview.h"
+#include "src/services/appidservice.h"
 #include "src/services/cipherservice.h"
-#include "cryptoservice.h"
-#include "syncservice.h"
-#include "services/environmentservice.h"
-#include "tokenservice.h"
+#include "src/services/cryptoservice.h"
+#include "src/services/environmentservice.h"
+#include "src/services/syncservice.h"
+#include "src/services/tokenservice.h"
 #include "vaultmanager.h"
 #include "user.h"
 
@@ -46,6 +45,12 @@ void msgHandler(QtMsgType type, const QMessageLogContext & context, const QStrin
     mutex.unlock();
 }
 
+class Goo{
+public:
+    Goo(QString name): name(name){}
+    QString name;
+};
+
 int main(int argc, char *argv[])
 {
 //    qInstallMessageHandler(msgHandler);
@@ -61,71 +66,34 @@ int main(int argc, char *argv[])
     // To display the view, call "show()" (will show fullscreen on device).
 
     // Set up QML engine.
-    QScopedPointer<QGuiApplication> app(SailfishApp::application(argc, argv));
+    QScopedPointer<QGuiApplication> guiApp(SailfishApp::application(argc, argv));
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
     QQmlContext *context = view.data()->rootContext();
-    QSettings settings("harbour-bitwarden-manager");
 
-    StateService stateService;
+    App app(*view);
 
-    TasksListModel tasks;
-    context->setContextProperty("tasks", &tasks);
-
-    EnvironmentService environmentService(&settings);
-    context->setContextProperty("environmentService", &environmentService);
-
-    Api api(&settings, &environmentService);
-    context->setContextProperty("api", &api);
-
-    TokenService tokenService(&settings, &api);
-    context->setContextProperty("tokenService", &tokenService);
-
-    CryptoService crypto(&settings);
-    context->setContextProperty("crypto", &crypto);
-
-    AppIdService appIdService(&settings);
-
-    User user(&settings);
-    context->setContextProperty("user", &user);
-
-    CipherView cipher;
-    context->setContextProperty("cipher", &cipher);
-
-    CipherService cipherService(&stateService, &crypto, &cipher);
-    context->setContextProperty("cipherService", &cipherService);
-    context->setContextProperty("ciphersListModel", cipherService.getCiphersListModel());
-    context->setContextProperty("cipherFieldsListModel", cipherService.getCipherFieldsListModel());
-    context->setContextProperty("cipherPasswordHistoryListModel", cipherService.getCipherPasswordHistoryListModel());
-
-    Vault vault(&stateService);
-    context->setContextProperty("vault", &vault);
-
-    ApiJsonDumper apiJsonDumper;
-
-    FolderService foldersService(&stateService, &crypto, &tokenService, &apiJsonDumper, &tasks, &api);
-    context->setContextProperty("foldersService", &foldersService);
-    context->setContextProperty("foldersListModel", foldersService.getListModel());
-
-    SyncService syncService(&api, &user, &tokenService, &crypto, &stateService, &foldersService,
-                            &cipherService, &settings, &apiJsonDumper, &tasks);
-    context->setContextProperty("syncService", &syncService);
-
-    Auth auth(&appIdService, &tokenService, &api, &crypto, &user, &syncService, &tasks);
-    context->setContextProperty("auth", &auth);
-
-    VaultManager vaultManager(&crypto, &user, &api, &tokenService);
-    context->setContextProperty("vaultManager", &vaultManager);
-
-    QDateTime UTC(QDateTime::currentDateTimeUtc());
-    QDateTime local(UTC.toLocalTime());
-    qDebug() << "UTC time is:" << UTC;
-    qDebug() << "Local time is:" << local;
-    qDebug() << "No difference between times:" << UTC.secsTo(local);
-
+    context->setContextProperty("tasks", app.getTasksListModel());
+    context->setContextProperty("environmentService", app.getEnvironmentService());
+    context->setContextProperty("api", app.getApi());
+    context->setContextProperty("tokenService", app.getTokenService());
+    context->setContextProperty("crypto", app.getCryptoService());
+    context->setContextProperty("user", app.getUser());
+    context->setContextProperty("cipher", app.getCipher());
+    context->setContextProperty("cipherService", app.getCipherService());
+    context->setContextProperty("ciphersListModel", app.getCipherService()->getCiphersListModel());
+    context->setContextProperty("cipherFieldsListModel", app.getCipherService()->getCipherFieldsListModel());
+    context->setContextProperty("cipherPasswordHistoryListModel", app.getCipherService()->getCipherPasswordHistoryListModel());
+    context->setContextProperty("vault", app.getVault());
+    context->setContextProperty("foldersService", app.getFoldersService());
+    context->setContextProperty("foldersListModel", app.getFoldersService()->getListModel());
+    context->setContextProperty("syncService", app.getSyncService());
+    context->setContextProperty("auth", app.getAuth());
+    context->setContextProperty("vaultManager", app.getVaultManager());
+    context->setContextProperty("entitiesService", app.getEntitiesService());
 
     // Start the application.
     view->setSource(SailfishApp::pathTo("qml/harbour-bitwarden-manager.qml"));
     view->show();
-    return app->exec();
+    return guiApp->exec();
 }

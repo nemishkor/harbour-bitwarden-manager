@@ -42,7 +42,9 @@ DockedPanel {
         function iconNameByStatusCode(status){
             if(status === -1)
                 return "icon-s-high-importance"
-            if(status === 1)
+            if(status === 0)
+                return "icon-s-time"
+            if(status === 2)
                 return "icon-s-checkmark"
             return "icon-s-maybe"
         }
@@ -67,14 +69,14 @@ DockedPanel {
                 }
 
                 BusyIndicator {
-                    visible: model.status === 0
+                    visible: model.status === 1
                     running: visible
                     size: BusyIndicatorSize.ExtraSmall
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 Icon {
-                    visible: model.status !== 0
+                    visible: model.status !== 1
                     source: {
                         var source = "image://theme/"
                                 + list.iconNameByStatusCode(model.status)

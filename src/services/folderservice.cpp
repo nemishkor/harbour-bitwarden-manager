@@ -1,22 +1,24 @@
 #include "folderservice.h"
 
-FolderService::FolderService(StateService *stateService, CryptoService *cryptoService,
+FolderService::FolderService(FolderFactory *folderFactory,
+                             StateService *stateService,
+                             CryptoService *cryptoService,
                              TokenService *tokenService,
-                             ApiJsonDumper *apiJsonDumper,
                              TasksListModel *tasksListModel,
                              Api *api, QObject *parent):
     QObject(parent),
+    folderFactory(folderFactory),
     stateService(stateService),
     cryptoService(cryptoService),
     tokenService(tokenService),
     api(api),
     tasksListModel(tasksListModel)
 {
-    listModel = new FoldersListModel();
+    listModel = new FoldersListModel(this);
     locale = QLocale::system();
     savingListItemFolder = nullptr;
     createFolderTask = nullptr;
-    folderFactory = new FolderFactory(apiJsonDumper);
+    removeFoldersTask = nullptr;
 }
 
 void FolderService::addListItemToModel(Folder *folder)
@@ -27,7 +29,7 @@ void FolderService::addListItemToModel(Folder *folder)
     FolderListItem listItem;
     listItem.setId(folder->getId());
     listItem.setName(cryptoService->decryptToUtf8(folder->getName()));
-    // remove redundant part of the dateTime string
+    // removing redundant part of the dateTime string
     // Bitwarden returns as example:
     // 2022-09-30T20:23:23.2123432Z
     // We need only "2022-09-30T20:23:23" part
@@ -42,6 +44,11 @@ void FolderService::addListItemToModel(Folder *folder)
 void FolderService::createFolderTaskWasUpdated()
 {
     emit creatingChanged();
+}
+
+void FolderService::removeFolderTaskWasUpdated()
+{
+    emit removingChanged();
 }
 
 void FolderService::decryptAll()
@@ -68,8 +75,14 @@ void FolderService::decryptAll()
 
 void FolderService::create(QString name)
 {
-    createFolderTask = tasksListModel->create("Add folder", createFolderTask);
+    if(createFolderTask != nullptr) {
+        qWarning() << "create folder task is exist already. Unable to create another one";
+        return;
+    }
+    createFolderTask = tasksListModel->create("Add folder");
+    connect(createFolderTask, &TaskListItem::finished, this, &FolderService::createFolderTaskWasFinished);
     connect(createFolderTask, &TaskListItem::updated, this, &FolderService::createFolderTaskWasUpdated);
+    createFolderTask->start();
     emit creatingChanged();
     FolderListItem folderListItem;
     folderListItem.setName(name);
@@ -82,11 +95,43 @@ void FolderService::create(QString name)
     tokenService->validateToken();
 }
 
+void FolderService::removeSelected()
+{
+    if(isRemoving()){
+        qCritical() << "Unable to run 'remove' task. It's in progress already";
+        return;
+    }
+
+
+    // TODO:
+//    setRemoveFoldersTask(tasksListModel->create("Remove folder(s)", removeFoldersTask));
+
+}
+
 bool FolderService::isCreating()
 {
     return createFolderTask != nullptr
             && tasksListModel->contains(createFolderTask)
             && createFolderTask->getStatus() == Enums::TaskStatus::InProgress;
+}
+
+bool FolderService::isRemoving()
+{
+    return removeFoldersTask != nullptr
+            && tasksListModel->contains(removeFoldersTask)
+            && removeFoldersTask->getStatus() == Enums::TaskStatus::InProgress;
+}
+
+void FolderService::setRemoveFoldersTask(TaskListItem *newRemoveFoldersTask)
+{
+    removeFoldersTask = newRemoveFoldersTask;
+    connect(removeFoldersTask, &TaskListItem::updated, this, &FolderService::removeFolderTaskWasUpdated);
+    emit removingChanged();
+}
+
+void FolderService::createFolderTaskWasFinished()
+{
+    createFolderTask = nullptr;
 }
 
 FoldersListModel *FolderService::getListModel() const
@@ -142,7 +187,7 @@ void FolderService::postFolderSuccess()
     setSavingListItemFolder(nullptr);
 
     if(postFolderReply->error() != QNetworkReply::NoError && postFolderReply->error() != QNetworkReply::ProtocolInvalidOperationError){
-        createFolderTask->fail(postFolderReply);
+        createFolderTask->fail(Api::getFailedReplyMessage(postFolderReply));
         cancelSavingListItemFolder();
         return;
     }

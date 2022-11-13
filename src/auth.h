@@ -8,18 +8,17 @@
 #include <QList>
 #include <QUrlQuery>
 
-
 #include "kdftype.h"
 #include "api.h"
-#include "authentication.h"
-#include "cryptoservice.h"
-#include "appidservice.h"
 #include "devicetype.h"
-#include "tokenservice.h"
 #include "user.h"
 #include "symmetriccryptokey.h"
-#include "syncservice.h"
+#include "src/services/appidservice.h"
+#include "src/services/cryptoservice.h"
+#include "src/services/syncservice.h"
+#include "src/services/tokenservice.h"
 #include "models/responses/identitycaptcharesponse.h"
+#include "src/models/authentication.h"
 #include "src/models/tasklistitem.h"
 #include "src/models/taskslistmodel.h"
 
@@ -35,7 +34,8 @@ public:
          CryptoService *crypto,
          User *user,
          SyncService *syncService,
-         TasksListModel *tasksListModel);
+         TasksListModel *tasksListModel,
+         QObject* parent = nullptr);
     Q_INVOKABLE void reset();
     Q_INVOKABLE void login(QString email, QString password, QString apiKey);
     Q_INVOKABLE void logout();
@@ -82,6 +82,9 @@ private:
     void preLoginReplyHandler();
     QByteArray makeIdentityTokenRequestBody();
     void postAuthenticate();
+
+private slots:
+    void loginTaskWasFinished();
 
 };
 

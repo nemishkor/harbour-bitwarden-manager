@@ -1,6 +1,6 @@
 #include "user.h"
 
-User::User(QSettings *settings) : QObject(nullptr), settings(settings)
+User::User(QSettings *settings, QObject* parent) : QObject(parent), settings(settings)
 {
     setIsAuthenticated(false);
     if(settings->contains("userId") && settings->contains("email")){
@@ -109,6 +109,8 @@ void User::clear()
     settings->remove("userId");
     settings->remove("email");
     settings->remove("securityStamp");
+    settings->remove("kdf");
+    settings->remove("kdfIterations");
     settings->sync();
     setIsAuthenticated(false);
 }

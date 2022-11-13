@@ -213,7 +213,23 @@
     <name>Ciphers</name>
     <message>
         <source>Ciphers</source>
-        <translation>Chiffer</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unselect all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -222,13 +238,6 @@
         <source>My Cover</source>
         <translation>Bitwarden
 Manager</translation>
-    </message>
-</context>
-<context>
-    <name>Folder</name>
-    <message>
-        <source>New folder</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -356,12 +365,16 @@ Manager</translation>
 <context>
     <name>SyncBlock</name>
     <message>
-        <source>Data is not synchronized</source>
-        <translation>Data är inte synkroniserad</translation>
-    </message>
-    <message>
         <source>Sync</source>
         <translation>Synkronisera</translation>
+    </message>
+    <message>
+        <source>Data is not synchronized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Syncing...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
